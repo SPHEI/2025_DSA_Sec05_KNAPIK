@@ -1,0 +1,124 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="45341298-9851-B1C3-2C25-8244CF5F21CE" name="Subcontractor">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>5B3A4EFB-5669-0281-1983-15CE6ED6B1ED</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id" id="36EF6F9A-BDE7-1F1E-C328-7E50AC868800">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>2947DAAA-E52D-1B36-C3BB-A3868C829329</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="name" id="B7342355-2552-58FF-8120-9C9DCF949636">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>04813599-6B3E-6931-FB47-D0F86DECAB42</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>6A8B4227-5A35-135B-2002-C9BA215E1146</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="email" id="81FA119B-E9F6-04B3-35F8-21610734D029">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>F848DF83-04DC-B9CF-958D-F3AA63708871</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>6A8B4227-5A35-135B-2002-C9BA215E1146</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="phone" id="C122AEFE-F09E-BFB9-361F-BEBED764F32D">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>52F53E16-5E02-9096-ACA6-1B9F51D53C6C</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>32CEE7E1-8815-9D28-AD58-D28BE70BFF4C</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="address" id="7CB109B5-70E8-5F22-E0DB-62A7FBC2722C">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>0E8392B9-2CFD-CF64-5626-1E5C6095096D</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>F69FEE30-E029-6C58-2C8A-BDA81D7EEA06</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="NIP" id="3F10661A-CAAC-2397-6E98-1CC85E7E7B29">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>144F32C1-6DC2-BA31-E1F8-607858C4B6EA</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>32CEE7E1-8815-9D28-AD58-D28BE70BFF4C</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="speciality" id="D4D7298E-D003-29A6-AB45-D8826D314E91">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>7F7053B9-8BE5-2B5B-DBBF-999756201696</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>6A8B4227-5A35-135B-2002-C9BA215E1146</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="81DA2960-606E-185A-05AF-3E73B00024EF" name="Subcontractor_PK">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>BB53C743-9C01-9FB1-5D36-450B1BB6D98B</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="36EF6F9A-BDE7-1F1E-C328-7E50AC868800"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="0B9624BF-7BE1-AD71-3ABB-C77FBDA7D644" name="INDEX_1v1">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>48A3E357-357B-416C-4DDE-FC629F42BC58</importedID>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="81FA119B-E9F6-04B3-35F8-21610734D029"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

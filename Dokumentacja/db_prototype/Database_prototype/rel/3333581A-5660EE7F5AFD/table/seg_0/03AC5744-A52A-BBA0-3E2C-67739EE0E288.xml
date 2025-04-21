@@ -1,0 +1,143 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="03AC5744-A52A-BBA0-3E2C-67739EE0E288" name="FaultReport">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>C25A2A62-1443-3596-10AD-A51FF8B78491</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id" id="31B37AF5-C3C7-2E7F-CA98-EACE92259DD2">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>B71BCE30-9D48-C5B5-255F-64F603A1A389</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="description" id="9DCDDF8A-7A3D-809C-F844-FB3EBFBB21AE">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>B1255C39-DD84-2B26-E124-50835FD5B12F</importedID>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="date_reported" id="DCA29CCA-14CA-A7C7-6A81-FC925CEAC7F0">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>83479863-2B53-BBF3-91F1-D1860055AA66</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<domain>4CC901EB-C4CF-394F-424A-637213532CF9</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="status" id="3DEDB0BC-F07A-89C3-0A7E-27BE70A05AD2">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>6876956E-962F-BFFF-4391-5CE160D7A1D8</importedID>
+<useDomainConstraints>false</useDomainConstraints>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>564393FD-00C8-5074-D3A6-81CEE13DF96D</domain>
+<listOfValues>
+<valueDef value="closed" description=""/>
+<valueDef value="open" description=""/>
+</listOfValues>
+<defaultValue>&apos;open&apos;</defaultValue>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ordered_by_user" id="42B35DBB-26C3-B662-73B2-9067D921AC9C">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>BA882196-FBC2-7550-BD08-C63D51EFB6C0</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="BA009780-A980-6DB4-6AAA-846E738A75BF" referredColumn="51A1483B-CD82-5607-F032-0A6B2010F960"/>
+</associations>
+</Column>
+<Column name="apartament_id" id="9F669AAE-DA3C-1882-380F-3E2C1DBE4EF2">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>E45D3647-15F2-F0D9-FCD8-814A35DFF827</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="82EB4B66-0232-C679-DC4B-2C35E903AFE7" referredColumn="9EE3BB7C-F333-5B0D-79F6-86F64A5C0868"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="87874B6A-B830-E202-0E05-1FE2CDBBCC8C" name="FaultReport_PK">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>3A8A2F06-65DF-BD78-DCA7-5EB642E8DD00</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="31B37AF5-C3C7-2E7F-CA98-EACE92259DD2"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="DB13EB27-8723-2386-3EAF-D20B7ACD10DB" name="date_reported">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>16D03CB9-6CC8-8084-12C1-ACD08D2FC665</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="DCA29CCA-14CA-A7C7-6A81-FC925CEAC7F0"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="397BFF59-BCD0-1250-1589-8CBA6E629246" name="FaultReport_Apartament_FK">
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="9F669AAE-DA3C-1882-380F-3E2C1DBE4EF2"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="8235756D-157D-BC1A-8CAB-BAB1D66BC9A1" name="FaultReport_User_FK">
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="42B35DBB-26C3-B662-73B2-9067D921AC9C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

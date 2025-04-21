@@ -1,0 +1,186 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="7A934594-6BFB-46B5-D54E-1B0C3CDC8E55" name="payments">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>998E8CEA-9D0B-0B65-870C-A65B36842CF0</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id" id="2D39F33D-0F06-EBB3-63CC-8AE066DBAF29">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>2F2DA5C4-0C6F-0C21-A0B4-FBEF89989291</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="user_id" id="3E5A4B7D-098F-D906-DC40-39B586D18BB0">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>E421E78C-11D8-45A7-181C-7D6DAC505C07</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="6B34BF50-723E-B292-2351-CF1DAE789464" referredColumn="51A1483B-CD82-5607-F032-0A6B2010F960"/>
+</associations>
+</Column>
+<Column name="apartament_id" id="D000A405-88D9-2DF3-1F5F-B607F53ADC83">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>1A3C8E3A-743A-A3F8-E600-010CD35CFE7C</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="61B0A241-8E70-5B36-18EA-F1F59549F1BC" referredColumn="9EE3BB7C-F333-5B0D-79F6-86F64A5C0868"/>
+</associations>
+</Column>
+<Column name="amount" id="48A04E48-9F54-72BB-A736-8E6E24C9CFAA">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>D98B5DCF-AAD2-7898-A40E-3C343916EBCB</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT026</logicalDatatype>
+<domain>312EAEB7-5C07-CA55-36EB-1A149DEA6426</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="payment_date" id="2BCC2B68-BDC2-CD73-DEE1-46EEC5E1DBE4">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>B8975525-BAC8-C918-FE27-BD69E117C516</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<domain>4CC901EB-C4CF-394F-424A-637213532CF9</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="status" id="EACD5B5B-7361-4DAE-0559-C94FD26447E1">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>F39E0D55-A149-E5BD-64A8-9709C03148E9</importedID>
+<useDomainConstraints>false</useDomainConstraints>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>564393FD-00C8-5074-D3A6-81CEE13DF96D</domain>
+<listOfValues>
+<valueDef value="completed" description=""/>
+<valueDef value="failed" description=""/>
+<valueDef value="pending" description=""/>
+</listOfValues>
+<defaultValue>&apos;pending&apos;</defaultValue>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="payment_method" id="80C6BF59-FB88-CC99-3A44-35DE9158C356">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>F9DD2726-1C8A-BA12-31CE-659AA1E16F75</importedID>
+<useDomainConstraints>false</useDomainConstraints>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>564393FD-00C8-5074-D3A6-81CEE13DF96D</domain>
+<listOfValues>
+<valueDef value="bank_transfer" description=""/>
+<valueDef value="cash" description=""/>
+<valueDef value="credit_card" description=""/>
+</listOfValues>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="transaction_reference" id="1367E4F8-3E29-2773-707B-012F94EC9BCA">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>A204FD63-6FB9-1F94-23DE-E3D863E29A50</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>6A8B4227-5A35-135B-2002-C9BA215E1146</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="078CEEB3-5B69-EA7B-CBB5-626F6B14A630" name="payments_PK">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>98202C01-49A5-1F3B-DC90-ACF719DA51EE</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="2D39F33D-0F06-EBB3-63CC-8AE066DBAF29"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="5CECF33A-3D47-5500-1843-6B161A7A62CE" name="user_id">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>1485AB74-D624-AC04-A6CD-673D83D62D3F</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="3E5A4B7D-098F-D906-DC40-39B586D18BB0"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="4A9A3A37-45D6-B0E9-47FC-98FC2C1DFACC" name="payment_date">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>D422129B-0E99-AAC9-E360-40C0847EC7F0</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="2BCC2B68-BDC2-CD73-DEE1-46EEC5E1DBE4"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="4AA9F185-A538-2DDC-E253-E87944C7E9A4" name="payments_Apartament_FK">
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D000A405-88D9-2DF3-1F5F-B607F53ADC83"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="89E7025C-564B-7836-3607-C3573DAF279C" name="payments_User_FK">
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="3E5A4B7D-098F-D906-DC40-39B586D18BB0"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

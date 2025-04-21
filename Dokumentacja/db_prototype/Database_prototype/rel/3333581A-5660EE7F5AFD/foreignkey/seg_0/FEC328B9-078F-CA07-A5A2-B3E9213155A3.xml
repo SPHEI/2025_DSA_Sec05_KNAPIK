@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="FEC328B9-078F-CA07-A5A2-B3E9213155A3" containerWithKeyObject="F09D6A22-556D-ADB6-9AF7-DA6A1215498A" localFKIndex="70581A6A-09C2-05AD-D1A4-DEB53DC342C0" name="Renting_history_User_FK">
+<sourceDDLFile>database.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>5873E646-6960-897F-D9DE-CBD3B577B8AB</importedID>
+<referredTableLongName>User</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>E11A92E5-1999-6721-19E6-696A18D96F1D</referredTableID>
+<keyObject>184EF843-A076-4BA1-610C-46E588A8092A</keyObject>
+<referredKeyID>184EF843-A076-4BA1-610C-46E588A8092A</referredKeyID>
+<mandatory>false</mandatory>
+<refColNames>id</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>
