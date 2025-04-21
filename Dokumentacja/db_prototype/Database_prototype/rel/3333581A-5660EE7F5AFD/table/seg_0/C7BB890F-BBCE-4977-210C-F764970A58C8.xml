@@ -1,0 +1,136 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="C7BB890F-BBCE-4977-210C-F764970A58C8" name="Expenses">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>BA85AE27-8E3B-F188-0174-6218C1E7E747</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id" id="55951868-1655-7878-1F6E-96B13D19B230">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>83E7FFC6-ABF7-905E-BBB7-7785AB651D81</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="amount" id="6973F9FC-9ED4-2AC1-A4A4-F034150BFD27">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>6A31EB9F-CD2E-BD92-DDBD-0AEE62D2C359</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT026</logicalDatatype>
+<domain>312EAEB7-5C07-CA55-36EB-1A149DEA6426</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="expense_date" id="6831FACC-3ECA-1CFE-1592-78CF81DC65DF">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>F6E8C645-3191-E406-8B4B-E7770BDDA3C3</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<domain>4CC901EB-C4CF-394F-424A-637213532CF9</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="description" id="FA6BB38A-43C5-0820-C833-3717A7BABC98">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>81EAB21A-9096-6519-EEB2-9D858D53B06A</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>F69FEE30-E029-6C58-2C8A-BDA81D7EEA06</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="category" id="A77B97C9-3F0D-CFE1-C574-642E2247F0BA">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>5815E9B7-2A84-8989-FA01-B4749B09CCC0</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>E68F6D8C-1F5F-B4CC-F6E6-FA1EFED96386</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="repair_id" id="757E8101-D6D1-1176-603C-59E1DB8B9F95">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>D8992B7B-EC67-41CC-6AAD-B4CB62F16F7C</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="67710519-31A3-DE28-C2D6-62971136B47B" referredColumn="17C97F90-040B-362A-1AF8-9C9BCFC9FE39"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="91A4383E-FAC5-B6C5-CFD7-B0E751F2D96E" name="Expenses_PK">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>B73DCE11-1153-4C55-6F92-288038AE1AF1</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="55951868-1655-7878-1F6E-96B13D19B230"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="C7730136-A473-FADD-830B-5E16ABF6CF6E" name="expense_date">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>3384F580-5C9E-5B4A-7941-81F97A8CA2A2</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6831FACC-3ECA-1CFE-1592-78CF81DC65DF"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="835471F4-595E-7EF7-D451-406BF2D2FA31" name="category">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>3A431D24-97A1-4D20-F178-87E106DB7CC8</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="A77B97C9-3F0D-CFE1-C574-642E2247F0BA"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="24540F0B-044C-5B24-33B1-801E3A9FC684" name="Expenses_Repair_FK">
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="757E8101-D6D1-1176-603C-59E1DB8B9F95"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

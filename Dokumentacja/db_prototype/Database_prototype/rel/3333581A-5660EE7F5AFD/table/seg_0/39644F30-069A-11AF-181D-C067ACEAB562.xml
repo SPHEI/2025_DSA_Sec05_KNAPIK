@@ -1,32 +1,32 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="7D4F17F8-BBF8-8623-B003-32FFD61E39D1" name="Repair">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="39644F30-069A-11AF-181D-C067ACEAB562" name="Repair">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>E93B9A15-D799-A141-DA25-4C9CB6B8C974</importedID>
+<importedID>4E49B3B9-81CE-C3D8-6045-438C1A377488</importedID>
 <allowColumnReorder>false</allowColumnReorder>
 <existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
 <parsed>true</parsed>
 <columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
-<Column name="id" id="AE76C94B-CD18-DB6A-357F-03D330417338">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="id" id="17C97F90-040B-362A-1AF8-9C9BCFC9FE39">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>56175850-313D-1DDB-6528-618837C0348D</importedID>
+<importedID>498AC64C-972B-EF4A-6FC8-63ECDB6149A8</importedID>
 <use>0</use>
 <logicalDatatype>LOGDT011</logicalDatatype>
 <domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="fault_report_id" id="CBB3E3A3-E763-0F48-0448-FAC317A9625C">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="fault_report_id" id="3F22D565-F012-F1F5-72C4-A62C553F8BFC">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>68AC83D6-7145-474A-CA90-5F3F6CBD95B2</importedID>
+<importedID>A8A12842-2AB8-2F97-B839-DCAF8E29EB0E</importedID>
 <nullsAllowed>true</nullsAllowed>
 <use>0</use>
 <logicalDatatype>LOGDT011</logicalDatatype>
@@ -34,27 +34,27 @@
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
-<colAssociation fkAssociation="4DE29550-25B6-C57F-58BC-5002FF980017" referredColumn="31B37AF5-C3C7-2E7F-CA98-EACE92259DD2"/>
+<colAssociation fkAssociation="3BF9AEDE-9E48-6201-163F-3188B18E57B5" referredColumn="63AC1DB4-75B5-497C-1BBB-4ED1D95079C1"/>
 </associations>
 </Column>
-<Column name="date_assigned" id="D94BCD7B-9508-491F-364C-8AB907C26F8C">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="date_assigned" id="9232941D-5D1B-F62F-C16B-00A7E9648C18">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>72BD2F42-19E8-31F3-8F87-EE01D2562B8D</importedID>
+<importedID>3796A14E-4D56-A98C-B065-84F13B525BFA</importedID>
 <use>0</use>
 <logicalDatatype>LOGDT007</logicalDatatype>
 <domain>4CC901EB-C4CF-394F-424A-637213532CF9</domain>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="date_completed" id="533F4091-F00C-CF2C-93E8-3EC52CF2A458">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="date_completed" id="FC63067B-A825-97CF-D9D6-80714843E890">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>6E167AA6-6A85-A115-65DD-196038E541D5</importedID>
+<importedID>45FCE4B3-7EF8-DA43-C3B5-31801E7118ED</importedID>
 <nullsAllowed>true</nullsAllowed>
 <use>0</use>
 <logicalDatatype>LOGDT007</logicalDatatype>
@@ -62,12 +62,12 @@
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="status" id="21E06460-CE3A-839A-7EF2-E3C392AD2043">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="status" id="C22FD1AA-CB99-F654-CD04-F856FCF591C2">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>80B48F9E-5EC1-077D-8A7A-5105286166C0</importedID>
+<importedID>1A4C0082-9907-49FA-7245-E04DFEA7225A</importedID>
 <useDomainConstraints>false</useDomainConstraints>
 <use>0</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
@@ -81,12 +81,12 @@
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="subcontractor_id" id="FB29608C-9911-9D8F-16DA-72F3869C16F0">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="subcontractor_id" id="0F922B99-3588-1AC8-5FF7-AFDB4D0D4050">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>CF2874F8-4C86-D4D1-12BF-80BFC4BBD5C0</importedID>
+<importedID>D4A0D1E7-5618-8E41-8A7E-AAC6606DF616</importedID>
 <nullsAllowed>true</nullsAllowed>
 <use>0</use>
 <logicalDatatype>LOGDT011</logicalDatatype>
@@ -94,53 +94,53 @@
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
-<colAssociation fkAssociation="AB5C0A90-29DF-151B-E7C4-6210BFB31B1B" referredColumn="36EF6F9A-BDE7-1F1E-C328-7E50AC868800"/>
+<colAssociation fkAssociation="B79897F4-138B-0318-76D6-8B1884C0996C" referredColumn="EAADA592-BE33-DFBC-1A14-A4A3D544D3FC"/>
 </associations>
-</Column>
-<Column name="INDEX" id="FC166BF4-5382-D66D-C0FF-1B16E64F5F25">
-<sourceDDLFile>database.sql</sourceDDLFile>
-<createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
-<ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>55FB3296-0A29-29E1-E82A-24D51C1454DC</importedID>
-<nullsAllowed>true</nullsAllowed>
-<use>0</use>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
-<ind_PK_UK id="6E53F24B-7D6A-B99A-0AC0-96F1F96FD736" name="Repair_PK">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<ind_PK_UK id="242A1D09-0C54-04CE-1FBE-BD04B6CE50D3" name="Repair_PK">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>C347A1D8-DFEE-51C0-F341-A5F2A6AFBC3C</importedID>
+<importedID>36A438B3-F5A3-1BE5-570A-49124345347F</importedID>
 <pk>true</pk>
 <indexState>Primary Constraint</indexState>
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
-<colUsage columnID="AE76C94B-CD18-DB6A-357F-03D330417338"/>
+<colUsage columnID="17C97F90-040B-362A-1AF8-9C9BCFC9FE39"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="A784A16C-D3D9-9366-92CA-B47AD3F842FB" name="Repair_FaultReport_FK">
+<ind_PK_UK id="676BC039-BF47-A1AB-BA56-0717DC674EE3" name="date_assigned">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>054869A6-6448-DCDB-63DD-97B2E47D1910</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="9232941D-5D1B-F62F-C16B-00A7E9648C18"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="4ABBFC59-8630-55BF-124F-0E10BFAB5235" name="Repair_FaultReport_FK">
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
 <indexState>Foreign Key</indexState>
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
-<colUsage columnID="CBB3E3A3-E763-0F48-0448-FAC317A9625C"/>
+<colUsage columnID="3F22D565-F012-F1F5-72C4-A62C553F8BFC"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="E6A73EFA-C4CD-4B4A-189E-9FACBE4D7C92" name="Repair_Subcontractor_FK">
+<ind_PK_UK id="193356B6-0838-A002-373C-FA7FD4D41043" name="Repair_Subcontractor_FK">
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
 <indexState>Foreign Key</indexState>
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
-<colUsage columnID="FB29608C-9911-9D8F-16DA-72F3869C16F0"/>
+<colUsage columnID="0F922B99-3588-1AC8-5FF7-AFDB4D0D4050"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

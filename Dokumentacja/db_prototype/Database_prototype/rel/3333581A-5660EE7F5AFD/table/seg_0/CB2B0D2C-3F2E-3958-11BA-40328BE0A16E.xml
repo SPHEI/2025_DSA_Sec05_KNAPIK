@@ -1,0 +1,101 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="CB2B0D2C-3F2E-3958-11BA-40328BE0A16E" name="Subcontractor">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>FEC2560D-B065-3A5B-B5EA-2EAF7C7879C8</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id" id="EAADA592-BE33-DFBC-1A14-A4A3D544D3FC">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>49E41C4D-8C47-65B5-74BA-A8AB38829F3E</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="user_id" id="86772E0E-1AD9-84EA-2CFF-42328135FFFB">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>86A98281-DA4E-7112-8BE8-3E82881F67FB</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="BEDC5180-110B-C50C-67FB-46EE34D020D9" referredColumn="6121E4AA-F8E3-DC83-A8B0-06CC5C14FBE4"/>
+</associations>
+</Column>
+<Column name="address" id="EA8D2239-2A4D-E549-4750-171DEF8350D6">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>AFEB63A3-AC94-7303-0B13-5D25356F8075</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>F69FEE30-E029-6C58-2C8A-BDA81D7EEA06</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="NIP" id="84D0BCB5-79DB-6C80-3104-ADD2B035592A">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>011F3F57-D812-045E-D5B3-40D15F49741F</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>564393FD-00C8-5074-D3A6-81CEE13DF96D</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="speciality" id="93B547E3-3D5B-9F4F-5CCB-243551DA179F">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>EE742001-27D0-3E07-42C0-314C432812AB</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>6A8B4227-5A35-135B-2002-C9BA215E1146</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="3EB9BF53-55B1-F005-3E8F-D27D21377AD4" name="Subcontractor_PK">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>84A2A148-B530-BA3E-93BE-3E2D45A4E862</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="EAADA592-BE33-DFBC-1A14-A4A3D544D3FC"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="BB3D3C77-7D4E-1368-8C54-E06A66451268" name="Subcontractor_User_FK">
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="86772E0E-1AD9-84EA-2CFF-42328135FFFB"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

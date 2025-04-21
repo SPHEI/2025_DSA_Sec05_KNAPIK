@@ -1,80 +1,68 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="E11A92E5-1999-6721-19E6-696A18D96F1D" name="User">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="3F65CD6E-9667-E4DF-FCF4-36C0E76617CB" name="User">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>20DFF6E2-25DC-1344-E015-7790CF57EB26</importedID>
+<importedID>7975D7C9-C2E5-BECB-4DC5-9541952AC383</importedID>
 <allowColumnReorder>false</allowColumnReorder>
 <existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
 <parsed>true</parsed>
 <columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
-<Column name="id" id="51A1483B-CD82-5607-F032-0A6B2010F960">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="id" id="6121E4AA-F8E3-DC83-A8B0-06CC5C14FBE4">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>945CCC36-09F2-1BAB-2F00-76D2AE1165F8</importedID>
+<importedID>2A63DCEB-7A4D-5FBA-6243-6C6B3CE90BC4</importedID>
 <use>0</use>
 <logicalDatatype>LOGDT011</logicalDatatype>
 <domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="first_name" id="FFB73BBA-ED7D-A05F-2E5C-A74E13D253FD">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="name" id="5E0D450F-CA39-FDA5-A2A2-333BD81AC06E">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>00FFA0AF-73F1-6040-8C6D-6500DCFB606A</importedID>
+<importedID>D4E502CE-389D-0ECA-5879-B40824B3E83F</importedID>
 <use>0</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
 <domain>6A8B4227-5A35-135B-2002-C9BA215E1146</domain>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="last_name" id="BBBCE459-9081-24F1-4063-2E5D8DB27948">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="email" id="9E0459DE-B916-6D66-A764-E59C4F662E1E">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>F2E507EF-5B3A-13CF-BD1D-27A1FB3DE2C1</importedID>
+<importedID>93330392-6A32-A9A8-6F37-C3571A9AFEA1</importedID>
 <use>0</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
 <domain>6A8B4227-5A35-135B-2002-C9BA215E1146</domain>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="email" id="ECF1C7CA-BACC-C3E6-6A72-55CA239A002E">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="phone" id="90F01598-986E-B90B-7839-713BF3B4E4DD">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>75379A35-EC15-B094-4D5A-6F49ECD30F19</importedID>
+<importedID>185583CB-E156-6FBB-B80E-733896A0FF8D</importedID>
 <use>0</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
-<domain>6A8B4227-5A35-135B-2002-C9BA215E1146</domain>
+<domain>32CEE7E1-8815-9D28-AD58-D28BE70BFF4C</domain>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="phone" id="7F7F6325-5F73-920A-0509-19018A04CB04">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="role" id="F45BA2D0-7162-0E19-3C16-E45360CC4AC0">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>6EE90AA1-C836-DEE2-14C4-7FEE88580E97</importedID>
-<use>0</use>
-<logicalDatatype>LOGDT011</logicalDatatype>
-<domain>8214F49C-2DA8-8268-890F-A48FB9B96CAF</domain>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
-</Column>
-<Column name="role" id="D05D5F28-3A78-A3B3-2C19-25E07E25B3F5">
-<sourceDDLFile>database.sql</sourceDDLFile>
-<createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
-<ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>B9809A54-8268-3A37-13E9-ED3CDEF4E077</importedID>
+<importedID>4C54C9FE-ED13-6FC4-3F88-124D3CE51AEB</importedID>
 <useDomainConstraints>false</useDomainConstraints>
 <use>0</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
@@ -87,12 +75,12 @@
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="password" id="0DCC0ACF-A6ED-154D-C995-502370E8D408">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="password" id="7981BB8D-01FF-7D02-998D-FBCBC7236A74">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>A17C36BE-69CE-C498-7FF9-416FFB47F923</importedID>
+<importedID>0D12B612-D041-DC26-348D-EA5C29F89CBF</importedID>
 <use>0</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
 <domain>F69FEE30-E029-6C58-2C8A-BDA81D7EEA06</domain>
@@ -101,29 +89,29 @@
 </Column>
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
-<ind_PK_UK id="184EF843-A076-4BA1-610C-46E588A8092A" name="User_PK">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<ind_PK_UK id="853F65C3-AF5A-8B5A-7FED-E1CA88D60706" name="User_PK">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>70390E83-2002-DA11-D382-B87457FAC6E6</importedID>
+<importedID>BAFB2B4B-A6A4-8DFD-2F6E-75F9B6BBEDAD</importedID>
 <pk>true</pk>
 <indexState>Primary Constraint</indexState>
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
-<colUsage columnID="51A1483B-CD82-5607-F032-0A6B2010F960"/>
+<colUsage columnID="6121E4AA-F8E3-DC83-A8B0-06CC5C14FBE4"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="22B02AC0-9654-BAA8-9804-9BC40670A5CF" name="INDEX_1v2">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<ind_PK_UK id="816F8734-1D1F-82F9-0F45-ECA7623BE9C8" name="INDEX_1v1">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>6E25B57E-B4F8-FB66-615D-8EF2945F252B</importedID>
+<importedID>5F314508-C65E-EB2F-6435-0320DAFAB7BD</importedID>
 <indexState>Unique Constraint</indexState>
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
-<colUsage columnID="ECF1C7CA-BACC-C3E6-6A72-55CA239A002E"/>
+<colUsage columnID="9E0459DE-B916-6D66-A764-E59C4F662E1E"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>

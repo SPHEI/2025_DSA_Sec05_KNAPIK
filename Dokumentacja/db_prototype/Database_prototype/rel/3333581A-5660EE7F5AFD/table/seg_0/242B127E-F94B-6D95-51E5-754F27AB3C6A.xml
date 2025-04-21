@@ -1,0 +1,101 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="242B127E-F94B-6D95-51E5-754F27AB3C6A" name="Pricing_History">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>F986BB29-DC6C-34C7-C979-23C857F493B6</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id" id="BE41639C-CF7B-6892-D887-44987A0D9EB3">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>2BCDF4CA-8F3E-5760-8045-271FEBE0689E</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="apartment_id" id="D7549903-D88B-9AC1-CA0B-C3A4196769D5">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>CBA81DA4-24A9-591F-8EC4-ED8732738761</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="A924B5B2-16BA-6B96-C123-CD43E71DB05C" referredColumn="27506E88-2A46-3BFB-BEA3-2EEE49694A7A"/>
+</associations>
+</Column>
+<Column name="date" id="94FA7EF2-E711-6CBA-8DF7-CB354ECA8263">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>27A88FD9-FFB9-7E4B-3B38-9616B8692428</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<domain>4CC901EB-C4CF-394F-424A-637213532CF9</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="price" id="F2BD1E9B-DBCD-AA10-5CEA-3824F0EC90D7">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>207B7D46-2721-D8C4-1E59-D1ABAE909CB8</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT026</logicalDatatype>
+<domain>312EAEB7-5C07-CA55-36EB-1A149DEA6426</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="8E139FF0-26FF-4801-B550-63754C5A6686" name="Pricing_History_PK">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>C7266309-15B0-F7F0-21F7-DC526556C875</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="BE41639C-CF7B-6892-D887-44987A0D9EB3"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="FBFB5212-2C8E-0ADA-3D48-B26D34753D61" name="date">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>D0DDD801-9A47-9D80-78CE-27F7C8361BA3</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="94FA7EF2-E711-6CBA-8DF7-CB354ECA8263"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="2FBF8867-1A83-6BB2-98F2-00384B999086" name="Pricing_History_Apartament_FK">
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D7549903-D88B-9AC1-CA0B-C3A4196769D5"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

@@ -1,0 +1,154 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="64756990-B7C4-561B-4BCE-DD6A55CAFD19" name="Renting_history">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>A923707A-DE6C-265A-C2B6-C858CA3C3384</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id" id="AA206FDD-3AB7-9D63-824C-FBB960CF8B11">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>2F43CEAD-5561-B2BD-50F3-892238CF3157</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="apartment_id" id="8F8718E5-DC6A-76A6-B66F-98775018F0D7">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>7D43F6E4-055B-D644-BC0D-51A0128C192A</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="3D90A9B9-F1D8-A24C-CB59-0D402B92C547" referredColumn="27506E88-2A46-3BFB-BEA3-2EEE49694A7A"/>
+</associations>
+</Column>
+<Column name="user_id" id="DBB8106C-FB31-3DE6-3A0E-22E3BBD12097">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>36DAF55E-1622-533A-4E63-03390A9EC759</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="32694153-B7E2-51AF-E8F7-954F523D6C7F" referredColumn="6121E4AA-F8E3-DC83-A8B0-06CC5C14FBE4"/>
+</associations>
+</Column>
+<Column name="start_date" id="CF0B0380-0C87-7C6E-0FA6-6C86D95C4FC4">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>C64DD93F-3EB1-B68B-68B6-D3A232145200</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<domain>4CC901EB-C4CF-394F-424A-637213532CF9</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="end_date" id="D6EDD03A-EB7D-6F08-5AF2-D16CCB947CC9">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>28D2B02D-FE35-C0B3-983F-643E3E792E78</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<domain>4CC901EB-C4CF-394F-424A-637213532CF9</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="fault_report_id" id="71DA649E-4D24-950D-5120-604E94FC0CFC">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>1392936B-0351-8D77-C8FF-C3F8162BBF1A</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="1BA3864E-6DB5-A3E6-DC9F-33D9C6A99134" referredColumn="63AC1DB4-75B5-497C-1BBB-4ED1D95079C1"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="3092EB27-A67C-299F-717E-8B5229B13594" name="Renting_history_PK">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>C8CE2448-176C-1C8B-DA66-B56DE709598B</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="AA206FDD-3AB7-9D63-824C-FBB960CF8B11"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="199AAF21-793A-074C-1F09-1F5431B76E1B" name="start_date">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>C1310A63-07D4-FBCA-D531-7F59640F966D</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="CF0B0380-0C87-7C6E-0FA6-6C86D95C4FC4"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="693D6382-CAD4-2FA5-86E3-89BBAC583B7E" name="Renting_history_Apartament_FK">
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="8F8718E5-DC6A-76A6-B66F-98775018F0D7"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="C488B29C-AEDF-D020-424F-01E5271B3A83" name="Renting_history_FaultReport_FK">
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="71DA649E-4D24-950D-5120-604E94FC0CFC"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="E67862D8-150D-732C-9510-A5A55CB93E65" name="Renting_history_User_FK">
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="DBB8106C-FB31-3DE6-3A0E-22E3BBD12097"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

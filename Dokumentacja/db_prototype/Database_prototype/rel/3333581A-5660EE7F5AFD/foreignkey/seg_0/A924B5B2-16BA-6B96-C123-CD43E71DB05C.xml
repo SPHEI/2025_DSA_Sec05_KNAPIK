@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="A924B5B2-16BA-6B96-C123-CD43E71DB05C" containerWithKeyObject="242B127E-F94B-6D95-51E5-754F27AB3C6A" localFKIndex="2FBF8867-1A83-6BB2-98F2-00384B999086" name="Pricing_History_Apartament_FK">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>FAE837A4-B935-16B5-8FFC-5689380FDCAB</importedID>
+<referredTableLongName>Apartament</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>216C9859-ECFC-60DA-D568-DECE1DE0FE60</referredTableID>
+<keyObject>4F25B51E-06C5-B97D-5A7B-DEC7FC568A8C</keyObject>
+<referredKeyID>4F25B51E-06C5-B97D-5A7B-DEC7FC568A8C</referredKeyID>
+<mandatory>false</mandatory>
+<refColNames>id</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

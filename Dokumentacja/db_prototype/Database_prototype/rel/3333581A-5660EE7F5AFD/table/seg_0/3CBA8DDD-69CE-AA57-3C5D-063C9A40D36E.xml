@@ -1,86 +1,86 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="7A934594-6BFB-46B5-D54E-1B0C3CDC8E55" name="payments">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="3CBA8DDD-69CE-AA57-3C5D-063C9A40D36E" name="payments">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>998E8CEA-9D0B-0B65-870C-A65B36842CF0</importedID>
+<importedID>04E570D5-525D-129F-F892-D81FED5474EF</importedID>
 <allowColumnReorder>false</allowColumnReorder>
 <existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
 <parsed>true</parsed>
 <columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
-<Column name="id" id="2D39F33D-0F06-EBB3-63CC-8AE066DBAF29">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="id" id="E98C035E-4AA5-CE6B-B5A4-801D60B73263">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>2F2DA5C4-0C6F-0C21-A0B4-FBEF89989291</importedID>
+<importedID>95668BDF-2483-B7E1-3FDA-6DB3D1542452</importedID>
 <use>0</use>
 <logicalDatatype>LOGDT011</logicalDatatype>
 <domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="user_id" id="3E5A4B7D-098F-D906-DC40-39B586D18BB0">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="user_id" id="895430FD-1ED3-EBCC-2024-D6E1CB244DD4">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>E421E78C-11D8-45A7-181C-7D6DAC505C07</importedID>
-<use>0</use>
-<logicalDatatype>LOGDT011</logicalDatatype>
-<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
-<ownDataTypeParameters>,,</ownDataTypeParameters>
-<autoIncrementCycle>false</autoIncrementCycle>
-<associations>
-<colAssociation fkAssociation="6B34BF50-723E-B292-2351-CF1DAE789464" referredColumn="51A1483B-CD82-5607-F032-0A6B2010F960"/>
-</associations>
-</Column>
-<Column name="apartament_id" id="D000A405-88D9-2DF3-1F5F-B607F53ADC83">
-<sourceDDLFile>database.sql</sourceDDLFile>
-<createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
-<ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>1A3C8E3A-743A-A3F8-E600-010CD35CFE7C</importedID>
+<importedID>DF9E75FB-ACC9-460A-BC79-A5AFD8461C16</importedID>
 <use>0</use>
 <logicalDatatype>LOGDT011</logicalDatatype>
 <domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 <associations>
-<colAssociation fkAssociation="61B0A241-8E70-5B36-18EA-F1F59549F1BC" referredColumn="9EE3BB7C-F333-5B0D-79F6-86F64A5C0868"/>
+<colAssociation fkAssociation="57F7F5F0-A1FE-1C89-D543-19A299EDBB01" referredColumn="6121E4AA-F8E3-DC83-A8B0-06CC5C14FBE4"/>
 </associations>
 </Column>
-<Column name="amount" id="48A04E48-9F54-72BB-A736-8E6E24C9CFAA">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="apartament_id" id="9F199D1C-13FE-E431-0757-47A231805E08">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>D98B5DCF-AAD2-7898-A40E-3C343916EBCB</importedID>
+<importedID>B3F863BE-1EA8-BB38-396D-0884B513109F</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<domain>2F14188F-9A31-0160-4D33-D458CF3264CE</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="BE85B5CE-D55D-9200-CACB-128A3380C1BB" referredColumn="27506E88-2A46-3BFB-BEA3-2EEE49694A7A"/>
+</associations>
+</Column>
+<Column name="amount" id="EAD1D570-63AC-5A1A-7C72-490B1CDE7191">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<importedID>0CEE1E6B-3692-45CC-8A49-831F15131177</importedID>
 <use>0</use>
 <logicalDatatype>LOGDT026</logicalDatatype>
 <domain>312EAEB7-5C07-CA55-36EB-1A149DEA6426</domain>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="payment_date" id="2BCC2B68-BDC2-CD73-DEE1-46EEC5E1DBE4">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="payment_date" id="8E0AF814-E442-FFD1-0993-8FBAF53C08A2">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>B8975525-BAC8-C918-FE27-BD69E117C516</importedID>
+<importedID>C130E182-23D2-0407-C61B-EF01FE84FB73</importedID>
 <use>0</use>
 <logicalDatatype>LOGDT007</logicalDatatype>
 <domain>4CC901EB-C4CF-394F-424A-637213532CF9</domain>
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="status" id="EACD5B5B-7361-4DAE-0559-C94FD26447E1">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="status" id="74CDF620-46C5-5D22-ACF2-87FAA926B8D6">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>F39E0D55-A149-E5BD-64A8-9709C03148E9</importedID>
+<importedID>37CAD529-1650-C08F-240A-D3888C670334</importedID>
 <useDomainConstraints>false</useDomainConstraints>
 <use>0</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
@@ -94,12 +94,12 @@
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="payment_method" id="80C6BF59-FB88-CC99-3A44-35DE9158C356">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="payment_method" id="D477C167-F279-6A42-1CFE-70A2B62100DA">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>F9DD2726-1C8A-BA12-31CE-659AA1E16F75</importedID>
+<importedID>964AC6DA-8C1E-4FCC-310F-D767279C5BE9</importedID>
 <useDomainConstraints>false</useDomainConstraints>
 <use>0</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
@@ -112,12 +112,12 @@
 <ownDataTypeParameters>,,</ownDataTypeParameters>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="transaction_reference" id="1367E4F8-3E29-2773-707B-012F94EC9BCA">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<Column name="transaction_reference" id="C8E6E9D4-31F3-9F04-B69B-9C7430BF713D">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>A204FD63-6FB9-1F94-23DE-E3D863E29A50</importedID>
+<importedID>22842E97-1389-A244-FD56-8997A11DCEA6</importedID>
 <nullsAllowed>true</nullsAllowed>
 <use>0</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
@@ -127,59 +127,59 @@
 </Column>
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
-<ind_PK_UK id="078CEEB3-5B69-EA7B-CBB5-626F6B14A630" name="payments_PK">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<ind_PK_UK id="17055FF2-D7AE-0968-FC25-1B2DD9772D57" name="payments_PK">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>98202C01-49A5-1F3B-DC90-ACF719DA51EE</importedID>
+<importedID>3B7C1598-AF5B-F0B5-A417-F38C0F16B757</importedID>
 <pk>true</pk>
 <indexState>Primary Constraint</indexState>
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
-<colUsage columnID="2D39F33D-0F06-EBB3-63CC-8AE066DBAF29"/>
+<colUsage columnID="E98C035E-4AA5-CE6B-B5A4-801D60B73263"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="5CECF33A-3D47-5500-1843-6B161A7A62CE" name="user_id">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<ind_PK_UK id="E8127644-BD50-1EA7-EECC-606E90A1B79F" name="user_id">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>1485AB74-D624-AC04-A6CD-673D83D62D3F</importedID>
+<importedID>21D1D073-D07A-B548-879D-6D6104F51485</importedID>
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
-<colUsage columnID="3E5A4B7D-098F-D906-DC40-39B586D18BB0"/>
+<colUsage columnID="895430FD-1ED3-EBCC-2024-D6E1CB244DD4"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="4A9A3A37-45D6-B0E9-47FC-98FC2C1DFACC" name="payment_date">
-<sourceDDLFile>database.sql</sourceDDLFile>
+<ind_PK_UK id="E5D25B64-2977-43C3-5F56-5DADDC0667A4" name="payment_date">
+<sourceDDLFile>Database_prototype.sql</sourceDDLFile>
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
-<importedID>D422129B-0E99-AAC9-E360-40C0847EC7F0</importedID>
+<importedID>10A93F46-5434-3AB4-90BA-3337640C196A</importedID>
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
-<colUsage columnID="2BCC2B68-BDC2-CD73-DEE1-46EEC5E1DBE4"/>
+<colUsage columnID="8E0AF814-E442-FFD1-0993-8FBAF53C08A2"/>
 </indexColumnUsage>
 </ind_PK_UK>
-<ind_PK_UK id="4AA9F185-A538-2DDC-E253-E87944C7E9A4" name="payments_Apartament_FK">
+<ind_PK_UK id="4601C3DE-E0C9-D988-284F-2B01D2612CF1" name="payments_Apartament_FK">
 <createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
-<ownerDesignName>Database_prototype</ownerDesignName>
-<indexState>Foreign Key</indexState>
-<isSurrogateKey>false</isSurrogateKey>
-<indexColumnUsage>
-<colUsage columnID="D000A405-88D9-2DF3-1F5F-B607F53ADC83"/>
-</indexColumnUsage>
-</ind_PK_UK>
-<ind_PK_UK id="89E7025C-564B-7836-3607-C3573DAF279C" name="payments_User_FK">
-<createdBy>js</createdBy>
-<createdTime>2025-04-20 15:41:56 UTC</createdTime>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
 <ownerDesignName>Database_prototype</ownerDesignName>
 <indexState>Foreign Key</indexState>
 <isSurrogateKey>false</isSurrogateKey>
 <indexColumnUsage>
-<colUsage columnID="3E5A4B7D-098F-D906-DC40-39B586D18BB0"/>
+<colUsage columnID="9F199D1C-13FE-E431-0757-47A231805E08"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="F1A8C6FB-7AD0-01B6-383F-A62707128AAE" name="payments_User_FK">
+<createdBy>js</createdBy>
+<createdTime>2025-04-21 12:05:30 UTC</createdTime>
+<ownerDesignName>Database_prototype</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="895430FD-1ED3-EBCC-2024-D6E1CB244DD4"/>
 </indexColumnUsage>
 </ind_PK_UK>
 </indexes>
