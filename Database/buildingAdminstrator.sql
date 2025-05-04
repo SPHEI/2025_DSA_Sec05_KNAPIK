@@ -174,14 +174,17 @@ FROM Expenses e;
 -- roles
 INSERT INTO Role (name) VALUES 
 ('admin'),
-('user');
+('tenent'),
+('subcontractor');
 
 -- users 
 INSERT INTO User (name, email, phone, role_id, password) VALUES
 ('John Admin', 'admin@example.com', '123456789', 1, 'admin123'),
-('Alice User', 'alice@example.com', '987654321', 2, 'alice123'),
+('Alice Beton', 'alice@example.com', '987654321', 2, 'alice123'),
 ('Bob Renter', 'bob@example.com', '555123456', 2, 'bob123'),
-('Eve Subcontractor', 'eve@example.com', '555987654', 2, 'eve123');
+('Eve Subcontractor', 'eve@example.com', '555987654', 3, 'eve123'),
+('Charlie Newman', 'chanew@example.com', '555654321', 3, 'charlie123');
+
 
 -- owners
 INSERT INTO Owner (name, email, phone) VALUES
@@ -211,7 +214,7 @@ INSERT INTO Speciality (name) VALUES
 
 INSERT INTO Subcontractor (user_id, address, NIP, speciality_id) VALUES
 (4, '123 Contractor St, City', '1234567890', 1),
-(1, '456 Repair Ave, Town', '0987654321', 2);
+(5, '456 Repair Ave, Town', '0987654321', 2);
 
 
 -- fault statuses
