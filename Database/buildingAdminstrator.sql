@@ -14,7 +14,6 @@ CREATE TABLE User(
     FOREIGN KEY (role_id) REFERENCES Role(id)
 );
 
-
 CREATE TABLE Owner(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -32,7 +31,6 @@ CREATE TABLE Apartament(
     owner_id INTEGER NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES Owner(id)
 );
-
 
 CREATE TABLE Pricing_History(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -109,10 +107,16 @@ CREATE TABLE Renting_history(
     user_id INTEGER,
     start_date DATE NOT NULL,
     end_date DATE,
-    fault_report_id INTEGER,
-    FOREIGN KEY (fault_report_id) REFERENCES FaultReport(id),
     FOREIGN KEY (apartment_id) REFERENCES Apartament(id),
     FOREIGN KEY (user_id) REFERENCES User(id)
+);
+
+CREATE TABLE Repair_history(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    renting_history_id INTEGER,
+    fault_report_id INTEGER,
+    FOREIGN KEY (renting_history_id) REFERENCES Renting_history(id),
+    FOREIGN KEY (fault_report_id) REFERENCES FaultReport(id)
 );
 
 CREATE TABLE payments (
@@ -199,9 +203,9 @@ INSERT INTO Apartament (name, street, building_number, building_name, flat_numbe
 
 -- pricing history
 INSERT INTO Pricing_History (apartment_id, date, price, is_current) VALUES
-(1, '2023-01-01', 1200.00, 1),
-(2, '2023-01-01', 850.00, 1),
-(3, '2023-01-01', 2500.00, 1),
+(1, '2025-01-01', 1200.00, 1),
+(2, '2025-01-01', 850.00, 1),
+(3, '2025-01-01', 2500.00, 1),
 (1, '2022-06-01', 1100.00, 0),
 (2, '2022-06-01', 800.00, 0);
 
@@ -224,9 +228,9 @@ INSERT OR IGNORE INTO FaultStatus (name) VALUES
 
 -- fault reports
 INSERT INTO FaultReport (description, date_reported, status_id) VALUES
-('Leaky faucet in kitchen', '2023-05-10', 1),
-('Broken heater', '2023-05-15', 1),
-('Power outlet not working', '2023-06-01', 2);
+('Leaky faucet in kitchen', '2025-05-10', 1),
+('Broken heater', '2025-05-15', 1),
+('Power outlet not working', '2025-06-01', 2);
 
 -- repair statuses
 INSERT OR IGNORE INTO RepairStatus (name) VALUES 
@@ -236,15 +240,20 @@ INSERT OR IGNORE INTO RepairStatus (name) VALUES
 
 -- repairs
 INSERT INTO Repair (fault_report_id, date_assigned, date_completed, status_id, subcontractor_id) VALUES
-(1, '2023-05-11', NULL, 2, 1),
-(2, '2023-05-16', '2023-05-18', 3, 2),
-(3, '2023-06-02', '2023-06-02', 3, 2);
+(1, '2025-05-11', NULL, 2, 1),
+(2, '2025-05-16', '2025-05-18', 3, 2),
+(3, '2025-06-02', '2025-06-02', 3, 2);
 
 -- renting history
-INSERT INTO Renting_history (apartment_id, user_id, start_date, end_date, fault_report_id) VALUES
-(1, 3, '2023-01-15', '2023-06-30', 1),
-(2, 2, '2023-02-01', NULL, NULL),
-(3, 3, '2023-03-01', '2023-04-30', NULL);
+INSERT INTO Renting_history (apartment_id, user_id, start_date, end_date) VALUES
+(1, 3, '2025-01-15', '2025-06-30'),
+(2, 2, '2025-02-01', NULL),
+(3, 3, '2025-03-01', '2025-04-30');
+
+INSERT INTO Repair_history (renting_history_id, fault_report_id) VALUES
+(1, 1),
+(2, 2),
+(3, 3);
 
 -- payment methods
 INSERT OR IGNORE INTO PaymentMethod (name) VALUES 
@@ -260,10 +269,10 @@ INSERT OR IGNORE INTO PaymentStatus (name) VALUES
 
 -- payments
 INSERT INTO payments (user_id, apartament_id, amount, payment_date, status_id, payment_method_id, transaction_reference) VALUES
-(3, 1, 1200.00, '2023-01-01', 2, 1, 'PAY12345'),
-(2, 2, 850.00, '2023-02-01', 2, 2, 'PAY12346'),
-(3, 3, 2500.00, '2023-03-01', 2, 1, 'PAY12347'),
-(3, 1, 1200.00, '2023-02-01', 2, 1, 'PAY12348');
+(3, 1, 1200.00, '2025-01-01', 2, 1, 'PAY12345'),
+(2, 2, 850.00, '2025-02-01', 2, 2, 'PAY12346'),
+(3, 3, 2500.00, '2025-03-01', 2, 1, 'PAY12347'),
+(3, 1, 1200.00, '2025-02-01', 2, 1, 'PAY12348');
 
 -- categories
 INSERT INTO ExpenseCategory (name) VALUES
@@ -274,7 +283,7 @@ INSERT INTO ExpenseCategory (name) VALUES
 
 -- example expenses
 INSERT INTO Expenses (amount, expense_date, description, category_id, repair_id) VALUES
-(150.00, '2023-05-18', 'Faucet replacement parts', 1, 1),
-(200.00, '2023-05-18', 'Heater repair service', 3, 2),
-(75.00, '2023-06-02', 'Outlet replacement', 2, 3),
-(120.00, '2023-06-15', 'Monthly cleaning service', 4, NULL);
+(150.00, '2025-05-18', 'Faucet replacement parts', 1, 1),
+(200.00, '2025-05-18', 'Heater repair service', 3, 2),
+(75.00, '2025-06-02', 'Outlet replacement', 2, 3),
+(120.00, '2025-06-15', 'Monthly cleaning service', 4, NULL);
