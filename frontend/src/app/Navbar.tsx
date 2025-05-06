@@ -116,7 +116,7 @@ function Navbar() {
                                 
                             </div>
 
-                        :<h1>log in</h1>
+                        :<button className={button} onClick={() => router.push("/login")}>Log In</button>
                     :<h1></h1>
                 }
             </nav>
