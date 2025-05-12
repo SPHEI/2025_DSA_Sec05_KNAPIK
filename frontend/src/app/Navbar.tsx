@@ -6,7 +6,7 @@ import logo from './logo.png';
 function Navbar() {
     const [ready,setReady] = useState(false)
 
-    const [userType, setUserType] = useState("");
+    const [userType, setUserType] = useState("not logged in");
     const [currentPage, setCurrentPage] = useState("")
 
     const router = useRouter();
@@ -16,8 +16,6 @@ function Navbar() {
     useEffect(refresh, [pathname])
     function refresh()
     {
-        //Manually set user type
-        setUserType("admin")
         setCurrentPage(pathname.substring(1))
         setReady(true)
     }
@@ -25,7 +23,16 @@ function Navbar() {
     function LogOut()
     {
         //Log out Properly later
+        setUserType("not logged in")
         router.push("/login")
+    }
+
+    function DebugNextUser()
+    {
+        if      (userType == "tenant") {setUserType("admin")}
+        else if (userType == "admin") {setUserType("subcontractor")}
+        else if (userType == "subcontractor") {setUserType("not logged in")}
+        else {setUserType("tenant")}
     }
 
     const button =          "h-[35px] px-2 cursor-pointer text-[var(--text)] tracking-wide transition-colors duration-200 rounded-lg hover:bg-[#c0c0c0] active:bg-[#a0a0a0] bg-transparent text-shadow-md "
@@ -35,8 +42,9 @@ function Navbar() {
     {
         return (
             <nav className="h-[80px] px-4 py-5 bg-[var(--borders)] top-0 w-full shadow-md flex justify-between z-50">
-                <div>
-                    <img src={logo.src} width={150}/>
+                <div className="flex gap-1">
+                    <img className="cursor-pointer" src={logo.src} width={150} onClick={() => router.push("/")}/>
+                    <button onClick={DebugNextUser}><b>{userType}</b></button>
                 </div>
                 {
                     currentPage != "login" ?
