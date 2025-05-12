@@ -18,7 +18,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   display: flex;
   flex-direction: column;
-  gap: 6em;
+  gap: 2em;
 }
 
 main {
@@ -31,6 +31,7 @@ main {
   align-items: center;
   align-content: center;
   gap: 1em;
+  padding:1% 4%;
 }
 
 .page-head{
@@ -58,7 +59,7 @@ main {
 }
 
 .white-box{
-  background: var(--navbutton);
+  background: white;
   border: 1px solid var(--borders);
   border-radius: 10px;
   box-shadow: 2px 2px 8px 4px rgba(0, 0, 0, 0.1);
@@ -71,6 +72,22 @@ main {
 }
 
 .white-box:has(:only-child) {
+  justify-content: center;
+}
+
+.white-box-noshadow{
+  background: white;
+  border: 1px solid var(--borders);
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-content: center;
+  padding-left: 50px;
+  padding-right: 50px;
+}
+
+.white-box-noshadow:has(:only-child) {
   justify-content: center;
 }
 
