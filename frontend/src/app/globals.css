@@ -114,3 +114,14 @@ main {
   background: #B3261E;
   box-shadow: 2px 2px 8px 4px rgba(0, 0, 0, 0.1);
 }
+
+.input-box{
+  padding-left: 1rem;   
+  padding-right: 1rem;
+  padding-top: 0.5rem;  
+  padding-bottom: 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--borders); 
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); 
+  background-color: #ffffff;
+}

@@ -34,14 +34,14 @@ function SubmitIssue() {
             placeholder="Title....."
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-[50%] px-4 py-2 rounded border border-gray-300 shadow-sm bg-white"
+            className="input-box w-[50%]"
           />
 
           <textarea
             placeholder="Describe the issue in detail..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-[50%] h-[300px] p-4 rounded border border-gray-300 shadow-sm bg-white"
+            className="input-box w-[50%] h-[300px]"
           />
 
           <button onClick={handleSubmit} className="black-button">

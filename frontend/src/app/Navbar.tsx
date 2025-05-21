@@ -98,7 +98,7 @@ function Navbar() {
                                 </button>
 
                                 <button className={currentPage == "accounts" ? buttonSelected : button}         onClick={() => router.push("/accounts")}>
-                                    Accounts
+                                    Add Users
                                 </button>
 
                                 <button className={button} onClick={LogOut}>
