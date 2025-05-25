@@ -10,8 +10,9 @@ func (app *app) routes() http.Handler {
 	router.HandleFunc("POST /logout", app.logout)
 	router.HandleFunc("POST /adduser", app.addUser)
 	router.HandleFunc("GET /info", app.info)
-	router.HandleFunc("GET /tenents", app.getTenantList)
-	router.HandleFunc("GET /apartaments", app.getApartamentList)
+	router.HandleFunc("POST /tenents", app.getTenantList)
+	router.HandleFunc("POST /apartaments", app.getApartamentList)
+	router.HandleFunc("POST /subspec", app.getSubContractorSpec)
 	router.HandleFunc("POST /addapartament", app.addApartament)
 
 	return router

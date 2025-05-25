@@ -36,6 +36,38 @@ func GetTenent(db *sql.DB) ([]string, error) {
 	return names, nil
 }
 
+func GetSubcontractorSpec(db *sql.DB, subContractor_email string) ([]string, error) {
+	query := `SELECT Speciality.name FROM User 
+	INNER JOIN Subcontractor 
+	ON Subcontractor.user_id = User.id 
+	INNER JOIN Speciality 
+	ON Subcontractor.speciality_id = Speciality.id 
+	WHERE User.email = ?`
+
+	rows, err := db.Query(query, subContractor_email)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var names []string
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			log.Println(err)
+		}
+		names = append(names, name)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return names, nil
+}
+
 func GetApartaments(db *sql.DB) ([]string, error) {
 	query := `SELECT name FROM Apartament`
 

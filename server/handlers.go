@@ -375,6 +375,39 @@ func (app *app) getTenantList(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (app *app) getSubContractorSpec(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	data := struct {
+		Token string   `json:"token"`
+		Email string   `json:"email"`
+		Spec  []string `json:"spec"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		log.Println(err)
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
+		return
+	}
+
+	if erro := app.checkAdmin(data.Token); erro != nil {
+		sendError(w, *erro)
+		return
+	}
+
+	data.Spec, err = database.GetSubcontractorSpec(app.DB, data.Email)
+	if err != nil {
+		log.Println(err)
+		sendError(w, Error{400, "Database", "Internal Server Error"})
+	}
+
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+}
+
 func (app *app) checkAdmin(token string) *Error {
 	email, err := auth.ValidateSession(app.CACHE, token)
 	if err != nil {
