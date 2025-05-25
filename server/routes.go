@@ -12,6 +12,7 @@ func (app *app) routes() http.Handler {
 	router.HandleFunc("GET /info", app.info)
 	router.HandleFunc("GET /tenents", app.getTenantList)
 	router.HandleFunc("GET /apartaments", app.getApartamentList)
+	router.HandleFunc("POST /addapartament", app.addApartament)
 
 	return router
 }

@@ -55,23 +55,8 @@ func (app *app) addUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email, err := auth.ValidateSession(app.CACHE, user.Token)
-	if err != nil {
-		log.Println(err)
-		sendError(w, Error{401, "Incorrect Token", "Unauthorized"})
-		return
-	}
-
-	role, err := database.GetRole(app.DB, email)
-	if err != nil {
-		log.Println(err)
-		sendError(w, Error{401, "Database", "Internal Server Error"})
-		return
-	}
-	log.Println(role)
-	if role != 1 {
-		log.Println("Wrong role")
-		sendError(w, Error{401, "Wrong role", "Unauthorized"})
+	if erro := app.checkAdmin(user.Token); erro != nil {
+		sendError(w, *erro)
 		return
 	}
 
@@ -252,22 +237,8 @@ func (app *app) getApartamentList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email, err := auth.ValidateSession(app.CACHE, tenants.Token)
-	if err != nil {
-		log.Println(err)
-		sendError(w, Error{401, "Incorrect Token", "Unauthorized"})
-		return
-	}
-
-	role, err := database.GetRole(app.DB, email)
-	if err != nil {
-		log.Println(err)
-		sendError(w, Error{401, "Database", "Internal Server Error"})
-		return
-	}
-	if role != 1 {
-		log.Println("Wrong role")
-		sendError(w, Error{401, "Wrong role", "Unauthorized"})
+	if erro := app.checkAdmin(tenants.Token); erro != nil {
+		sendError(w, *erro)
 		return
 	}
 
@@ -281,6 +252,40 @@ func (app *app) getApartamentList(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
+}
+
+func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	apartament := struct {
+		Token          string `json:"token"`
+		OwnerEmail     string `json:"owner_email"`
+		Name           string `json:"name"`
+		Street         string `json:"street"`
+		BuildingNumber string `json:"building_number"`
+		BuildingName   string `json:"building_name"`
+		FlatNumber     string `json:"flat_number"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&apartament)
+	if err != nil {
+		log.Println(err)
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
+		return
+	}
+
+	if erro := app.checkAdmin(apartament.Token); erro != nil {
+		sendError(w, *erro)
+		return
+	}
+
+	err = database.AddApartament(app.DB, []string{apartament.OwnerEmail, apartament.Name, apartament.Street, apartament.BuildingNumber, apartament.BuildingName, apartament.FlatNumber})
+	if err != nil {
+		log.Println(err)
+		sendError(w, Error{400, "Database", "Internal Server Error"})
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 // func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
@@ -353,22 +358,8 @@ func (app *app) getTenantList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email, err := auth.ValidateSession(app.CACHE, tenants.Token)
-	if err != nil {
-		log.Println(err)
-		sendError(w, Error{401, "Incorrect Token", "Unauthorized"})
-		return
-	}
-
-	role, err := database.GetRole(app.DB, email)
-	if err != nil {
-		log.Println(err)
-		sendError(w, Error{401, "Database", "Internal Server Error"})
-		return
-	}
-	if role != 1 {
-		log.Println("Wrong role")
-		sendError(w, Error{401, "Wrong role", "Unauthorized"})
+	if erro := app.checkAdmin(tenants.Token); erro != nil {
+		sendError(w, *erro)
 		return
 	}
 
@@ -382,4 +373,23 @@ func (app *app) getTenantList(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
+}
+
+func (app *app) checkAdmin(token string) *Error {
+	email, err := auth.ValidateSession(app.CACHE, token)
+	if err != nil {
+		log.Println(err)
+		return &Error{401, "Incorrect Token", "Unauthorized"}
+	}
+
+	role, err := database.GetRole(app.DB, email)
+	if err != nil {
+		log.Println(err)
+		return &Error{401, "Database", "Internal Server Error"}
+	}
+	if role != 1 {
+		log.Println("Wrong role")
+		return &Error{401, "Wrong role", "Unauthorized"}
+	}
+	return nil
 }
