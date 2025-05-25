@@ -427,7 +427,7 @@ func (app *app) getSubContractorSpec(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data.Spec, err = database.GetSubcontractorSpec(app.DB, data.Email)
+	data.Spec, err = database.GetSubcontractorSpec(app.DB)
 	if err != nil {
 		log.Println(err)
 		sendError(w, Error{400, "Database", "Internal Server Error"})
@@ -437,6 +437,35 @@ func (app *app) getSubContractorSpec(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
+}
+
+func (app *app) addSubContractorSpec(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	data := struct {
+		Token string `json:"token"`
+		Name  string `json:"name"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		log.Println(err)
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
+		return
+	}
+
+	if erro := app.checkAdmin(data.Token); erro != nil {
+		sendError(w, *erro)
+		return
+	}
+
+	err = database.AddSpec(app.DB, data.Name)
+	if err != nil {
+		log.Println(err)
+		sendError(w, Error{400, "Database", "Internal Server Error"})
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func (app *app) checkAdmin(token string) *Error {
