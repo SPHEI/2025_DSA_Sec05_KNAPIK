@@ -32,7 +32,7 @@ function Dashboard() {
         }
 
         var t = Cookies.get("token");
-
+        try{
         const res = await fetch('http://localhost:8080/apartaments',{
                 method:'POST',
                 body: JSON.stringify({ 
@@ -48,6 +48,11 @@ function Dashboard() {
             {
                 setApartaments(data.apartaments);
             }
+        }
+        catch(err: any)
+        {
+            setError(err.message);
+        }
 
         setReady(true);
         }

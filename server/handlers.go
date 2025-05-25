@@ -200,6 +200,8 @@ func (app *app) info(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *app) logout(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+	
 	token := struct {
 		Token string `json:"token"`
 	}{}

@@ -2,6 +2,8 @@
 import "../globals.css";
 import { useState, useEffect } from "react";
 import TenantBox from "../components/TenantBox";
+import Cookies from "js-cookie";
+
 //Admin only
 function Dashboard() {
     const [ready,setReady] = useState(false)
@@ -10,8 +12,15 @@ function Dashboard() {
 
     useEffect(() => {
         const fetchData = async () => {
+            
             try {
-              const res = await fetch('http://localhost:8080/tenents');
+                var t = Cookies.get("token");
+              const res = await fetch('http://localhost:8080/tenents',{
+                method: 'POST',
+                body: JSON.stringify({
+                    "token" : t 
+                })
+              });
               const data = await res.json();
               //alert(JSON.stringify(data));
               if(data.message)

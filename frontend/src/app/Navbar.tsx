@@ -39,10 +39,22 @@ function Navbar() {
         setReady(true)
     }
 
-    function LogOut()
+    async function LogOut()
     {
         //Log out Properly later
         setUserType("not logged in")
+        try{
+            var t = Cookies.get("token")
+            var r = await fetch('http://localhost:8080/logout',{
+                method: 'POST',
+                body: JSON.stringify({
+                    "token" : t 
+                })
+              });
+            //alert(JSON.stringify(await r.json()))
+        }catch(err: any){
+            alert(err.message)
+        }
         Cookies.remove("token")
         Cookies.remove("role")
         router.push("/login")
