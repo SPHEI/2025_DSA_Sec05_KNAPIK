@@ -2,9 +2,11 @@ package main
 
 import (
 	"database/sql"
-	_ "github.com/glebarez/go-sqlite"
 	"log"
 	"net/http"
+	"server/database"
+
+	_ "github.com/glebarez/go-sqlite"
 )
 
 type app struct {
@@ -18,8 +20,16 @@ func main() {
 		log.Fatal(err)
 	}
 
+	cache, err := sql.Open("sqlite", ":memory:")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	database.SetupCache(cache)
+
 	app := app{
-		DB: db,
+		DB:    db,
+		CACHE: cache,
 	}
 
 	server := http.Server{
