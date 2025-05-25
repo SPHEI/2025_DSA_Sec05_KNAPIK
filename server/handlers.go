@@ -288,60 +288,91 @@ func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
-// 	prepareResponse(w)
+//	func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
+//		prepareResponse(w)
 //
-// 	user := struct {
-// 		Token          string `json:"token"`
-// 		Name           string `json:"name"`
-// 		Street         string `json:"street"`
-// 		BuildingNumber string `json:"building_number"`
-// 		BuildingName   string `json:"building_name"`
-// 		FlatNumber     string `json:"flat_number"`
-// 		OwnerName      string `json:"owner_name"`
-// 	}{}
+//		user := struct {
+//			Token          string `json:"token"`
+//			Name           string `json:"name"`
+//			Street         string `json:"street"`
+//			BuildingNumber string `json:"building_number"`
+//			BuildingName   string `json:"building_name"`
+//			FlatNumber     string `json:"flat_number"`
+//			OwnerName      string `json:"owner_name"`
+//		}{}
 //
-// 	err := json.NewDecoder(r.Body).Decode(&user)
-// 	if err != nil {
-// 		log.Println(err)
-// 		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
-// 		return
-// 	}
+//		err := json.NewDecoder(r.Body).Decode(&user)
+//		if err != nil {
+//			log.Println(err)
+//			sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
+//			return
+//		}
 //
-// 	email, err := auth.ValidateSession(app.CACHE, user.Token)
-// 	if err != nil {
-// 		log.Println(err)
-// 		sendError(w, Error{401, "Incorrect Token", "Unauthorized"})
-// 		return
-// 	}
+//		email, err := auth.ValidateSession(app.CACHE, user.Token)
+//		if err != nil {
+//			log.Println(err)
+//			sendError(w, Error{401, "Incorrect Token", "Unauthorized"})
+//			return
+//		}
 //
-// 	role, err := database.GetRole(app.DB, email)
-// 	if err != nil {
-// 		log.Println(err)
-// 		sendError(w, Error{401, "Database", "Internal Server Error"})
-// 		return
-// 	}
-// 	log.Println(role)
-// 	if role != 1 {
-// 		log.Println("Wrong role")
-// 		sendError(w, Error{401, "Wrong role", "Unauthorized"})
-// 		return
-// 	}
+//		role, err := database.GetRole(app.DB, email)
+//		if err != nil {
+//			log.Println(err)
+//			sendError(w, Error{401, "Database", "Internal Server Error"})
+//			return
+//		}
+//		log.Println(role)
+//		if role != 1 {
+//			log.Println("Wrong role")
+//			sendError(w, Error{401, "Wrong role", "Unauthorized"})
+//			return
+//		}
 //
 //
-// 	err = database.AddApartament(app.DB, []string{user.Name, string(hashedPassword), user.Email, user.Phone}, user.Role)
-// 	if err != nil {
-// 		log.Println(err)
-// 		sendError(w, Error{500, "Could not add user", "Internal Server Error"})
-// 		return
-// 	}
+//		err = database.AddApartament(app.DB, []string{user.Name, string(hashedPassword), user.Email, user.Phone}, user.Role)
+//		if err != nil {
+//			log.Println(err)
+//			sendError(w, Error{500, "Could not add user", "Internal Server Error"})
+//			return
+//		}
 //
-// 	user.Password = strings.Repeat("*", len(user.Password)) // should be changed
-// 	if err := json.NewEncoder(w).Encode(user); err != nil {
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 		return
-// 	}
-// }
+//		user.Password = strings.Repeat("*", len(user.Password)) // should be changed
+//		if err := json.NewEncoder(w).Encode(user); err != nil {
+//			w.WriteHeader(http.StatusInternalServerError)
+//			return
+//		}
+//	}
+func (app *app) getEmailList(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	tenants := struct {
+		Token  string   `json:"token"`
+		Emails []string `json:"emails"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&tenants)
+	if err != nil {
+		log.Println(err)
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
+		return
+	}
+
+	if erro := app.checkAdmin(tenants.Token); erro != nil {
+		sendError(w, *erro)
+		return
+	}
+
+	tenants.Emails, err = database.GetEmails(app.DB)
+	if err != nil {
+		log.Println(err)
+		sendError(w, Error{400, "Database", "Internal Server Error"})
+	}
+
+	if err := json.NewEncoder(w).Encode(tenants); err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+}
 
 func (app *app) getTenantList(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
