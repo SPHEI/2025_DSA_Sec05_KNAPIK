@@ -1,14 +1,31 @@
 "use client"
-import { format } from "path";
 import "../globals.css";
 import { useState, useEffect } from "react";
+import { useRouter} from 'next/navigation';
+import Cookies from "js-cookie";
 
 //Admin only
 function Dashboard() {
     const [ready,setReady] = useState(false)
     const [error, setError] = useState('none')
+
+    const router = useRouter();
+
     useEffect(() => {
         //Page setup goes here
+        var a = Cookies.get("role");
+        if(a == null )
+        {
+            alert("You need to be logged in to see this page.");
+            router.push("/login");
+            return
+        }
+        if(a != "1")
+        {
+            alert("You need to be an admin to see this page.");
+            router.push("/dashboard");
+            return
+        }
         setReady(true);
     },[])
 
@@ -58,19 +75,55 @@ function Dashboard() {
         setNip(a);
     }
 
-    function sendData()
+    async function sendData()
     {
-        var a = role + "\n\nName: " + name + "\nE-mail: " + email + "\nPhone number: " + phone + "\nPassword: " + password + "\nRepeated password: " + repassword + "\n";
-        if(role === "Tenant")
+        var a = 0;
+        var t = Cookies.get("token");
+        if(password != repassword)
         {
-            a += "Apartment: " + apartment + "\nRent: " + rent + "\n"; 
-        } 
-        if(role === "Subcontractor")
-        {
-            a += "Address: " + address + "\nNIP: " + nip + "\nSpeciality: " + speciality;
+            alert("Passwords don't match")
+            return
         }
-        alert(a)
-    }
+        if(t == null)
+        {
+            alert("Token not found.");
+            return;
+        }
+        if (role === 'Admin'){a = 1}
+        if (role === 'Tenant'){a = 2}
+        if (role === 'Subcontractor'){a = 3}
+        try {
+            const res = await fetch('http://localhost:8080/adduser',{
+                method:'POST',
+                body: JSON.stringify({ 
+                    "token": t,
+                    name, 
+                    password,
+                    email,
+                    phone,
+                    apartment,
+                    rent,
+                    address,
+                    nip,
+                    speciality,
+                    "role":a
+                })
+            });
+            const data = await res.json();
+            if(data.message)
+            {
+                alert(data.message)
+            }
+            else
+            {
+                alert("User added succesfully.");
+            }
+        } catch (err: any) {
+            setError(err.message)
+        } finally{
+            setReady(true);
+        }
+}
 
     const line = "flex flex-row gap-1";
     if(ready)
@@ -85,9 +138,9 @@ function Dashboard() {
                     <div className="white-box w-[55%] py-8">
                         <div className="flex flex-col gap-2 w-[100%]">
                             <select className="input-box w-[25.5%]" defaultValue={'Tenant'} onChange={(a) => {setRole(a.target.value)}}>
+                                <option value="Admin">Admin</option>
                                 <option value="Tenant">Tenant</option>
                                 <option value="Subcontractor">Subcontractor</option>
-                                <option value="Admin">Admin</option>
                             </select>
                             <div className={line}>
                                 <input className="input-box" placeholder="Name" value={name} onChange={(a) => {setName(a.target.value)}}/>

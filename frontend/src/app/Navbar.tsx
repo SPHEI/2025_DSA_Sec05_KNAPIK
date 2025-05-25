@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from 'next/navigation';
 import logo from './logo.png';
+import Cookies from "js-cookie";
 
 function Navbar() {
     const [ready,setReady] = useState(false)
@@ -17,6 +18,24 @@ function Navbar() {
     function refresh()
     {
         setCurrentPage(pathname.substring(1))
+        var a = Cookies.get("role");
+        if(a != null){
+            switch(a){
+                case "1":
+                    setUserType("admin")
+                    break
+                case "2":
+                    setUserType("tenant")
+                    break
+                case "3":
+                    setUserType("subcontractor")
+                    break
+            }
+        }
+        else
+        {
+            setUserType("not logged in")
+        }
         setReady(true)
     }
 
@@ -24,6 +43,8 @@ function Navbar() {
     {
         //Log out Properly later
         setUserType("not logged in")
+        Cookies.remove("token")
+        Cookies.remove("role")
         router.push("/login")
     }
 

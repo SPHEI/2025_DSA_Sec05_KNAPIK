@@ -14,7 +14,14 @@ function Dashboard() {
               const res = await fetch('http://localhost:8080/tenents');
               const data = await res.json();
               //alert(JSON.stringify(data));
-              setNames(data.names)
+              if(data.message)
+              {
+                setError(data.message)
+              }
+              else
+              {
+                setNames(data.names)
+              }
             } catch (err: any) {
                 setError(err.message)
             } finally{
