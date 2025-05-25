@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from 'next/navigation';
 import logo from './logo.png';
+import Cookies from "js-cookie";
 
 function Navbar() {
     const [ready,setReady] = useState(false)
@@ -17,13 +18,45 @@ function Navbar() {
     function refresh()
     {
         setCurrentPage(pathname.substring(1))
+        var a = Cookies.get("role");
+        if(a != null){
+            switch(a){
+                case "1":
+                    setUserType("admin")
+                    break
+                case "2":
+                    setUserType("tenant")
+                    break
+                case "3":
+                    setUserType("subcontractor")
+                    break
+            }
+        }
+        else
+        {
+            setUserType("not logged in")
+        }
         setReady(true)
     }
 
-    function LogOut()
+    async function LogOut()
     {
         //Log out Properly later
         setUserType("not logged in")
+        try{
+            var t = Cookies.get("token")
+            var r = await fetch('http://localhost:8080/logout',{
+                method: 'POST',
+                body: JSON.stringify({
+                    "token" : t 
+                })
+              });
+            //alert(JSON.stringify(await r.json()))
+        }catch(err: any){
+            alert(err.message)
+        }
+        Cookies.remove("token")
+        Cookies.remove("role")
         router.push("/login")
     }
 
@@ -79,6 +112,10 @@ function Navbar() {
 
                                 <button className={currentPage == "dashboard" ? buttonSelected : button}        onClick={() => router.push("/dashboard")}>
                                     Dashboard
+                                </button>
+
+                                <button className={currentPage == "apartments" ? buttonSelected : button}          onClick={() => router.push("/apartments")}>
+                                    Apartments
                                 </button>
 
                                 <button className={currentPage == "tenants" ? buttonSelected : button}          onClick={() => router.push("/tenants")}>

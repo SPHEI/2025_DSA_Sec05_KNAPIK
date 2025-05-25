@@ -1,15 +1,62 @@
 "use client"
-import { format } from "path";
 import "../globals.css";
 import { useState, useEffect } from "react";
+import { useRouter} from 'next/navigation';
+import Cookies from "js-cookie";
 
 //Admin only
 function Dashboard() {
     const [ready,setReady] = useState(false)
     const [error, setError] = useState('none')
+
+    const [apartaments,setApartaments] = useState([''])
+    const [specialities,setSpecialities] = useState(['a','b'])
+
+    const router = useRouter();
+
     useEffect(() => {
+        const fetchData = async () => {
         //Page setup goes here
+        var a = Cookies.get("role");
+        if(a == null )
+        {
+            alert("You need to be logged in to see this page.");
+            router.push("/login");
+            return
+        }
+        if(a != "1")
+        {
+            alert("You need to be an admin to see this page.");
+            router.push("/dashboard");
+            return
+        }
+
+        var t = Cookies.get("token");
+        try{
+        const res = await fetch('http://localhost:8080/apartaments',{
+                method:'POST',
+                body: JSON.stringify({ 
+                    "token": t,
+                })
+            });
+            const data = await res.json();
+            if(data.message)
+            {
+                setError(data.message)
+            }
+            else
+            {
+                setApartaments(data.apartaments);
+            }
+        }
+        catch(err: any)
+        {
+            setError(err.message);
+        }
+
         setReady(true);
+        }
+        fetchData();
     },[])
 
     const [role, setRole] = useState('Tenant')
@@ -58,19 +105,55 @@ function Dashboard() {
         setNip(a);
     }
 
-    function sendData()
+    async function sendData()
     {
-        var a = role + "\n\nName: " + name + "\nE-mail: " + email + "\nPhone number: " + phone + "\nPassword: " + password + "\nRepeated password: " + repassword + "\n";
-        if(role === "Tenant")
+        var a = 0;
+        var t = Cookies.get("token");
+        if(password != repassword)
         {
-            a += "Apartment: " + apartment + "\nRent: " + rent + "\n"; 
-        } 
-        if(role === "Subcontractor")
-        {
-            a += "Address: " + address + "\nNIP: " + nip + "\nSpeciality: " + speciality;
+            alert("Passwords don't match")
+            return
         }
-        alert(a)
-    }
+        if(t == null)
+        {
+            alert("Token not found.");
+            return;
+        }
+        if (role === 'Admin'){a = 1}
+        if (role === 'Tenant'){a = 2}
+        if (role === 'Subcontractor'){a = 3}
+        try {
+            const res = await fetch('http://localhost:8080/adduser',{
+                method:'POST',
+                body: JSON.stringify({ 
+                    "token": t,
+                    name, 
+                    password,
+                    email,
+                    phone,
+                    apartment,
+                    rent,
+                    address,
+                    nip,
+                    speciality,
+                    "role":a
+                })
+            });
+            const data = await res.json();
+            if(data.message)
+            {
+                alert(data.message)
+            }
+            else
+            {
+                alert("User added succesfully.");
+            }
+        } catch (err: any) {
+            setError(err.message)
+        } finally{
+            setReady(true);
+        }
+}
 
     const line = "flex flex-row gap-1";
     if(ready)
@@ -84,34 +167,60 @@ function Dashboard() {
                     </div>
                     <div className="white-box w-[55%] py-8">
                         <div className="flex flex-col gap-2 w-[100%]">
-                            <select className="input-box w-[25.5%]" defaultValue={'Tenant'} onChange={(a) => {setRole(a.target.value)}}>
+                            <select className="input-box w-[26%]" defaultValue={'Tenant'} onChange={(a) => {setRole(a.target.value)}}>
+                                <option value="Admin">Admin</option>
                                 <option value="Tenant">Tenant</option>
                                 <option value="Subcontractor">Subcontractor</option>
-                                <option value="Admin">Admin</option>
                             </select>
+                            <div className={line}>
+                                <b className="w-[26%]">Name</b>
+                                <b className="w-[26%]">Email</b>
+                                <b className="w-[26%]">Phone</b>
+                            </div>
                             <div className={line}>
                                 <input className="input-box" placeholder="Name" value={name} onChange={(a) => {setName(a.target.value)}}/>
                                 <input className="input-box" placeholder="E-mail" value={email} onChange={(a) => {setEmail(a.target.value)}} />
                                 <input type="tel" className="input-box" placeholder="Phone" pattern="[0-9]*" value={phone} onChange={phoneChange}/>
                             </div>
                             <div className={line}>
+                                <b className="w-[26%]">Password</b>
+                                <b className="w-[26%]">Repeat password</b>
+                            </div>
+                            <div className={line}>
                                 <input className="input-box" placeholder="Password" type="password" value={password} onChange={(a) => {setPassword(a.target.value)}}/>
                                 <input className="input-box" placeholder="Repeat Password" type="password" value={repassword} onChange={(a) => {setRepassword(a.target.value)}}/>
                             </div>
                             {role === "Tenant" && (
-                                <div className={line}>
-                                    <input className="input-box" placeholder="Apartment" value={apartment} onChange={(a) => {setApartment(a.target.value)}}/>
-                                    <input className="input-box" placeholder="Rent" value={rent} onChange={rentChange}/>
+                                <div>
+                                    <div className={line}>
+                                        <b className="w-[26%]">Apartment</b>
+                                        <b className="w-[26%]">Rent</b>
+                                    </div>
+                                    <div className={line}>
+                                        <select className="input-box w-[26%]" onChange={(a) => {setApartment(a.target.value)}}>
+                                            {apartaments.map((a,index) => (<option key={index} value={a}>{a}</option>))}
+                                        </select>
+                                        <input className="input-box" placeholder="Rent" value={rent} onChange={rentChange}/>
+                                    </div>
                                 </div>
                             )}
                             {role === "Subcontractor" && (
-                                <div className={line}>
-                                    <input className="input-box" placeholder="Address" value={address} onChange={(a) => {setAddress(a.target.value)}}/>
-                                    <input className="input-box" placeholder="NIP" value={nip} onChange={nipChange}/>
-                                    <input className="input-box" placeholder="Speciality" value={speciality} onChange={(a) => {setSpeciality(a.target.value)}}/>
+                                <div>
+                                    <div className={line}>
+                                        <b className="w-[26%]">Address</b>
+                                        <b className="w-[26%]">NIP</b>
+                                        <b className="w-[26%]">Speciality</b>
+                                    </div>
+                                    <div className={line}>
+                                        <input className="input-box" placeholder="Address" value={address} onChange={(a) => {setAddress(a.target.value)}}/>
+                                        <input className="input-box" placeholder="NIP" value={nip} onChange={nipChange}/>
+                                        <select className="input-box w-[26%]" onChange={(a) => {setSpeciality(a.target.value)}}>
+                                            {specialities.map((a,index) => (<option key={index} value={a}>{a}</option>))}
+                                        </select>
+                                    </div>
                                 </div>
                             )}
-                            <button className="black-button w-[25.5%]" onClick={sendData}>Add</button>
+                            <button className="black-button w-[26%]" onClick={sendData}>Add</button>
                         </div>
                     </div>
                 </main>

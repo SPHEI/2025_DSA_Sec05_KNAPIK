@@ -1,21 +1,21 @@
 "use client"
 import "../globals.css";
 import { useState, useEffect } from "react";
-import TenantBox from "../components/TenantBox";
 import Cookies from "js-cookie";
-
+import ApartmentBox from "../components/ApartmentBox";
 //Admin only
-function Tenants() {
+function Apartments() {
     const [ready,setReady] = useState(false)
     const [error, setError] = useState('none')
-    const [names,setNames] = useState([''])
+
+    const [apartments, setApartments] = useState([''])
 
     useEffect(() => {
         const fetchData = async () => {
             
             try {
                 var t = Cookies.get("token");
-              const res = await fetch('http://localhost:8080/tenents',{
+              const res = await fetch('http://localhost:8080/apartaments',{
                 method: 'POST',
                 body: JSON.stringify({
                     "token" : t 
@@ -29,7 +29,7 @@ function Tenants() {
               }
               else
               {
-                setNames(data.names)
+                setApartments(data.apartaments)
               }
             } catch (err: any) {
                 setError(err.message)
@@ -47,10 +47,10 @@ function Tenants() {
             return (
                 <main>
                     <div className="page-head w-[50%]">
-                        <b className="text-4xl">Tenants</b> 
-                        <button className="black-button">+ Add Tenants</button>
+                        <b className="text-4xl">Apartments</b> 
+                        <button className="black-button">+ Add Apartment</button>
                     </div>
-                    {names.map((text, index) => <TenantBox key={index} name={text}/>)}
+                    {apartments.map((a,index) => <ApartmentBox key={index} name={a}/>)}
                 </main>
             );
         }
@@ -74,4 +74,4 @@ function Tenants() {
     }
 };
 
-export default Tenants;
+export default Apartments;
