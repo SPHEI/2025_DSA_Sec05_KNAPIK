@@ -114,6 +114,10 @@ function Navbar() {
                                     Dashboard
                                 </button>
 
+                                <button className={currentPage == "apartments" ? buttonSelected : button}          onClick={() => router.push("/apartments")}>
+                                    Apartments
+                                </button>
+
                                 <button className={currentPage == "tenants" ? buttonSelected : button}          onClick={() => router.push("/tenants")}>
                                     Tenants
                                 </button>
