@@ -35,7 +35,7 @@ CREATE TABLE Apartament(
 CREATE TABLE Pricing_History(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     apartment_id INTEGER NOT NULL,
-    date DATE NOT NULL,
+    date DATE NOT NULL DEFAULT CURRENT_DATE,
     price REAL NOT NULL,
     is_current BOOLEAN DEFAULT 0,
     FOREIGN KEY (apartment_id) REFERENCES Apartament(id)

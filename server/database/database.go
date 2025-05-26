@@ -92,8 +92,8 @@ func GetInfo(db *sql.DB, email string) (string, string, int, error) {
 	query := "SELECT name, phone, role_id FROM User WHERE email = ?"
 
 	var name, phone string
-	var role_id int
-	err := db.QueryRow(query, email).Scan(&name, &phone, &role_id)
+	var roleId int
+	err := db.QueryRow(query, email).Scan(&name, &phone, &roleId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No user found
@@ -103,14 +103,14 @@ func GetInfo(db *sql.DB, email string) (string, string, int, error) {
 		return "", "", -1, err
 	}
 
-	return name, phone, role_id, nil
+	return name, phone, roleId, nil
 }
 
 func GetRole(db *sql.DB, email string) (int, error) {
 	query := "SELECT role_id FROM User WHERE email = ?"
 
-	var role_id int
-	err := db.QueryRow(query, email).Scan(&role_id)
+	var roleId int
+	err := db.QueryRow(query, email).Scan(&roleId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No user found
@@ -120,5 +120,14 @@ func GetRole(db *sql.DB, email string) (int, error) {
 		return -1, err
 	}
 
-	return role_id, nil
+	return roleId, nil
+}
+
+func ChangeRent(db *sql.DB, apartamentId int, rent string) error {
+	query := "INSERT INTO Pricing_History (apartament_id, rent) VALUES(?, ?)"
+
+	//id := getUserCount(db) + 1
+
+	_, err := db.Exec(query, apartamentId, rent)
+	return err
 }

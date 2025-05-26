@@ -36,6 +36,34 @@ func sendError(w http.ResponseWriter, error Error) {
 	}
 }
 
+func (app *app) changeRent(w http.ResponseWriter, r *http.Request) {
+	data := struct {
+		Token        string `json:"token"`
+		ApartamentId int    `json:"apartament_id"`
+		Rent         string `json:"rent"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		log.Println(err)
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
+		return
+	}
+
+	if erro := app.checkAdmin(data.Token); erro != nil {
+		sendError(w, *erro)
+		return
+	}
+
+	if err = database.ChangeRent(app.DB, data.ApartamentId, data.Rent); err != nil {
+		log.Println(err)
+		sendError(w, Error{400, "Database", "Internal Server Error"})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func (app *app) addUser(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 

@@ -16,6 +16,7 @@ func (app *app) routes() http.Handler {
 	router.HandleFunc("POST /subspec", app.getSubContractorSpec)
 	router.HandleFunc("POST /addsubspec", app.addSubContractorSpec)
 	router.HandleFunc("POST /addapartament", app.addApartament)
+	router.HandleFunc("POST /changerent", app.changeRent)
 
 	return router
 }
