@@ -16,6 +16,7 @@ function Dashboard() {
 
     const pathname = usePathname();
 
+
     useEffect(() => {
         const fetchData = async () => {
         //Page setup goes here
@@ -182,7 +183,7 @@ function Dashboard() {
                             <div className={line}>
                                 <input className="input-box" placeholder="Name" value={name} onChange={(a) => {setName(a.target.value)}}/>
                                 <input className="input-box" placeholder="E-mail" value={email} onChange={(a) => {setEmail(a.target.value)}} />
-                                <input type="tel" className="input-box" placeholder="Phone" pattern="[0-9]*" value={phone} onChange={phoneChange}/>
+                                <input className="input-box" placeholder="Phone" value={phone} onChange={phoneChange}/>
                             </div>
                             <div className={line}>
                                 <b className="w-[26%]">Password</b>
