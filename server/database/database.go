@@ -109,7 +109,7 @@ func GetOwners(db *sql.DB) ([]int, []string, []string, []string, error) {
 }
 
 func AddOwner(db *sql.DB, data []string) error {
-	query := "INSERT INTO Owner (name, emali, phone) VALUES(?, ?, ?)"
+	query := "INSERT INTO Owner (name, email, phone) VALUES(?, ?, ?)"
 
 	_, err := db.Exec(query, data[0], data[1], data[2])
 
