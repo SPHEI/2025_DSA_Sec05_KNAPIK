@@ -147,12 +147,23 @@ func GetEmails(db *sql.DB) ([]string, error) {
 
 }
 
-func GetTenent(db *sql.DB) ([]string, error) {
-	query := `SELECT User.name FROM User INNER JOIN Role ON User.role_id = Role.id WHERE Role.name = "tenent"`
+func GetTenents(db *sql.DB) ([]int, []string, []string, []string, []int, error) {
+	query := `SELECT id FROM User WHERE role_id = "2"`
+	id, err := getMultiRowInt(db, query)
 
-	data, err := getMultiRow(db, query)
+	query = `SELECT name FROM User WHERE role_id = "2"`
+	name, err := getMultiRow(db, query)
 
-	return data, err
+	query = `SELECT email FROM User WHERE role_id = "2"`
+	email, err := getMultiRow(db, query)
+
+	query = `SELECT phone FROM User WHERE role_id = "2"`
+	phone, err := getMultiRow(db, query)
+
+	query = `SELECT role_id FROM User WHERE role_id = "2"`
+	role_id, err := getMultiRowInt(db, query)
+
+	return id, name, email, phone, role_id, err
 }
 
 func GetSubcontractorSpec(db *sql.DB) ([]string, error) {
