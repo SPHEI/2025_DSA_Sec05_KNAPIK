@@ -94,7 +94,6 @@ function Dashboard() {
     const [password, setPassword] = useState('');
     const [repassword, setRepassword] = useState('');
     const [apartment, setApartment] = useState('');
-    const [rent, setRent] = useState('');
     const [address, setAddress] = useState('');
     const [nip, setNip] = useState('');
     const [speciality, setSpeciality] = useState('');
@@ -114,15 +113,6 @@ function Dashboard() {
         const formatted = formatPhone(e.target.value);
         setPhone(formatted);
     };
-
-    const formatRent = (value: string) => {
-        const digits = value.replace(/[^\d.]/g, '');
-        return digits;
-    }
-    function rentChange(e: React.ChangeEvent<HTMLInputElement>){
-        const a = formatRent(e.target.value);
-        setRent(a);
-    }
 
 
     const formatNip = (value: string) => {
@@ -203,7 +193,6 @@ function Dashboard() {
                     email,
                     phone,
                     apartment,
-                    rent,
                     address,
                     nip,
                     speciality,
@@ -249,29 +238,27 @@ function Dashboard() {
                                 <b className="w-[26%]">Phone</b>
                             </div>
                             <div className={line}>
-                                <input className="input-box" placeholder="Name" value={name} onChange={(a) => {setName(a.target.value)}}/>
-                                <input className="input-box" placeholder="E-mail" value={email} onChange={(a) => {setEmail(a.target.value)}} />
-                                <input className="input-box" placeholder="Phone" value={phone} onChange={phoneChange}/>
+                                <input className="input-box w-[26%]" placeholder="Name" value={name} onChange={(a) => {setName(a.target.value)}}/>
+                                <input className="input-box w-[26%]" placeholder="E-mail" value={email} onChange={(a) => {setEmail(a.target.value)}} />
+                                <input className="input-box w-[26%]" placeholder="Phone" value={phone} onChange={phoneChange}/>
                             </div>
                             <div className={line}>
                                 <b className="w-[26%]">Password</b>
                                 <b className="w-[26%]">Repeat password</b>
                             </div>
                             <div className={line}>
-                                <input className="input-box" placeholder="Password" type="password" value={password} onChange={(a) => {setPassword(a.target.value)}}/>
-                                <input className="input-box" placeholder="Repeat Password" type="password" value={repassword} onChange={(a) => {setRepassword(a.target.value)}}/>
+                                <input className="input-box w-[26%]" placeholder="Password" type="password" value={password} onChange={(a) => {setPassword(a.target.value)}}/>
+                                <input className="input-box w-[26%]" placeholder="Repeat Password" type="password" value={repassword} onChange={(a) => {setRepassword(a.target.value)}}/>
                             </div>
                             {role === "Tenant" && (
                                 <div>
                                     <div className={line}>
                                         <b className="w-[26%]">Apartment</b>
-                                        <b className="w-[26%]">Rent</b>
                                     </div>
                                     <div className={line}>
                                         <select className="input-box w-[26%]" onChange={(a) => {setApartment(a.target.value)}}>
                                             {apartaments.map((a,index) => (<option key={index} value={a.name}>{a.name}</option>))}
                                         </select>
-                                        <input className="input-box" placeholder="Rent" value={rent} onChange={rentChange}/>
                                     </div>
                                 </div>
                             )}
@@ -283,8 +270,8 @@ function Dashboard() {
                                         <b className="w-[26%]">Speciality</b>
                                     </div>
                                     <div className={line}>
-                                        <input className="input-box" placeholder="Address" value={address} onChange={(a) => {setAddress(a.target.value)}}/>
-                                        <input className="input-box" placeholder="NIP" value={nip} onChange={nipChange}/>
+                                        <input className="input-box w-[26%]" placeholder="Address" value={address} onChange={(a) => {setAddress(a.target.value)}}/>
+                                        <input className="input-box w-[26%]" placeholder="NIP" value={nip} onChange={nipChange}/>
                                         <select className="input-box w-[26%]" onChange={(a) => {setSpeciality(a.target.value)}}>
                                             {specialities.map((a,index) => (<option key={index} value={a}>{a}</option>))}
                                         </select>
@@ -293,13 +280,13 @@ function Dashboard() {
                             )}
                             <div className={line}>
                                 <button className="black-button w-[26%]" onClick={sendData}>Add</button>
-                                {role === "Subcontractor" && (<button className="black-button w-[26%] relative left-57.5" onClick={() => {setShowPopup(true)}}>+ Add Speciality</button>)}
+                                {role === "Subcontractor" && (<button className="black-button w-[26%] relative left-[26.5%]" onClick={() => {setShowPopup(true)}}>+ Add Speciality</button>)}
                             </div>
                         </div>
                     </div>
                     {showPopup && (
                     <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50">
-                        <div className="white-box w-[20%] h-[20%] rounded-lg relative">
+                        <div className="white-box w-[20%] py-4 rounded-lg relative">
                             <div className="flex flex-col gap-2 w-[100%]">
                                 <b className="text-4xl">Add Speciality</b>
                                 <input className="input-box" placeholder="Speciality Name" onChange={(a)=>{setNewSpeciality(a.target.value)}}/>

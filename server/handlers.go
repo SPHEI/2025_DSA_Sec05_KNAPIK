@@ -438,8 +438,6 @@ func (app *app) changeRent(w http.ResponseWriter, r *http.Request) {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
-
-	log.Printf("a")
 	w.WriteHeader(http.StatusOK)
 }
 
