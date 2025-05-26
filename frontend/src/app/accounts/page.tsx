@@ -10,11 +10,14 @@ function Dashboard() {
     const [error, setError] = useState('none')
 
     const [apartaments,setApartaments] = useState([''])
-    const [specialities,setSpecialities] = useState(['a','b'])
+    const [specialities,setSpecialities] = useState([''])
 
     const router = useRouter();
 
     const pathname = usePathname();
+
+    const [showPopup,setShowPopup] = useState(false)
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -55,11 +58,38 @@ function Dashboard() {
         {
             setError(err.message);
         }
+        await reFetchSpecialities();
 
         setReady(true);
         }
         fetchData();
     },[pathname])
+
+    async function reFetchSpecialities()
+    {
+        var t = Cookies.get("token");
+        try{
+        const res = await fetch('http://localhost:8080/subspec',{
+                method:'POST',
+                body: JSON.stringify({ 
+                    "token": t,
+                })
+            });
+            const data = await res.json();
+            if(data.message)
+            {
+                setError(data.message)
+            }
+            else
+            {
+                setSpecialities(data.spec);
+            }
+        }
+        catch(err: any)
+        {
+            setError(err.message);
+        }
+    }
 
     const [role, setRole] = useState('Tenant')
 
@@ -73,6 +103,8 @@ function Dashboard() {
     const [address, setAddress] = useState('');
     const [nip, setNip] = useState('');
     const [speciality, setSpeciality] = useState('');
+
+    const [newSpeciality, setNewSpeciality] = useState('');
 
     function formatPhone(value: string) {
         let cleaned = value.replace(/[^\d+\s]/g, '');
@@ -107,6 +139,35 @@ function Dashboard() {
         setNip(a);
     }
 
+    async function addSpeciality()
+    {
+        var t = Cookies.get("token");
+        try {
+            const res = await fetch('http://localhost:8080/addsubspec',{
+                method:'POST',
+                body: JSON.stringify({ 
+                    "token" : t,
+                    "name" : newSpeciality
+                })
+            });
+            if(res.ok)
+            {
+                alert("Speciality added succesfully.");
+            }
+            else
+            {
+                var data = await res.json()
+                alert(data.message)
+            }
+            reFetchSpecialities()
+            setShowPopup(false)
+        } catch (err: any) {
+            setError(err.message)
+        } finally{
+            setReady(true);
+        }
+    }
+
     async function sendData()
     {
         var a = 0;
@@ -124,6 +185,19 @@ function Dashboard() {
         if (role === 'Admin'){a = 1}
         if (role === 'Tenant'){a = 2}
         if (role === 'Subcontractor'){a = 3}
+        alert(JSON.stringify({ 
+                    "token": t,
+                    name, 
+                    password,
+                    email,
+                    phone,
+                    apartment,
+                    rent,
+                    address,
+                    nip,
+                    speciality,
+                    "role":a
+                }))
         try {
             const res = await fetch('http://localhost:8080/adduser',{
                 method:'POST',
@@ -182,7 +256,7 @@ function Dashboard() {
                             <div className={line}>
                                 <input className="input-box" placeholder="Name" value={name} onChange={(a) => {setName(a.target.value)}}/>
                                 <input className="input-box" placeholder="E-mail" value={email} onChange={(a) => {setEmail(a.target.value)}} />
-                                <input type="tel" className="input-box" placeholder="Phone" pattern="[0-9]*" value={phone} onChange={phoneChange}/>
+                                <input className="input-box" placeholder="Phone" value={phone} onChange={phoneChange}/>
                             </div>
                             <div className={line}>
                                 <b className="w-[26%]">Password</b>
@@ -222,9 +296,24 @@ function Dashboard() {
                                     </div>
                                 </div>
                             )}
-                            <button className="black-button w-[26%]" onClick={sendData}>Add</button>
+                            <div className={line}>
+                                <button className="black-button w-[26%]" onClick={sendData}>Add</button>
+                                {role === "Subcontractor" && (<button className="black-button w-[26%] relative left-57.5" onClick={() => {setShowPopup(true)}}>+ Add Speciality</button>)}
+                            </div>
                         </div>
                     </div>
+                    {showPopup && (
+                    <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50">
+                        <div className="white-box w-[20%] h-[20%] rounded-lg relative">
+                            <div className="flex flex-col gap-2 w-[100%]">
+                                <b className="text-4xl">Add Speciality</b>
+                                <input className="input-box" placeholder="Speciality Name" onChange={(a)=>{setNewSpeciality(a.target.value)}}/>
+                                <button className="black-button" onClick={addSpeciality}>Add</button>
+                            </div>
+                            <button onClick={() => setShowPopup(false)}className="absolute top-4 right-4 text-xl font-bold cursor-pointer">x</button>
+                        </div>
+                    </div>
+                    )}
                 </main>
             );
         }

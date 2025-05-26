@@ -11,7 +11,7 @@ function Tenants() {
     const [error, setError] = useState('none')
     const [names,setNames] = useState([''])
     const pathname = usePathname();
-
+    const router = useRouter();
     useEffect(() => {
         const fetchData = async () => {
             
@@ -50,7 +50,7 @@ function Tenants() {
                 <main>
                     <div className="page-head w-[50%]">
                         <b className="text-4xl">Tenants</b> 
-                        <button className="black-button">+ Add Tenants</button>
+                        <button className="black-button" onClick={() =>{router.push("/accounts")}}>+ Add Tenants</button>
                     </div>
                     {names.map((text, index) => <TenantBox key={index} name={text}/>)}
                 </main>
