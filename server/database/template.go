@@ -1,0 +1,33 @@
+package database
+
+import (
+	"database/sql"
+)
+
+func insertValue(db *sql.DB, query, value string) error {
+	_, err := db.Exec(query, value)
+	return err
+}
+
+func getMultiRow(db *sql.DB, query string) ([]string, error) {
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var values []string
+	for rows.Next() {
+		var value string
+		if err := rows.Scan(&value); err != nil {
+			//
+		}
+		values = append(values, value)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return values, nil
+}
