@@ -135,6 +135,18 @@ func GetRent(db *sql.DB, apartamentId int) (float32, error) {
 
 }
 
+func ChangeRent(db *sql.DB, apartamentId int, rent float32) error {
+	query := `UPDATE Pricing_History
+	SET is_current = 1
+	WHERE is_current = 0 AND apartament_id = ?`
+	_, err := db.Exec(query)
+
+	query = "INSERT INTO Pricing_History (apartament_id, rent) VALUES(?, ?)"
+	_, err = db.Exec(query, apartamentId, rent)
+
+	return err
+}
+
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
@@ -193,14 +205,5 @@ func AddUser(db *sql.DB, user []string, role_id int) error {
 	//id := getUserCount(db) + 1
 
 	_, err := db.Exec(query, user[0], user[1], user[2], user[3], role_id)
-	return err
-}
-
-func ChangeRent(db *sql.DB, apartamentId int, rent float32) error {
-	query := "INSERT INTO Pricing_History (apartament_id, rent) VALUES(?, ?)"
-
-	//id := getUserCount(db) + 1
-
-	_, err := db.Exec(query, apartamentId, rent)
 	return err
 }
