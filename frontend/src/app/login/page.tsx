@@ -1,7 +1,7 @@
 "use client"
 import "../globals.css";
 import { useState, useEffect } from "react";
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation';
 import bg from './bg.png';
 import Cookies from "js-cookie";
 
@@ -14,10 +14,11 @@ function Login() {
 
     const router = useRouter();
 
+    const pathname = usePathname();
     useEffect(() => {
         //Page setup goes here
         setReady(true);
-    },[])
+    },[pathname])
 
     async function sendLogin(){
         try {

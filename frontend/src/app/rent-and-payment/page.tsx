@@ -4,15 +4,17 @@ import { useState, useEffect } from "react";
 import card from "./card.png";
 import PaymentBox from "../components/PaymentBox";
 import calendar from "./calendar.png";
+import { useRouter, usePathname } from 'next/navigation';
 
 //Shared by admin and tenants
 function RentAndPayment() {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("none");
+  const pathname = usePathname();
   useEffect(() => {
     //Page setup goes here
     setReady(true);
-  }, []);
+  }, [pathname]);
 
   if (ready) {
     if (error == "none") {

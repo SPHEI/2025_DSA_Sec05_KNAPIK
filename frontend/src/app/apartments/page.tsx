@@ -3,12 +3,16 @@ import "../globals.css";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import ApartmentBox from "../components/ApartmentBox";
+import { useRouter, usePathname } from 'next/navigation';
+
 //Admin only
 function Apartments() {
     const [ready,setReady] = useState(false)
     const [error, setError] = useState('none')
 
     const [apartments, setApartments] = useState([''])
+
+    const pathname = usePathname();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -38,7 +42,7 @@ function Apartments() {
             }
           };
           fetchData();
-    },[])
+    },[pathname])
 
     if(ready)
     {

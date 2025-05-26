@@ -2,15 +2,18 @@
 import "../globals.css";
 import { useState, useEffect } from "react";
 import RequestBox from "../components/RequestBox";
+import { useRouter, usePathname } from 'next/navigation';
 
 //Page is shared by all types of accounts
 function Requests() {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("none");
+
+  const pathname = usePathname();
   useEffect(() => {
     //Page setup goes here
     setReady(true);
-  }, []);
+  }, [pathname]);
 
   if (ready) {
     if (error == "none") {

@@ -1,7 +1,7 @@
 "use client"
 import "../globals.css";
 import { useState, useEffect } from "react";
-import { useRouter} from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Cookies from "js-cookie";
 
 //Admin only
@@ -13,6 +13,8 @@ function Dashboard() {
     const [specialities,setSpecialities] = useState(['a','b'])
 
     const router = useRouter();
+
+    const pathname = usePathname();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -57,7 +59,7 @@ function Dashboard() {
         setReady(true);
         }
         fetchData();
-    },[])
+    },[pathname])
 
     const [role, setRole] = useState('Tenant')
 

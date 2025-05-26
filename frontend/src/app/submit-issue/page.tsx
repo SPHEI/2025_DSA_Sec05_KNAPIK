@@ -1,6 +1,7 @@
 "use client";
 import "../globals.css";
 import { useState, useEffect } from "react";
+import { useRouter, usePathname } from 'next/navigation';
 
 //Tenants Only
 function SubmitIssue() {
@@ -16,10 +17,11 @@ function SubmitIssue() {
     alert("Issue submitted!");
   };
 
+  const pathname = usePathname();
   useEffect(() => {
     //Page setup goes here
     setReady(true);
-  }, []);
+  }, [pathname]);
 
   if (ready) {
     if (error == "none") {

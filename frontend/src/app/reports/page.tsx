@@ -1,15 +1,17 @@
 "use client"
 import "../globals.css";
 import { useState, useEffect } from "react";
+import { useRouter, usePathname } from 'next/navigation';
 
 //Admin only
 function Reports() {
     const [ready,setReady] = useState(false)
     const [error, setError] = useState('none')
+    const pathname = usePathname();
     useEffect(() => {
         //Page setup goes here
         setReady(true);
-    },[])
+    },[pathname])
 
     if(ready)
     {

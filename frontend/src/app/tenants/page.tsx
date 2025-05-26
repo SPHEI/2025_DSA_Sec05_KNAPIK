@@ -3,12 +3,14 @@ import "../globals.css";
 import { useState, useEffect } from "react";
 import TenantBox from "../components/TenantBox";
 import Cookies from "js-cookie";
+import { useRouter, usePathname } from 'next/navigation';
 
 //Admin only
 function Tenants() {
     const [ready,setReady] = useState(false)
     const [error, setError] = useState('none')
     const [names,setNames] = useState([''])
+    const pathname = usePathname();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -38,7 +40,7 @@ function Tenants() {
             }
           };
           fetchData();
-    },[])
+    },[pathname])
 
     if(ready)
     {
