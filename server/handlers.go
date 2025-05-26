@@ -439,6 +439,7 @@ func (app *app) changeRent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Printf("a")
 	w.WriteHeader(http.StatusOK)
 }
 

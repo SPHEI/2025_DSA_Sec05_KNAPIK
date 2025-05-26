@@ -141,7 +141,7 @@ func ChangeRent(db *sql.DB, apartamentId int, rent float32) error {
 	WHERE is_current = 0 AND apartment_id = ?`
 	_, err := db.Exec(query)
 
-	query = "INSERT INTO Pricing_History (apartament_id, rent) VALUES(?, ?)"
+	query = "INSERT INTO Pricing_History (apartment_id, price) VALUES(?, ?)"
 	_, err = db.Exec(query, apartamentId, rent)
 
 	return err
