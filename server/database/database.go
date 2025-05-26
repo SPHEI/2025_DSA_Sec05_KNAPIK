@@ -92,6 +92,30 @@ func AddApartament(db *sql.DB, data []string, ownerId int) error {
 	return err
 }
 
+func GetOwners(db *sql.DB) ([]int, []string, []string, []string, error) {
+	query := `SELECT id FROM Owner`
+	id, err := getMultiRowInt(db, query)
+
+	query = `SELECT name FROM Owner`
+	name, err := getMultiRow(db, query)
+
+	query = `SELECT email FROM Owner`
+	street, err := getMultiRow(db, query)
+
+	query = `SELECT phone FROM Owner`
+	phone, err := getMultiRow(db, query)
+
+	return id, name, street, phone, err
+}
+
+func AddOwner(db *sql.DB, data []string) error {
+	query := "INSERT INTO Owner (name, emali, phone) VALUES(?, ?, ?)"
+
+	_, err := db.Exec(query, data[0], data[1], data[2])
+
+	return err
+}
+
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////

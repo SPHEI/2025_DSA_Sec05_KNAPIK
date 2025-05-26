@@ -288,6 +288,80 @@ func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func (app *app) getOwners(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	type owner struct {
+		Id    int    `json:"id"`
+		Name  string `json:"name"`
+		Email string `json:"email"`
+		Phone string `json:"phone"`
+	}
+
+	output := struct {
+		Owners []owner `json:"owners"`
+	}{}
+
+	r.ParseMultipartForm(32 << 20)
+	token := r.FormValue("token")
+	if erro := app.checkRole(token, 1); erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	id, name, email, phone, err := database.GetOwners(app.DB)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	var data []owner
+	for n := range id {
+		data = append(data,
+			owner{
+				Id:    id[n],
+				Name:  name[n],
+				Email: email[n],
+				Phone: phone[n]})
+	}
+	output.Owners = data
+
+	if err = json.NewEncoder(w).Encode(&output); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func (app *app) addOwner(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	input := struct {
+		Token string `json:"token"`
+		Name  string `json:"name"`
+		Email string `json:"email"`
+		Phone string `json:"phone"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
+		return
+	}
+
+	if erro := app.checkRole(input.Token, 1); erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	err = database.AddOwner(app.DB, []string{input.Name, input.Email, input.Phone})
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
