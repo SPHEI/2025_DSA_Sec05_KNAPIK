@@ -201,7 +201,7 @@ func (app *app) info(w http.ResponseWriter, r *http.Request) {
 
 func (app *app) logout(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
-	
+
 	token := struct {
 		Token string `json:"token"`
 	}{}
@@ -215,13 +215,7 @@ func (app *app) logout(w http.ResponseWriter, r *http.Request) {
 
 	database.DeleteToken(app.CACHE, token.Token)
 
-	token.Token = "" // should be changed
-	if err := json.NewEncoder(w).Encode(token); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		//http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
+	w.WriteHeader(http.StatusOK)
 }
 
 func (app *app) getApartamentList(w http.ResponseWriter, r *http.Request) {

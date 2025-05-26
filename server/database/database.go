@@ -5,157 +5,41 @@ import (
 	"log"
 )
 
-func SetupDatabase(db *sql.DB) error {
-	return nil
-}
-
 func GetEmails(db *sql.DB) ([]string, error) {
 	query := `SELECT User.email FROM User`
 
-	rows, err := db.Query(query)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	defer rows.Close()
+	data, err := getMultiRow(db, query)
+	return data, err
 
-	var names []string
-	for rows.Next() {
-		var name string
-		if err := rows.Scan(&name); err != nil {
-			log.Println(err)
-		}
-		names = append(names, name)
-	}
-
-	if err := rows.Err(); err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	return names, nil
 }
 
 func GetTenent(db *sql.DB) ([]string, error) {
 	query := `SELECT User.name FROM User INNER JOIN Role ON User.role_id = Role.id WHERE Role.name = "tenent"`
 
-	rows, err := db.Query(query)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	defer rows.Close()
+	data, err := getMultiRow(db, query)
 
-	var names []string
-	for rows.Next() {
-		var name string
-		if err := rows.Scan(&name); err != nil {
-			log.Println(err)
-		}
-		names = append(names, name)
-	}
-
-	if err := rows.Err(); err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	return names, nil
+	return data, err
 }
 
 func GetSubcontractorSpec(db *sql.DB) ([]string, error) {
 	query := `SELECT Speciality.name FROM Speciality`
 
-	rows, err := db.Query(query)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	defer rows.Close()
+	data, err := getMultiRow(db, query)
 
-	var names []string
-	for rows.Next() {
-		var name string
-		if err := rows.Scan(&name); err != nil {
-			log.Println(err)
-		}
-		names = append(names, name)
-	}
-
-	if err := rows.Err(); err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	return names, nil
+	return data, err
 }
-
-// func GetSubcontractorSpec(db *sql.DB, subContractor_email string) ([]string, error) {
-// 	query := `SELECT Speciality.name FROM User
-// 	INNER JOIN Subcontractor
-// 	ON Subcontractor.user_id = User.id
-// 	INNER JOIN Speciality
-// 	ON Subcontractor.speciality_id = Speciality.id
-// 	WHERE User.email = ?`
-//
-// 	rows, err := db.Query(query, subContractor_email)
-// 	if err != nil {
-// 		log.Println(err)
-// 		return nil, err
-// 	}
-// 	defer rows.Close()
-//
-// 	var names []string
-// 	for rows.Next() {
-// 		var name string
-// 		if err := rows.Scan(&name); err != nil {
-// 			log.Println(err)
-// 		}
-// 		names = append(names, name)
-// 	}
-//
-// 	if err := rows.Err(); err != nil {
-// 		log.Println(err)
-// 		return nil, err
-// 	}
-//
-// 	return names, nil
-// }
 
 func AddSpec(db *sql.DB, name string) error {
 	query := "INSERT INTO Speciality (name) VALUES(?)"
-
-	//id := getUserCount(db) + 1
-
-	_, err := db.Exec(query, name)
+	err := insertValue(db, query, name)
 	return err
 }
 
 func GetApartaments(db *sql.DB) ([]string, error) {
 	query := `SELECT name FROM Apartament`
 
-	rows, err := db.Query(query)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	defer rows.Close()
-
-	var names []string
-	for rows.Next() {
-		var name string
-		if err := rows.Scan(&name); err != nil {
-			log.Println(err)
-		}
-		names = append(names, name)
-	}
-
-	if err := rows.Err(); err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	return names, nil
+	data, err := getMultiRow(db, query)
+	return data, err
 }
 
 func AddApartament(db *sql.DB, data []string) error {
