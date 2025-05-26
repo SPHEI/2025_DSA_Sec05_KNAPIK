@@ -24,7 +24,8 @@ func GetInfo(db *sql.DB, email string) (int, string, string, int, error) {
 }
 
 func GetApartamentId(db *sql.DB, userId int) (int, error) {
-	query := `SELECT apartment_id FROM Renting_History WHERE user_id = ?`
+	query := `SELECT apartment_id 
+	FROM Renting_History WHERE end_date IS NULL AND user_id = ?`
 	var apartamentId int
 
 	err := db.QueryRow(query, userId).Scan(&apartamentId)
@@ -116,6 +117,24 @@ func AddOwner(db *sql.DB, data []string) error {
 	return err
 }
 
+func GetRent(db *sql.DB, apartamentId int) (float32, error) {
+	query := `SELECT price FROM Pricing_History WHERE is_current = 0 AND apartment_id = ?`
+	var rent float32
+
+	err := db.QueryRow(query, apartamentId).Scan(&rent)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// No user found
+			return -1, nil
+		}
+		log.Println("Error retrieving user:", err)
+		return -1, err
+	}
+
+	return rent, err
+
+}
+
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
@@ -164,51 +183,6 @@ func AddUser(db *sql.DB, user []string, role_id int) error {
 
 	_, err := db.Exec(query, user[0], user[1], user[2], user[3], role_id)
 	return err
-}
-
-func GetPassword(db *sql.DB, email string) (string, error) {
-	query := "SELECT password FROM User WHERE email = ?"
-
-	var password string
-	err := db.QueryRow(query, email).Scan(&password)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			// No user found
-			return "", nil
-		}
-		log.Println("Error retrieving user:", err)
-		return "", err
-	}
-
-	return password, nil
-}
-
-func GetRent(db *sql.DB, user_id int) (int, float32, error) {
-	query := `SELECT id FROM Apartament WHERE owner_id = ?`
-
-	var apartamentId int
-	err := db.QueryRow(query, user_id).Scan(&apartamentId)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			log.Println(err)
-			return -1, -1, nil
-		}
-		log.Println(err)
-		return -1, -1, err
-	}
-
-	query = `SELECT price FROM Pricing_History WHERE apartment_id = ?`
-	var rent float32
-	err = db.QueryRow(query, apartamentId).Scan(&rent)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			// No user found
-			return apartamentId, -1, nil
-		}
-		return apartamentId, -1, err
-	}
-
-	return apartamentId, rent, nil
 }
 
 func ChangeRent(db *sql.DB, apartamentId int, rent float32) error {

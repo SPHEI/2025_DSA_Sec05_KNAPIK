@@ -136,7 +136,8 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
 	output := struct {
-		ApartamentId int `json:"apartament_id"`
+		ApartamentId int     `json:"apartament_id"`
+		Rent         float32 `json:"rent"`
 	}{}
 
 	r.ParseMultipartForm(32 << 20)
@@ -150,13 +151,19 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 	email, _ := auth.ValidateSession(app.CACHE, token)
 	// change
 
-	id, _, _, _, err := database.GetInfo(app.DB, email)
+	id, err := database.GetId(app.DB, email)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
 
 	output.ApartamentId, err = database.GetApartamentId(app.DB, id)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	output.Rent, err = database.GetRent(app.DB, output.ApartamentId)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
@@ -189,7 +196,7 @@ func (app *app) subInfo(w http.ResponseWriter, r *http.Request) {
 	email, _ := auth.ValidateSession(app.CACHE, token)
 	// change
 
-	id, _, _, _, err := database.GetInfo(app.DB, email)
+	id, err := database.GetId(app.DB, email)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
