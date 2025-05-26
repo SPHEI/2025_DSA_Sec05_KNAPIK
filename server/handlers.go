@@ -38,9 +38,9 @@ func sendError(w http.ResponseWriter, error Error) {
 
 func (app *app) changeRent(w http.ResponseWriter, r *http.Request) {
 	data := struct {
-		Token        string `json:"token"`
-		ApartamentId int    `json:"apartament_id"`
-		Rent         string `json:"rent"`
+		Token        string  `json:"token"`
+		ApartamentId int     `json:"apartament_id"`
+		Rent         float32 `json:"rent"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&data)
@@ -219,6 +219,8 @@ func (app *app) info(w http.ResponseWriter, r *http.Request) {
 		Email: email,
 		Phone: phone,
 		Role:  role_id,
+	}
+	if role_id == 2 {
 	}
 
 	if err := json.NewEncoder(w).Encode(info); err != nil {

@@ -123,7 +123,9 @@ func GetRole(db *sql.DB, email string) (int, error) {
 	return roleId, nil
 }
 
-func ChangeRent(db *sql.DB, apartamentId int, rent string) error {
+// func GetRent(db *sql.DB, email) (int,
+
+func ChangeRent(db *sql.DB, apartamentId int, rent float32) error {
 	query := "INSERT INTO Pricing_History (apartament_id, rent) VALUES(?, ?)"
 
 	//id := getUserCount(db) + 1
