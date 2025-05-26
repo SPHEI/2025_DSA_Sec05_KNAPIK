@@ -8,10 +8,15 @@ func (app *app) routes() http.Handler {
 	router := http.NewServeMux()
 	router.HandleFunc("POST /login", app.login)
 	router.HandleFunc("POST /logout", app.logout)
+
 	router.HandleFunc("GET /info", app.info)
 	router.HandleFunc("GET /tenant/info", app.tenantInfo)
 	router.HandleFunc("GET /subcon/info", app.subInfo)
-	router.HandleFunc("GET /apartaments", app.getApartaments)
+
+	router.HandleFunc("GET /apartament/list", app.getApartaments)
+	router.HandleFunc("POST /apartament/add", app.addApartament)
+
+	////
 
 	router.HandleFunc("POST /adduser", app.addUser)
 

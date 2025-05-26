@@ -84,6 +84,14 @@ func GetApartamentsData(db *sql.DB) ([]int, []string, []string, []string, []stri
 	return id, name, street, buildingNumber, buildingName, flatNumber, ownerId, err
 }
 
+func AddApartament(db *sql.DB, data []string, ownerId int) error {
+	query := "INSERT INTO Apartament (name, street, building_namber, building_name, flat_number, owner_id) VALUES(?, ?, ?, ?, ?, ?)"
+
+	_, err := db.Exec(query, data[0], data[1], data[2], data[3], data[4], ownerId)
+
+	return err
+}
+
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
@@ -123,26 +131,6 @@ func GetApartaments(db *sql.DB) ([]string, error) {
 
 	data, err := getMultiRow(db, query)
 	return data, err
-}
-
-func AddApartament(db *sql.DB, data []string) error {
-	query := "SELECT id FROM Owner WHERE email = ?"
-
-	var owner_id int
-	err := db.QueryRow(query, data[0]).Scan(&owner_id)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			// No user found
-			return nil
-		}
-		log.Println("Error retrieving user:", err)
-		return err
-	}
-
-	query = "INSERT INTO Apartament (name, street, building_namber, building_name, flat_number, owner_id) VALUES(?, ?, ?, ?, ?)"
-
-	_, err = db.Exec(query, data[1], data[2], data[3], data[4], data[5], owner_id)
-	return err
 }
 
 func AddUser(db *sql.DB, user []string, role_id int) error {

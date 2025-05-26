@@ -85,6 +85,24 @@ func (app *app) login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (app *app) logout(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	token := struct {
+		Token string `json:"token"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&token)
+	if err != nil {
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
+		return
+	}
+
+	database.DeleteToken(app.CACHE, token.Token)
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func (app *app) info(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
@@ -237,6 +255,39 @@ func (app *app) getApartaments(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	input := struct {
+		Token          string `json:"token"`
+		Name           string `json:"name"`
+		Street         string `json:"street"`
+		BuildingNumber string `json:"building_number"`
+		BuildingName   string `json:"building_name"`
+		FlatNumber     string `json:"flat_number"`
+		OwnerId        int    `json:"owner_id"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
+		return
+	}
+
+	if erro := app.checkRole(input.Token, 1); erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	err = database.AddApartament(app.DB, []string{input.Name, input.Street, input.BuildingNumber, input.BuildingName, input.FlatNumber}, input.OwnerId)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
@@ -309,85 +360,35 @@ func (app *app) addUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *app) logout(w http.ResponseWriter, r *http.Request) {
-	prepareResponse(w)
-
-	token := struct {
-		Token string `json:"token"`
-	}{}
-
-	err := json.NewDecoder(r.Body).Decode(&token)
-	if err != nil {
-		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
-		return
-	}
-
-	database.DeleteToken(app.CACHE, token.Token)
-
-	w.WriteHeader(http.StatusOK)
-}
-
-func (app *app) getApartamentList(w http.ResponseWriter, r *http.Request) {
-	prepareResponse(w)
-
-	tenants := struct {
-		Token       string   `json:"token"`
-		Apartaments []string `json:"apartaments"`
-	}{}
-
-	err := json.NewDecoder(r.Body).Decode(&tenants)
-	if err != nil {
-		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
-		return
-	}
-
-	if erro := app.checkRole(tenants.Token, 1); erro != nil {
-		sendError(w, *erro, nil)
-		return
-	}
-
-	tenants.Apartaments, err = database.GetApartaments(app.DB)
-	if err != nil {
-		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-	}
-
-	if err := json.NewEncoder(w).Encode(tenants); err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-}
-
-func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
-	prepareResponse(w)
-
-	apartament := struct {
-		Token          string `json:"token"`
-		OwnerEmail     string `json:"owner_email"`
-		Name           string `json:"name"`
-		Street         string `json:"street"`
-		BuildingNumber string `json:"building_number"`
-		BuildingName   string `json:"building_name"`
-		FlatNumber     string `json:"flat_number"`
-	}{}
-
-	err := json.NewDecoder(r.Body).Decode(&apartament)
-	if err != nil {
-		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
-		return
-	}
-
-	if erro := app.checkRole(apartament.Token, 1); erro != nil {
-		sendError(w, *erro, nil)
-		return
-	}
-
-	err = database.AddApartament(app.DB, []string{apartament.OwnerEmail, apartament.Name, apartament.Street, apartament.BuildingNumber, apartament.BuildingName, apartament.FlatNumber})
-	if err != nil {
-		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-	}
-
-	w.WriteHeader(http.StatusOK)
-}
+// func (app *app) getApartamentList(w http.ResponseWriter, r *http.Request) {
+// 	prepareResponse(w)
+//
+// 	tenants := struct {
+// 		Token       string   `json:"token"`
+// 		Apartaments []string `json:"apartaments"`
+// 	}{}
+//
+// 	err := json.NewDecoder(r.Body).Decode(&tenants)
+// 	if err != nil {
+// 		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
+// 		return
+// 	}
+//
+// 	if erro := app.checkRole(tenants.Token, 1); erro != nil {
+// 		sendError(w, *erro, nil)
+// 		return
+// 	}
+//
+// 	tenants.Apartaments, err = database.GetApartaments(app.DB)
+// 	if err != nil {
+// 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+// 	}
+//
+// 	if err := json.NewEncoder(w).Encode(tenants); err != nil {
+// 		log.Println(err)
+// 		w.WriteHeader(http.StatusInternalServerError)
+// 	}
+// }
 
 //	func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
 //		prepareResponse(w)
