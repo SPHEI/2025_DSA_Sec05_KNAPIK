@@ -85,7 +85,7 @@ func GetApartamentsData(db *sql.DB) ([]int, []string, []string, []string, []stri
 }
 
 func AddApartament(db *sql.DB, data []string, ownerId int) error {
-	query := "INSERT INTO Apartament (name, street, building_namber, building_name, flat_number, owner_id) VALUES(?, ?, ?, ?, ?, ?)"
+	query := "INSERT INTO Apartament (name, street, building_number, building_name, flat_number, owner_id) VALUES(?, ?, ?, ?, ?, ?)"
 
 	_, err := db.Exec(query, data[0], data[1], data[2], data[3], data[4], ownerId)
 
