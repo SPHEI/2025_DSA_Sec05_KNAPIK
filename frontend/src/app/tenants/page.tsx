@@ -9,7 +9,7 @@ import { useRouter, usePathname } from 'next/navigation';
 function Tenants() {
     const [ready,setReady] = useState(false)
     const [error, setError] = useState('none')
-    const [names,setNames] = useState([''])
+    const [names,setNames] = useState([{id: -1, name: '', email: '', phone: '', role_id: -1}])
     const pathname = usePathname();
     const router = useRouter();
     useEffect(() => {
@@ -17,12 +17,7 @@ function Tenants() {
             
             try {
                 var t = Cookies.get("token");
-              const res = await fetch('http://localhost:8080/tenents',{
-                method: 'POST',
-                body: JSON.stringify({
-                    "token" : t 
-                })
-              });
+              const res = await fetch('http://localhost:8080/tenant/list?token=' + t)
               const data = await res.json();
               //alert(JSON.stringify(data));
               if(data.message)
@@ -31,7 +26,7 @@ function Tenants() {
               }
               else
               {
-                setNames(data.names)
+                setNames(data.apartaments)
               }
             } catch (err: any) {
                 setError(err.message)
@@ -52,7 +47,7 @@ function Tenants() {
                         <b className="text-4xl">Tenants</b> 
                         <button className="black-button" onClick={() =>{router.push("/accounts")}}>+ Add Tenants</button>
                     </div>
-                    {names.map((text, index) => <TenantBox key={index} name={text}/>)}
+                    {names.map((text, index) => <TenantBox key={index} id={text.id} name={text.name} email={text.email} phone={text.phone} role_id={text.role_id}/>)}
                 </main>
             );
         }

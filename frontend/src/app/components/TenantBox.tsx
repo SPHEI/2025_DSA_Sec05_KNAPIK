@@ -1,7 +1,11 @@
 import React from "react";
 
 interface TenantProps {
+    id: number
     name: String
+    email: String
+    phone: String
+    role_id: number
   }
 
 function TenantBox(props : TenantProps)
@@ -10,8 +14,8 @@ function TenantBox(props : TenantProps)
         <div className="white-box w-[50%] h-[200px]">
             <div className="flex flex-col">
                 <h1>Name: {props.name}</h1>
-                <h1>Email: demo@demo.com</h1>
-                <h1>Phone: 000 000 000</h1>
+                <h1>Email: {props.email}</h1>
+                <h1>Phone: {props.phone}</h1>
                 <h1>Apartment: 1 demo street</h1>
                 <h1>Monthly Rent: 0$</h1>
                 <h1>Rent Status: Paid</h1>
@@ -31,6 +35,10 @@ function TenantBox(props : TenantProps)
 }
 
 TenantBox.defaultProps = {
-    name: "Default Name"
+    id: -1,
+    name: "Default Name",
+    email: "default@default.def",
+    phone: "999",
+    role_id: -1
 }
 export default TenantBox;

@@ -9,7 +9,7 @@ function Dashboard() {
     const [ready,setReady] = useState(false)
     const [error, setError] = useState('none')
 
-    const [apartaments,setApartaments] = useState([''])
+    const [apartaments,setApartaments] = useState([{id: -1,name: '', street: '', building_number: '', building_name: '',flat_number:'',owner_id:-1 }])
     const [specialities,setSpecialities] = useState([''])
 
     const router = useRouter();
@@ -38,12 +38,7 @@ function Dashboard() {
 
         var t = Cookies.get("token");
         try{
-        const res = await fetch('http://localhost:8080/apartaments',{
-                method:'POST',
-                body: JSON.stringify({ 
-                    "token": t,
-                })
-            });
+        const res = await fetch('http://localhost:8080/apartament/list?token=' + t)
             const data = await res.json();
             if(data.message)
             {
@@ -185,19 +180,19 @@ function Dashboard() {
         if (role === 'Admin'){a = 1}
         if (role === 'Tenant'){a = 2}
         if (role === 'Subcontractor'){a = 3}
-        alert(JSON.stringify({ 
-                    "token": t,
-                    name, 
-                    password,
-                    email,
-                    phone,
-                    apartment,
-                    rent,
-                    address,
-                    nip,
-                    speciality,
-                    "role":a
-                }))
+        // alert(JSON.stringify({ 
+        //             "token": t,
+        //             name, 
+        //             password,
+        //             email,
+        //             phone,
+        //             apartment,
+        //             rent,
+        //             address,
+        //             nip,
+        //             speciality,
+        //             "role":a
+        //         }))
         try {
             const res = await fetch('http://localhost:8080/adduser',{
                 method:'POST',
@@ -274,7 +269,7 @@ function Dashboard() {
                                     </div>
                                     <div className={line}>
                                         <select className="input-box w-[26%]" onChange={(a) => {setApartment(a.target.value)}}>
-                                            {apartaments.map((a,index) => (<option key={index} value={a}>{a}</option>))}
+                                            {apartaments.map((a,index) => (<option key={index} value={a.name}>{a.name}</option>))}
                                         </select>
                                         <input className="input-box" placeholder="Rent" value={rent} onChange={rentChange}/>
                                     </div>
