@@ -5,6 +5,64 @@ import (
 	"log"
 )
 
+func GetInfo(db *sql.DB, email string) (int, string, string, int, error) {
+	query := "SELECT id, name, phone, role_id FROM User WHERE email = ?"
+	var name, phone string
+	var id, roleId int
+
+	err := db.QueryRow(query, email).Scan(&id, &name, &phone, &roleId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// No user found
+			return -1, "", "", -1, nil
+		}
+		log.Println("Error retrieving user:", err)
+		return -1, "", "", -1, err
+	}
+
+	return id, name, phone, roleId, nil
+}
+
+func GetApartamentId(db *sql.DB, userId int) (int, error) {
+	query := `SELECT apartment_id FROM Renting_History WHERE user_id = ?`
+	var apartamentId int
+
+	err := db.QueryRow(query, userId).Scan(&apartamentId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// No user found
+			return -1, nil
+		}
+		log.Println("Error retrieving user:", err)
+		return -1, err
+	}
+
+	return apartamentId, err
+}
+
+func GetSubconInfo(db *sql.DB, userId int) (string, string, int, error) {
+	query := `SELECT address, NIP, speciality_id FROM Subcontractor WHERE user_id = ?`
+	var address, NIP string
+	var speciality_id int
+
+	err := db.QueryRow(query, userId).Scan(&address, &NIP, &speciality_id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// No user found
+			return "", "", -1, nil
+		}
+		log.Println("Error retrieving user:", err)
+		return "", "", -1, err
+	}
+
+	return address, NIP, speciality_id, err
+
+}
+
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+
 func GetEmails(db *sql.DB) ([]string, error) {
 	query := `SELECT User.email FROM User`
 
@@ -71,7 +129,7 @@ func AddUser(db *sql.DB, user []string, role_id int) error {
 	return err
 }
 
-func GetUser(db *sql.DB, email string) (string, error) {
+func GetPassword(db *sql.DB, email string) (string, error) {
 	query := "SELECT password FROM User WHERE email = ?"
 
 	var password string
@@ -88,42 +146,33 @@ func GetUser(db *sql.DB, email string) (string, error) {
 	return password, nil
 }
 
-func GetInfo(db *sql.DB, email string) (string, string, int, error) {
-	query := "SELECT name, phone, role_id FROM User WHERE email = ?"
+func GetRent(db *sql.DB, user_id int) (int, float32, error) {
+	query := `SELECT id FROM Apartament WHERE owner_id = ?`
 
-	var name, phone string
-	var roleId int
-	err := db.QueryRow(query, email).Scan(&name, &phone, &roleId)
+	var apartamentId int
+	err := db.QueryRow(query, user_id).Scan(&apartamentId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Println(err)
+			return -1, -1, nil
+		}
+		log.Println(err)
+		return -1, -1, err
+	}
+
+	query = `SELECT price FROM Pricing_History WHERE apartment_id = ?`
+	var rent float32
+	err = db.QueryRow(query, apartamentId).Scan(&rent)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No user found
-			return "", "", -1, nil
+			return apartamentId, -1, nil
 		}
-		log.Println("Error retrieving user:", err)
-		return "", "", -1, err
+		return apartamentId, -1, err
 	}
 
-	return name, phone, roleId, nil
+	return apartamentId, rent, nil
 }
-
-func GetRole(db *sql.DB, email string) (int, error) {
-	query := "SELECT role_id FROM User WHERE email = ?"
-
-	var roleId int
-	err := db.QueryRow(query, email).Scan(&roleId)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			// No user found
-			return -1, nil
-		}
-		log.Println("Error retrieving user:", err)
-		return -1, err
-	}
-
-	return roleId, nil
-}
-
-// func GetRent(db *sql.DB, email) (int,
 
 func ChangeRent(db *sql.DB, apartamentId int, rent float32) error {
 	query := "INSERT INTO Pricing_History (apartament_id, rent) VALUES(?, ?)"

@@ -24,17 +24,171 @@ type Error struct {
 	StatusCode int    `json:"status_code"`
 	Message    string `json:"message"`
 	ErrorType  string `json:"error_type"`
-	// to be expanded
 }
 
-// interface for json needed
-func sendError(w http.ResponseWriter, error Error) {
+func sendError(w http.ResponseWriter, error Error, err error) {
+	log.Println(err)
 	if err := json.NewEncoder(w).Encode(error); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		//http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
+
+func (app *app) login(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	input := struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}{}
+
+	output := struct {
+		Token string `json:"token"`
+		Role  int    `json:"role"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
+		return
+	}
+
+	password, err := database.GetPassword(app.DB, input.Email)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	if password != input.Password || password == "" {
+		sendError(w, Error{401, "Wrong password or login", "Unauthorized"}, err)
+		return
+	}
+
+	output.Token, err = auth.CreateSession(app.CACHE, input.Email)
+	if err != nil {
+		sendError(w, Error{500, "Could not generate a new token", "Internal Server Error"}, err)
+		return
+	}
+
+	output.Role, err = database.GetRole(app.DB, input.Email)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	log.Printf("Login -- User: %s - Token: %s", input.Email, output.Token)
+
+	if err := json.NewEncoder(w).Encode(output); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (app *app) info(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	var err error
+	output := struct {
+		Id    int    `json:"id"`
+		Name  string `json:"name"`
+		Email string `json:"email"`
+		Phone string `json:"phone"`
+		Role  int    `json:"role"`
+	}{}
+
+	r.ParseMultipartForm(32 << 20)
+	token := r.FormValue("token")
+
+	output.Email, err = auth.ValidateSession(app.CACHE, token)
+	if err != nil {
+		sendError(w, Error{401, "Incorrect Token", "Unauthorized"}, err)
+		return
+	}
+
+	output.Id, output.Name, output.Phone, output.Role, err = database.GetInfo(app.DB, output.Email)
+
+	if err := json.NewEncoder(w).Encode(output); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	output := struct {
+		ApartamentId int `json:"apartament_id"`
+	}{}
+
+	r.ParseMultipartForm(32 << 20)
+	token := r.FormValue("token")
+
+	if erro := app.checkRole(token, 2); erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	email, _ := auth.ValidateSession(app.CACHE, token)
+	// change
+
+	id, _, _, _, err := database.GetInfo(app.DB, email)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	output.ApartamentId, err = database.GetApartamentId(app.DB, id)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(&output)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+}
+
+func (app *app) subInfo(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	output := struct {
+		Address      string `json:"address"`
+		NIP          string `json:"NIP"`
+		SpecialityId int    `json:"speciality_id"`
+	}{}
+
+	r.ParseMultipartForm(32 << 20)
+	token := r.FormValue("token")
+
+	erro := app.checkRole(token, 3)
+	if erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	email, _ := auth.ValidateSession(app.CACHE, token)
+	// change
+
+	id, _, _, _, err := database.GetInfo(app.DB, email)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	output.Address, output.NIP, output.SpecialityId, err = database.GetSubconInfo(app.DB, id)
+
+	if err = json.NewEncoder(w).Encode(&output); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+}
+
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 
 func (app *app) changeRent(w http.ResponseWriter, r *http.Request) {
 	data := struct {
@@ -45,19 +199,17 @@ func (app *app) changeRent(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
 		return
 	}
 
-	if erro := app.checkAdmin(data.Token); erro != nil {
-		sendError(w, *erro)
+	if erro := app.checkRole(data.Token, 1); erro != nil {
+		sendError(w, *erro, nil)
 		return
 	}
 
 	if err = database.ChangeRent(app.DB, data.ApartamentId, data.Rent); err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Database", "Internal Server Error"})
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
 
@@ -78,153 +230,30 @@ func (app *app) addUser(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
 		return
 	}
 
-	if erro := app.checkAdmin(user.Token); erro != nil {
-		sendError(w, *erro)
+	if erro := app.checkRole(user.Token, 1); erro != nil {
+		sendError(w, *erro, nil)
 		return
 	}
 
 	_, err = bcrypt.GenerateFromPassword([]byte(user.Password), 12)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{500, "Could not generate hash from password", "Internal Server Error"})
+		sendError(w, Error{500, "Could not generate hash from password", "Internal Server Error"}, err)
 		return
 	}
 
 	err = database.AddUser(app.DB, []string{user.Name, user.Password, user.Email, user.Phone}, user.Role)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{500, "Could not add user", "Internal Server Error"})
+		sendError(w, Error{500, "Could not add user", "Internal Server Error"}, err)
 		return
 	}
 
 	user.Password = strings.Repeat("*", len(user.Password)) // should be changed
 	if err := json.NewEncoder(w).Encode(user); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-}
-
-func (app *app) login(w http.ResponseWriter, r *http.Request) {
-	prepareResponse(w)
-
-	user := struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-		Token    string `json:"token"`
-		Role     int    `json:"role"`
-	}{}
-
-	err := json.NewDecoder(r.Body).Decode(&user)
-	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
-		return
-	}
-
-	hashedPassword, err := database.GetUser(app.DB, user.Email)
-	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Database", "Internal Server Error"})
-		return
-	}
-
-	user.Role, err = database.GetRole(app.DB, user.Email)
-	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Database", "Internal Server Error"})
-		return
-	}
-
-	//if err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(user.Password)); err != nil {
-	if hashedPassword != user.Password || hashedPassword == "" {
-		log.Println(err)
-		sendError(w, Error{401, "Wrong password or login", "Unauthorized"})
-		return
-	} else {
-		token, err := auth.CreateSession(app.CACHE, user.Email)
-		if err != nil {
-			log.Println(err)
-			sendError(w, Error{500, "Could not generate a new token", "Internal Server Error"})
-			return
-		}
-
-		log.Printf("User: %s - Logged in with token: %s", user.Email, token)
-
-		user.Token = token
-		user.Password = strings.Repeat("*", len(user.Password)) // should be changed
-		if err := json.NewEncoder(w).Encode(user); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
-}
-
-// func (app *app) issue(w http.ResponseWriter, r *http.Request) {
-// 	prepareResponse(w)
-//
-// 	user := struct {
-// 		Token       string `json:"token"`
-// 		Description string `json:"description"`
-// 	}{}
-//
-// 	err := json.NewDecoder(r.Body).Decode(&user)
-// 	if err != nil {
-// 		log.Println(err)
-// 		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
-// 		return
-// 	}
-//
-// 	_, err = auth.ValidateSession(app.CACHE, user.Token)
-// 	if err != nil {
-// 		log.Println(err)
-// 		sendError(w, Error{401, "Incorrect Token", "Unauthorized"})
-// 		return
-// 	}
-//
-// 	if err = database.AddIssue(app.DB, user.Description); err != nil {
-// 		log.Println(err)
-// 		sendError(w, Error{500, "Could not add issue", "Internal Server Error"})
-// 		return
-// 	}
-//
-// 	w.WriteHeader(http.StatusOK)
-// }
-
-func (app *app) info(w http.ResponseWriter, r *http.Request) {
-	prepareResponse(w)
-
-	r.ParseMultipartForm(32 << 20)
-	token := r.FormValue("token")
-
-	email, err := auth.ValidateSession(app.CACHE, token)
-	if err != nil {
-		log.Println(err)
-		sendError(w, Error{401, "Incorrect Token", "Unauthorized"})
-		return
-	}
-
-	name, phone, role_id, err := database.GetInfo(app.DB, email)
-	info := struct {
-		Name  string `json:"name"`
-		Email string `json:"email"`
-		Phone string `json:"phone"`
-		Role  int    `json:"role"`
-	}{
-		Name:  name,
-		Email: email,
-		Phone: phone,
-		Role:  role_id,
-	}
-	if role_id == 2 {
-	}
-
-	if err := json.NewEncoder(w).Encode(info); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
@@ -238,8 +267,7 @@ func (app *app) logout(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&token)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
 		return
 	}
 
@@ -258,20 +286,18 @@ func (app *app) getApartamentList(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&tenants)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
 		return
 	}
 
-	if erro := app.checkAdmin(tenants.Token); erro != nil {
-		sendError(w, *erro)
+	if erro := app.checkRole(tenants.Token, 1); erro != nil {
+		sendError(w, *erro, nil)
 		return
 	}
 
 	tenants.Apartaments, err = database.GetApartaments(app.DB)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Database", "Internal Server Error"})
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 	}
 
 	if err := json.NewEncoder(w).Encode(tenants); err != nil {
@@ -295,20 +321,18 @@ func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&apartament)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
 		return
 	}
 
-	if erro := app.checkAdmin(apartament.Token); erro != nil {
-		sendError(w, *erro)
+	if erro := app.checkRole(apartament.Token, 1); erro != nil {
+		sendError(w, *erro, nil)
 		return
 	}
 
 	err = database.AddApartament(app.DB, []string{apartament.OwnerEmail, apartament.Name, apartament.Street, apartament.BuildingNumber, apartament.BuildingName, apartament.FlatNumber})
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Database", "Internal Server Error"})
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -378,20 +402,18 @@ func (app *app) getEmailList(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&tenants)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
 		return
 	}
 
-	if erro := app.checkAdmin(tenants.Token); erro != nil {
-		sendError(w, *erro)
+	if erro := app.checkRole(tenants.Token, 1); erro != nil {
+		sendError(w, *erro, nil)
 		return
 	}
 
 	tenants.Emails, err = database.GetEmails(app.DB)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Database", "Internal Server Error"})
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 	}
 
 	if err := json.NewEncoder(w).Encode(tenants); err != nil {
@@ -410,20 +432,18 @@ func (app *app) getTenantList(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&tenants)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
 		return
 	}
 
-	if erro := app.checkAdmin(tenants.Token); erro != nil {
-		sendError(w, *erro)
+	if erro := app.checkRole(tenants.Token, 1); erro != nil {
+		sendError(w, *erro, nil)
 		return
 	}
 
 	tenants.Names, err = database.GetTenent(app.DB)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Database", "Internal Server Error"})
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 	}
 
 	if err := json.NewEncoder(w).Encode(tenants); err != nil {
@@ -443,20 +463,18 @@ func (app *app) getSubContractorSpec(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
 		return
 	}
 
-	if erro := app.checkAdmin(data.Token); erro != nil {
-		sendError(w, *erro)
+	if erro := app.checkRole(data.Token, 1); erro != nil {
+		sendError(w, *erro, nil)
 		return
 	}
 
 	data.Spec, err = database.GetSubcontractorSpec(app.DB)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Database", "Internal Server Error"})
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 	}
 
 	if err := json.NewEncoder(w).Encode(data); err != nil {
@@ -475,26 +493,24 @@ func (app *app) addSubContractorSpec(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Could not acquire json data", "Bad Request"})
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
 		return
 	}
 
-	if erro := app.checkAdmin(data.Token); erro != nil {
-		sendError(w, *erro)
+	if erro := app.checkRole(data.Token, 1); erro != nil {
+		sendError(w, *erro, nil)
 		return
 	}
 
 	err = database.AddSpec(app.DB, data.Name)
 	if err != nil {
-		log.Println(err)
-		sendError(w, Error{400, "Database", "Internal Server Error"})
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 	}
 
 	w.WriteHeader(http.StatusOK)
 }
 
-func (app *app) checkAdmin(token string) *Error {
+func (app *app) checkRole(token string, role_id int) *Error {
 	email, err := auth.ValidateSession(app.CACHE, token)
 	if err != nil {
 		log.Println(err)
@@ -506,7 +522,7 @@ func (app *app) checkAdmin(token string) *Error {
 		log.Println(err)
 		return &Error{401, "Database", "Internal Server Error"}
 	}
-	if role != 1 {
+	if role != role_id {
 		log.Println("Wrong role")
 		return &Error{401, "Wrong role", "Unauthorized"}
 	}

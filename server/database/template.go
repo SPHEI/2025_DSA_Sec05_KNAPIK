@@ -2,10 +2,12 @@ package database
 
 import (
 	"database/sql"
+	"log"
 )
 
 func insertValue(db *sql.DB, query, value string) error {
 	_, err := db.Exec(query, value)
+	log.Println(err)
 	return err
 }
 
