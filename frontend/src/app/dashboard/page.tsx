@@ -6,16 +6,18 @@ import placeholder from "./placeholder.png"
 import card from "./card.png"
 import wrench from "./wrench.png"
 import calendar from "./calendar.png"
-
+import { useRouter, usePathname } from 'next/navigation';
 //Page is shared by all types of accounts
 function Dashboard() {
     const [ready,setReady] = useState(false)
     const [error, setError] = useState('none')
+
+    const pathname = usePathname();
     useEffect(() => {
         //Page setup goes here
         setReady(true);
-    },[])
-
+    },[pathname])
+    
 
     if(ready)
     {
