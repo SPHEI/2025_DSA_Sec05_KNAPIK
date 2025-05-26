@@ -59,6 +59,31 @@ func GetSubconInfo(db *sql.DB, userId int) (string, string, int, error) {
 
 }
 
+func GetApartamentsData(db *sql.DB) ([]int, []string, []string, []string, []string, []string, []int, error) {
+	query := `SELECT id FROM Apartament`
+	id, err := getMultiRowInt(db, query)
+
+	query = `SELECT name FROM Apartament`
+	name, err := getMultiRow(db, query)
+
+	query = `SELECT street FROM Apartament`
+	street, err := getMultiRow(db, query)
+
+	query = `SELECT building_number FROM Apartament`
+	buildingNumber, err := getMultiRow(db, query)
+
+	query = `SELECT building_name FROM Apartament`
+	buildingName, err := getMultiRow(db, query)
+
+	query = `SELECT flat_number FROM Apartament`
+	flatNumber, err := getMultiRow(db, query)
+
+	query = `SELECT owner_id FROM Apartament`
+	ownerId, err := getMultiRowInt(db, query)
+
+	return id, name, street, buildingNumber, buildingName, flatNumber, ownerId, err
+}
+
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////

@@ -186,6 +186,57 @@ func (app *app) subInfo(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func (app *app) getApartaments(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	type apartament struct {
+		Id             int    `json:"id"`
+		Name           string `json:"name"`
+		Street         string `json:"street"`
+		BuildingNumber string `json:"building_number"`
+		Buildingname   string `json:"building_name"`
+		FlatNumber     string `json:"flat_number"`
+		OwnerId        int    `json:"owner_id"`
+	}
+
+	output := struct {
+		Apartaments []apartament `json:"apartaments"`
+	}{}
+
+	r.ParseMultipartForm(32 << 20)
+	token := r.FormValue("token")
+
+	if erro := app.checkRole(token, 1); erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	id, name, street, buildingNumber, buildingName, flatNumber, ownerId, err := database.GetApartamentsData(app.DB)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	var data []apartament
+	for n := range id {
+		data = append(data,
+			apartament{
+				Id:             id[n],
+				Name:           name[n],
+				Street:         street[n],
+				BuildingNumber: buildingNumber[n],
+				Buildingname:   buildingName[n],
+				FlatNumber:     flatNumber[n],
+				OwnerId:        ownerId[n]})
+	}
+	output.Apartaments = data
+
+	if err = json.NewEncoder(w).Encode(&output); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
