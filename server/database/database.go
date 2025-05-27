@@ -193,7 +193,7 @@ func GetActiveRentings(db *sql.DB) ([]int, []int, []int, []string, error) {
 
 func AddNewRenting(db *sql.DB, apartamentId, userId int, startDate string) error {
 	query := "INSERT INTO Renting_history (apartment_id, user_id, start_date) VALUES(?, ?, ?)"
-	date, err := time.Parse("DateOnly", startDate)
+	date, err := time.Parse("2006-01-02", startDate)
 	if err != nil {
 		return err
 	}
@@ -206,7 +206,7 @@ func AddNewRenting(db *sql.DB, apartamentId, userId int, startDate string) error
 func SetEndDate(db *sql.DB, id int, endDate string) error {
 	query := `UPDATE Renting_History SET end_date = ? WHERE id = ?`
 
-	date, err := time.Parse("DateOnly", endDate)
+	date, err := time.Parse("2006-01-02", endDate)
 	if err != nil {
 		return err
 	}
@@ -237,7 +237,7 @@ func GetFaultReports(db *sql.DB) ([]int, []string, []string, []int, []int, error
 
 func AddFault(db *sql.DB, description, dateReported string, statusId, apartamentId int) error {
 	query := "INSERT INTO FaultReport (description, date_reported, status_id, apartment_id) VALUES(?, ?, ?, ?)"
-	date, err := time.Parse("DateOnly", dateReported)
+	date, err := time.Parse("2006-01-02", dateReported)
 	if err != nil {
 		return err
 	}
