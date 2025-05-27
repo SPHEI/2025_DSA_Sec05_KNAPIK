@@ -11,6 +11,7 @@ function Dashboard() {
 
     const [apartaments,setApartaments] = useState([{id: -1,name: '', street: '', building_number: '', building_name: '',flat_number:'',owner_id:-1 }])
     const [specialities,setSpecialities] = useState([''])
+    const [specialitiesID,setSpecialitiesID] = useState([1])
 
     const router = useRouter();
 
@@ -78,6 +79,7 @@ function Dashboard() {
             else
             {
                 setSpecialities(data.spec);
+                setSpecialitiesID(data.spec_id);
             }
         }
         catch(err: any)
@@ -93,10 +95,11 @@ function Dashboard() {
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [repassword, setRepassword] = useState('');
-    const [apartment, setApartment] = useState('');
+    const [apartment, setApartment] = useState(1);
+    const [date, setDate] = useState('');
     const [address, setAddress] = useState('');
     const [nip, setNip] = useState('');
-    const [speciality, setSpeciality] = useState('');
+    const [speciality, setSpeciality] = useState(1);
 
     const [newSpeciality, setNewSpeciality] = useState('');
 
@@ -192,10 +195,6 @@ function Dashboard() {
                     password,
                     email,
                     phone,
-                    apartment,
-                    address,
-                    nip,
-                    speciality,
                     "role":a
                 })
             });
@@ -206,8 +205,54 @@ function Dashboard() {
             }
             else
             {
-                alert("User added succesfully.");
-                alert(data.id)
+                if(role === 'Tenant')
+                {
+                    const res2 = await fetch('http://localhost:8080/renting/start',{
+                        method:'POST',
+                        body: JSON.stringify({ 
+                            "token": t,
+                            "apartament_id" : apartment,
+                            "user_id" : data.id,
+                            "start_date" : date
+                        })
+                    });
+                    if(res2.ok)
+                    {
+                        alert("Tenant Added Succesfully")
+                    }
+                    else
+                    {
+                        var data2 = await res2.json()
+                        alert(data2.message)
+                    }
+                }
+                else if(role === 'Subcontractor')
+                {
+
+                    const res2 = await fetch('http://localhost:8080/subcon/add',{
+                        method:'POST',
+                        body: JSON.stringify({ 
+                            "token": t,
+                            "user_id" : data.id,
+                            "address" : address,
+                            "NIP" : nip,
+                            "speciality_id" : speciality
+                        })
+                    });
+                    if(res2.ok)
+                    {
+                        alert("Subcontractor Added Succesfully")
+                    }
+                    else
+                    {
+                        var data2 = await res2.json()
+                        alert(data2.message)
+                    }
+                }
+                else
+                {
+                    alert("Admin added succesfully.");
+                }
             }
         } catch (err: any) {
             setError(err.message)
@@ -255,11 +300,18 @@ function Dashboard() {
                                 <div>
                                     <div className={line}>
                                         <b className="w-[26%]">Apartment</b>
+                                        <b className="w-[26%]">Start Date</b>
                                     </div>
                                     <div className={line}>
-                                        <select className="input-box w-[26%]" onChange={(a) => {setApartment(a.target.value)}}>
-                                            {apartaments.map((a,index) => (<option key={index} value={a.name}>{a.name}</option>))}
+                                        <select className="input-box w-[26%]" value={apartment} onChange={(a) => {setApartment(Number(a.target.value))}}>
+                                            {apartaments.map((a,index) => (<option key={index} value={a.id}>{a.name}</option>))}
                                         </select>
+                                        <input
+                                        type="date"
+                                        className="input-box w-[26%]"
+                                        value={date}
+                                        onChange={(e) => setDate(e.target.value)}
+                                        />
                                     </div>
                                 </div>
                             )}
@@ -273,8 +325,8 @@ function Dashboard() {
                                     <div className={line}>
                                         <input className="input-box w-[26%]" placeholder="Address" value={address} onChange={(a) => {setAddress(a.target.value)}}/>
                                         <input className="input-box w-[26%]" placeholder="NIP" value={nip} onChange={nipChange}/>
-                                        <select className="input-box w-[26%]" onChange={(a) => {setSpeciality(a.target.value)}}>
-                                            {specialities.map((a,index) => (<option key={index} value={a}>{a}</option>))}
+                                        <select className="input-box w-[26%]" onChange={(a) => {setSpeciality(Number(a.target.value))}}>
+                                            {specialitiesID.map((a,index) => (<option key={index} value={a}>{specialities[a-1]}</option>))}
                                         </select>
                                     </div>
                                 </div>
