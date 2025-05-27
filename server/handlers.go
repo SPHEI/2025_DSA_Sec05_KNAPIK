@@ -783,9 +783,10 @@ func (app *app) getSubContractorSpec(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
 	data := struct {
-		Token string   `json:"token"`
-		Email string   `json:"email"`
-		Spec  []string `json:"spec"`
+		Token  string   `json:"token"`
+		Email  string   `json:"email"`
+		Spec   []string `json:"spec"`
+		SpecId []int    `json:"spec_id"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&data)
@@ -799,7 +800,7 @@ func (app *app) getSubContractorSpec(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data.Spec, err = database.GetSubcontractorSpec(app.DB)
+	data.SpecId, data.Spec, err = database.GetSubcontractorSpec(app.DB)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return

@@ -278,12 +278,14 @@ func GetTenents(db *sql.DB) ([]int, []string, []string, []string, []int, error) 
 	return id, name, email, phone, role_id, err
 }
 
-func GetSubcontractorSpec(db *sql.DB) ([]string, error) {
-	query := `SELECT Speciality.name FROM Speciality`
+func GetSubcontractorSpec(db *sql.DB) ([]int, []string, error) {
+	query := `SELECT Speciality.id FROM Speciality`
+	id, err := getMultiRowInt(db, query)
 
+	query = `SELECT Speciality.name FROM Speciality`
 	data, err := getMultiRow(db, query)
 
-	return data, err
+	return id, data, err
 }
 
 func AddSpec(db *sql.DB, name string) error {
