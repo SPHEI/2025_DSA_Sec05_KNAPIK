@@ -441,6 +441,47 @@ func (app *app) changeRent(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func (app *app) getCurrentRenting(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	type renting struct {
+		ApartamentId int    `json:"apartament_id"`
+		UserId       int    `json:"user_id"`
+		StartDate    string `json:"start_date"`
+	}
+
+	output := struct {
+		Rentings []renting `json:"owners"`
+	}{}
+
+	r.ParseMultipartForm(32 << 20)
+	token := r.FormValue("token")
+	if erro := app.checkRole(token, 1); erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	apartamentId, userId, startDate, err := database.GetActiveRentings(app.DB)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	var data []renting
+	for n := range apartamentId {
+		data = append(data,
+			renting{ApartamentId: apartamentId[n],
+				UserId:    userId[n],
+				StartDate: startDate[n]})
+	}
+	output.Rentings = data
+
+	if err = json.NewEncoder(w).Encode(&data); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////

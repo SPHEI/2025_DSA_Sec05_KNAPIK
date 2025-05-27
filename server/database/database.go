@@ -147,6 +147,23 @@ func ChangeRent(db *sql.DB, apartamentId int, rent float32) error {
 	return err
 }
 
+func GetActiveRentings(db *sql.DB) ([]int, []int, []string, error) {
+	query := `SELECT apartment_id FROM Renting_history WHERE end_date IS NULL`
+	apartamentId, err := getMultiRowInt(db, query)
+
+	query = `SELECT user_id FROM Renting_history WHERE end_date IS NULL`
+	userId, err := getMultiRowInt(db, query)
+
+	query = `SELECT start_date FROM Renting_history WHERE end_date IS NULL`
+	startDate, err := getMultiRow(db, query)
+
+	return apartamentId, userId, startDate, err
+}
+
+func AddNewRenting(db *sql.DB, apartamentId, userId int, startDate, endDate string) error {
+	return nil
+}
+
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////

@@ -20,6 +20,8 @@ func (app *app) routes() http.Handler {
 	router.HandleFunc("GET /apartament/list", app.getApartaments)
 	router.HandleFunc("POST /apartament/add", app.addApartament)
 
+	router.HandleFunc("GET /current", app.getCurrentRenting)
+
 	////
 
 	router.HandleFunc("POST /adduser", app.addUser)
