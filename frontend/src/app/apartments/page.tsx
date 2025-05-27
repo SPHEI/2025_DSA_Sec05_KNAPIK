@@ -10,7 +10,7 @@ function Apartments() {
     const [ready,setReady] = useState(false)
     const [error, setError] = useState('none')
 
-    const [apartaments,setApartaments] = useState([{id: -1,name: '', street: '', building_number: '', building_name: '',flat_number:'',owner_id:-1 }])
+    const [apartaments,setApartaments] = useState([{id: -1,name: '', street: '', building_number: '', building_name: '',flat_number:'',owner_id:-1, rent: -1 }])
     const [owners, setOwners] = useState([{id: -1, name:'',email:'',phone:''}])
 
     const pathname = usePathname();
@@ -64,6 +64,7 @@ function Apartments() {
         try{
             const res = await fetch('http://localhost:8080/apartament/list?token=' + t)
             const data = await res.json();
+            //alert(JSON.stringify(data))
             if(data.message)
             {
                 setError(data.message)
@@ -176,7 +177,7 @@ function Apartments() {
                         <b className="text-4xl">Apartments</b> 
                         <button className="black-button" onClick={() => {setShowPopup(true)}}>+ Add Apartment</button>
                     </div>
-                    {apartaments.map((a,index) => <ApartmentBox key={index} id={a.id} name={a.name} street={a.street} building_number={a.building_number} building_name={a.building_name} flat_number={a.flat_number} owner_id={a.owner_id}/>)}
+                    {apartaments.map((a,index) => <ApartmentBox key={index} id={a.id} name={a.name} street={a.street} building_number={a.building_number} building_name={a.building_name} flat_number={a.flat_number} owner_id={a.owner_id} rent={a.rent} refresh={refresh}/>)}
                     {showPopup && (
                     <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50">
                         <div className="white-box w-[40%] py-4 rounded-lg relative">

@@ -207,6 +207,7 @@ function Dashboard() {
             else
             {
                 alert("User added succesfully.");
+                alert(data.id)
             }
         } catch (err: any) {
             setError(err.message)

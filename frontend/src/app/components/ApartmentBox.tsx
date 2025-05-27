@@ -10,6 +10,8 @@ interface ApartmentProps {
     building_name: String
     flat_number: String
     owner_id: number
+    rent: number
+    refresh: Function
   }
 
 function ApartmentBox(props : ApartmentProps)
@@ -48,8 +50,11 @@ function ApartmentBox(props : ApartmentProps)
             }
             setShowPopup(false)
         } catch (err: any) {
-            alert(err.message)
-        } 
+            //alert(err.message)
+            setShowPopup(false)
+        } finally{
+            props.refresh()
+        }
     }
 
     return(
@@ -61,6 +66,7 @@ function ApartmentBox(props : ApartmentProps)
                     <h1>Building Number: {props.building_number}</h1>
                     <h1>Building Name: {props.building_name}</h1>
                     <h1>Flat Number: {props.flat_number}</h1>
+                    {props.rent != -1 ? <h1>Rent: {props.rent}</h1> : <h1>Rent: Not Set</h1>}
                 </div>
                 <button className="black-button" onClick={()=>{setShowPopup(true)}}>Change Rent</button>
             </div>
@@ -89,6 +95,7 @@ ApartmentBox.defaultProps = {
     building_number: "Default Building Number",
     building_name: "Default Building Name",
     flat_number: "Default Flat Number",
-    owner_id: -1
+    owner_id: -1,
+    rent: -1
 }
 export default ApartmentBox;
