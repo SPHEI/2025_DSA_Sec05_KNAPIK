@@ -2,6 +2,7 @@
 import "../globals.css";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from 'next/navigation';
+import Cookies from "js-cookie";
 
 //Tenants Only
 function SubmitIssue() {
@@ -10,19 +11,85 @@ function SubmitIssue() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  const handleSubmit = () => {
-    //handle api
+  const [apartaments,setApartaments] = useState([{id: -1,name: '', street: '', building_number: '', building_name: '',flat_number:'',owner_id:-1 }])
+  const [apartment, setApartment] = useState(1);
+  const [role, setRole] = useState('')
 
-    console.log("Submitted:", { title, description });
-    alert("Issue submitted!");
+  async function handleSubmit()
+  {
+    var t = Cookies.get("token");
+    const res = await fetch('http://localhost:8080/faults/add',{
+                method:'POST',
+                body: JSON.stringify({ 
+                    "token" : t,
+                    description,
+                    "date_reported" : "2025-10-10",
+                    "status_id" : 1,
+                    apartament_id : apartment
+                })
+            });
+            if(res.ok)
+            {
+                alert("Issue submitted succesfully.");
+            }
+            else
+            {
+                var data = await res.json()
+                alert(data.message)
+            }
   };
 
   const pathname = usePathname();
   useEffect(() => {
-    //Page setup goes here
-    setReady(true);
+    refresh()
   }, [pathname]);
 
+  async function refresh()
+  {
+    var a = String(Cookies.get("role"))
+    setRole(a)
+    var t = Cookies.get("token");
+    if(a === '1')
+    {
+        try{
+        const res = await fetch('http://localhost:8080/apartament/list?token=' + t)
+            const data = await res.json();
+            if(data.message)
+            {
+                setError(data.message)
+            }
+            else
+            {
+                setApartaments(data.apartaments);
+            }
+        }
+        catch(err: any)
+        {
+            setError(err.message);
+        }
+    }
+    else
+    {
+      try{
+        const res = await fetch('http://localhost:8080/tenant/info?token=' + t)
+            const data = await res.json();
+            if(data.message)
+            {
+                setError(data.message)
+            }
+            else
+            {
+              alert(data.apartament_id)
+                setApartment(data.apartament_id);
+            }
+        }
+        catch(err: any)
+        {
+            setError(err.message);
+        }
+    }
+    setReady(true);
+  }
   if (ready) {
     if (error == "none") {
       return (
@@ -38,6 +105,15 @@ function SubmitIssue() {
             onChange={(e) => setTitle(e.target.value)}
             className="input-box w-[50%]"
           />
+
+          {role === '1' && (
+            <div className="w-[50%]">
+            <b>Apartament</b>
+              <select className="input-box w-[100%]" value={apartment} onChange={(a) => {setApartment(Number(a.target.value))}}>
+                  {apartaments.map((a,index) => (<option key={index} value={a.id}>{a.name}</option>))}
+              </select>
+            </div>
+        )}
 
           <textarea
             placeholder="Describe the issue in detail..."
