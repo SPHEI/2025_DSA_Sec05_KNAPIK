@@ -211,6 +211,84 @@ func (app *app) subInfo(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func (app *app) getContractors(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	type contractor struct {
+		Id           int    `json:"id"`
+		UserId       int    `json:"user_id"`
+		Address      string `json:"address"`
+		NIP          string `json:"NIP"`
+		SpecialityId int    `json:"speciality_id"`
+	}
+
+	output := struct {
+		Contractors []contractor `json:"apartaments"`
+	}{}
+
+	r.ParseMultipartForm(32 << 20)
+	token := r.FormValue("token")
+
+	if erro := app.checkRole(token, 1); erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	id, useId, address, NIP, specialityId, err := database.GetContractorsData(app.DB)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	var data []contractor
+	for n := range id {
+		data = append(data,
+			contractor{
+				Id:           id[n],
+				UserId:       useId[n],
+				Address:      address[n],
+				NIP:          NIP[n],
+				SpecialityId: specialityId[n]})
+	}
+	output.Contractors = data
+
+	if err := json.NewEncoder(w).Encode(&output); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func (app *app) addContractor(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	input := struct {
+		Token        string `json:"token"`
+		UserId       int    `json:"user_id"`
+		Address      string `json:"address"`
+		NIP          string `json:"NIP"`
+		SpecialityId int    `json:"speciality_id"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
+		return
+	}
+
+	if erro := app.checkRole(input.Token, 1); erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	err = database.AddContractor(app.DB, []string{input.Address, input.NIP}, input.UserId, input.SpecialityId)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func (app *app) getTenants(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 

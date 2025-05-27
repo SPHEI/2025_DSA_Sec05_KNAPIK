@@ -61,6 +61,33 @@ func GetSubconInfo(db *sql.DB, userId int) (string, string, int, error) {
 
 }
 
+func GetContractorsData(db *sql.DB) ([]int, []int, []string, []string, []int, error) {
+	query := `SELECT id FROM Subcontractor`
+	id, err := getMultiRowInt(db, query)
+
+	query = `SELECT user_id FROM Subcontractor`
+	userId, err := getMultiRowInt(db, query)
+
+	query = `SELECT address FROM Subcontractor`
+	address, err := getMultiRow(db, query)
+
+	query = `SELECT NIP FROM Subcontractor`
+	nip, err := getMultiRow(db, query)
+
+	query = `SELECT speciality_id FROM Subcontractor`
+	specialityId, err := getMultiRowInt(db, query)
+
+	return id, userId, address, nip, specialityId, err
+}
+
+func AddContractor(db *sql.DB, data []string, userId, specialityId int) error {
+	query := "INSERT INTO Subcontractor (user_id, address, NIP, speciality_id) VALUES(?, ?, ?, ?)"
+
+	_, err := db.Exec(query, userId, data[0], data[1], specialityId)
+
+	return err
+}
+
 func GetApartamentsData(db *sql.DB) ([]int, []string, []string, []string, []string, []string, []int, error) {
 	query := `SELECT id FROM Apartament`
 	id, err := getMultiRowInt(db, query)
