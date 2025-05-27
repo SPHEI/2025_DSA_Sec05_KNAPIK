@@ -262,13 +262,14 @@ func (app *app) getApartaments(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
 	type apartament struct {
-		Id             int    `json:"id"`
-		Name           string `json:"name"`
-		Street         string `json:"street"`
-		BuildingNumber string `json:"building_number"`
-		Buildingname   string `json:"building_name"`
-		FlatNumber     string `json:"flat_number"`
-		OwnerId        int    `json:"owner_id"`
+		Id             int     `json:"id"`
+		Name           string  `json:"name"`
+		Street         string  `json:"street"`
+		BuildingNumber string  `json:"building_number"`
+		Buildingname   string  `json:"building_name"`
+		FlatNumber     string  `json:"flat_number"`
+		OwnerId        int     `json:"owner_id"`
+		Rent           float32 `json:"rent"`
 	}
 
 	output := struct {
@@ -291,6 +292,11 @@ func (app *app) getApartaments(w http.ResponseWriter, r *http.Request) {
 
 	var data []apartament
 	for n := range id {
+		rent, err := database.GetRent(app.DB, id[n])
+		if err != nil {
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
 		data = append(data,
 			apartament{
 				Id:             id[n],
@@ -299,7 +305,8 @@ func (app *app) getApartaments(w http.ResponseWriter, r *http.Request) {
 				BuildingNumber: buildingNumber[n],
 				Buildingname:   buildingName[n],
 				FlatNumber:     flatNumber[n],
-				OwnerId:        ownerId[n]})
+				OwnerId:        ownerId[n],
+				Rent:           rent})
 	}
 	output.Apartaments = data
 
@@ -655,6 +662,7 @@ func (app *app) addUser(w http.ResponseWriter, r *http.Request) {
 		Email    string `json:"email"`
 		Phone    string `json:"phone"`
 		Role     int    `json:"role"`
+		Id       int    `json:"id"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&user)
@@ -677,6 +685,12 @@ func (app *app) addUser(w http.ResponseWriter, r *http.Request) {
 	err = database.AddUser(app.DB, []string{user.Name, user.Password, user.Email, user.Phone}, user.Role)
 	if err != nil {
 		sendError(w, Error{500, "Could not add user", "Internal Server Error"}, err)
+		return
+	}
+
+	user.Id, err = database.GetId(app.DB, user.Email)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
 
