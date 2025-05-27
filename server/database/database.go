@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"log"
+	"time"
 )
 
 func GetInfo(db *sql.DB, email string) (int, string, string, int, error) {
@@ -139,7 +140,7 @@ func ChangeRent(db *sql.DB, apartamentId int, rent float32) error {
 	query := `UPDATE Pricing_History
 	SET is_current = 1
 	WHERE is_current = 0 AND apartment_id = ?`
-	_, err := db.Exec(query)
+	_, err := db.Exec(query, apartamentId)
 
 	query = "INSERT INTO Pricing_History (apartment_id, price) VALUES(?, ?)"
 	_, err = db.Exec(query, apartamentId, rent)
@@ -147,8 +148,11 @@ func ChangeRent(db *sql.DB, apartamentId int, rent float32) error {
 	return err
 }
 
-func GetActiveRentings(db *sql.DB) ([]int, []int, []string, error) {
-	query := `SELECT apartment_id FROM Renting_history WHERE end_date IS NULL`
+func GetActiveRentings(db *sql.DB) ([]int, []int, []int, []string, error) {
+	query := `SELECT id FROM Renting_history WHERE end_date IS NULL`
+	id, err := getMultiRowInt(db, query)
+
+	query = `SELECT apartment_id FROM Renting_history WHERE end_date IS NULL`
 	apartamentId, err := getMultiRowInt(db, query)
 
 	query = `SELECT user_id FROM Renting_history WHERE end_date IS NULL`
@@ -157,11 +161,32 @@ func GetActiveRentings(db *sql.DB) ([]int, []int, []string, error) {
 	query = `SELECT start_date FROM Renting_history WHERE end_date IS NULL`
 	startDate, err := getMultiRow(db, query)
 
-	return apartamentId, userId, startDate, err
+	return id, apartamentId, userId, startDate, err
 }
 
-func AddNewRenting(db *sql.DB, apartamentId, userId int, startDate, endDate string) error {
-	return nil
+func AddNewRenting(db *sql.DB, apartamentId, userId int, startDate string) error {
+	query := "INSERT INTO Renting_history (apartment_id, user_id, start_date) VALUES(?, ?, ?)"
+	date, err := time.Parse("DateOnly", startDate)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(query, apartamentId, userId, date)
+
+	return err
+}
+
+func SetEndDate(db *sql.DB, id int, endDate string) error {
+	query := `UPDATE Renting_History SET end_date = ? WHERE id = ?`
+
+	date, err := time.Parse("DateOnly", endDate)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(query, date, id)
+
+	return err
 }
 
 //////////////////////////////////////////////////////////////

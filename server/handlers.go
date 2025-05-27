@@ -445,6 +445,7 @@ func (app *app) getCurrentRenting(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
 	type renting struct {
+		Id           int    `json:"id"`
 		ApartamentId int    `json:"apartament_id"`
 		UserId       int    `json:"user_id"`
 		StartDate    string `json:"start_date"`
@@ -461,14 +462,14 @@ func (app *app) getCurrentRenting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	apartamentId, userId, startDate, err := database.GetActiveRentings(app.DB)
+	id, apartamentId, userId, startDate, err := database.GetActiveRentings(app.DB)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
 
 	var data []renting
-	for n := range apartamentId {
+	for n := range id {
 		data = append(data,
 			renting{ApartamentId: apartamentId[n],
 				UserId:    userId[n],
@@ -480,6 +481,65 @@ func (app *app) getCurrentRenting(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+}
+
+func (app *app) addNewRenting(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	input := struct {
+		Token        string `json:"token"`
+		ApartamentId int    `json:"apartament_id"`
+		UserId       int    `json:"user_id"`
+		StartDate    string `json:"start_date"` // DateOnly   = "2006-01-02"
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
+		return
+	}
+
+	if erro := app.checkRole(input.Token, 1); erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	err = database.AddNewRenting(app.DB, input.ApartamentId, input.UserId, input.StartDate)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (app *app) setEndOfRenting(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	input := struct {
+		Token   string `json:"token"`
+		Id      int    `json:"id"`
+		EndDate string `json:"start_date"` // DateOnly   = "2006-01-02"
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
+		return
+	}
+
+	if erro := app.checkRole(input.Token, 1); erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	err = database.SetEndDate(app.DB, input.Id, input.EndDate)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -551,6 +611,7 @@ func (app *app) getSubContractorSpec(w http.ResponseWriter, r *http.Request) {
 	data.Spec, err = database.GetSubcontractorSpec(app.DB)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
 	}
 
 	if err := json.NewEncoder(w).Encode(data); err != nil {
