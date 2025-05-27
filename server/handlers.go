@@ -559,9 +559,28 @@ func (app *app) getReports(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
-	if erro := app.checkRole(token, 1); erro != nil {
-		sendError(w, *erro, nil)
+
+	email, err := auth.ValidateSession(app.CACHE, token)
+	if err != nil {
+		sendError(w, Error{401, "Incorrect Token", "Unauthorized"}, err)
 		return
+	}
+
+	role, err := database.GetRole(app.DB, email)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	apartId := -1
+
+	if role == 2 {
+		user_id, err := database.GetId(app.DB, email)
+		apartId, err = database.GetApartamentId(app.DB, user_id)
+		if err != nil {
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
 	}
 
 	id, description, dateReported, statusId, apartamentId, err := database.GetFaultReports(app.DB)
@@ -572,12 +591,14 @@ func (app *app) getReports(w http.ResponseWriter, r *http.Request) {
 
 	var data []fault
 	for n := range id {
-		data = append(data,
-			fault{Id: id[n],
-				Description:  description[n],
-				DateReported: dateReported[n],
-				StatusId:     statusId[n],
-				ApartamentId: apartamentId[n]})
+		if apartamentId[n] == apartId {
+			data = append(data,
+				fault{Id: id[n],
+					Description:  description[n],
+					DateReported: dateReported[n],
+					StatusId:     statusId[n],
+					ApartamentId: apartamentId[n]})
+		}
 	}
 	output.Faults = data
 
@@ -725,7 +746,7 @@ func (app *app) addSubContractorSpec(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (app *app) checkRole(token string, role_id int) *Error {
+func (app *app) checkRole(token string, role_id ...int) *Error {
 	email, err := auth.ValidateSession(app.CACHE, token)
 	if err != nil {
 		log.Println(err)
@@ -737,7 +758,16 @@ func (app *app) checkRole(token string, role_id int) *Error {
 		log.Println(err)
 		return &Error{401, "Database", "Internal Server Error"}
 	}
-	if role != role_id {
+
+	valid := false
+
+	for i := range role_id {
+		if role_id[i] == role {
+			valid = true
+		}
+	}
+
+	if !valid {
 		log.Println("Wrong role")
 		return &Error{401, "Wrong role", "Unauthorized"}
 	}
