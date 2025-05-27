@@ -86,7 +86,9 @@ CREATE TABLE FaultReport(
     description TEXT NOT NULL,
     date_reported DATE NOT NULL,
     status_id INTEGER NOT NULL DEFAULT 1,  -- default'open'
-    FOREIGN KEY (status_id) REFERENCES FaultStatus(id)
+    apartment_id INTEGER NOT NULL,
+    FOREIGN KEY (status_id) REFERENCES FaultStatus(id),
+    FOREIGN KEY (apartment_id) REFERENCES Apartament(id)
 );
 
 CREATE TABLE Repair(
@@ -227,10 +229,10 @@ INSERT OR IGNORE INTO FaultStatus (name) VALUES
 ('closed');
 
 -- fault reports
-INSERT INTO FaultReport (description, date_reported, status_id) VALUES
-('Leaky faucet in kitchen', '2025-05-10', 1),
-('Broken heater', '2025-05-15', 1),
-('Power outlet not working', '2025-06-01', 2);
+INSERT INTO FaultReport (description, date_reported, status_id, apartment_id) VALUES
+('Leaky faucet in kitchen', '2025-05-10', 1, 1),
+('Broken heater', '2025-05-15', 1, 2),
+('Power outlet not working', '2025-06-01', 2, 2);
 
 -- repair statuses
 INSERT OR IGNORE INTO RepairStatus (name) VALUES 

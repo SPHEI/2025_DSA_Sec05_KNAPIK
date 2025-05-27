@@ -542,6 +542,84 @@ func (app *app) setEndOfRenting(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func (app *app) getReports(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	type fault struct {
+		Id           int    `json:"id"`
+		Description  string `json:"description"`
+		DateReported string `json:"date_reported"`
+		StatusId     int    `json:"status_id"`
+		ApartamentId int    `json:"apartament_id"`
+	}
+
+	output := struct {
+		Faults []fault `json:"faults"`
+	}{}
+
+	r.ParseMultipartForm(32 << 20)
+	token := r.FormValue("token")
+	if erro := app.checkRole(token, 1); erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	id, description, dateReported, statusId, apartamentId, err := database.GetFaultReports(app.DB)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	var data []fault
+	for n := range id {
+		data = append(data,
+			fault{Id: id[n],
+				Description:  description[n],
+				DateReported: dateReported[n],
+				StatusId:     statusId[n],
+				ApartamentId: apartamentId[n]})
+	}
+	output.Faults = data
+
+	if err = json.NewEncoder(w).Encode(&data); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+}
+
+func (app *app) addFault(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	input := struct {
+		Token        string `json:"token"`
+		Description  string `json:"description"`
+		DateReported string `json:"date_reported"` // DateOnly   = "2006-01-02"
+		StatusId     int    `json:"status_id"`
+		ApartamentId int    `json:"apartament_id"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
+		return
+	}
+
+	_, err = auth.ValidateSession(app.CACHE, input.Token)
+	if err != nil {
+		sendError(w, Error{401, "Incorrect Token", "Unauthorized"}, err)
+		return
+	}
+
+	err = database.AddFault(app.DB, input.Description, input.DateReported, input.StatusId, input.ApartamentId)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////

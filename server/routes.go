@@ -24,6 +24,9 @@ func (app *app) routes() http.Handler {
 	router.HandleFunc("POST /renting/start", app.addNewRenting)
 	router.HandleFunc("POST /renting/end", app.setEndOfRenting)
 
+	router.HandleFunc("GET /faults/list", app.getReports)
+	router.HandleFunc("POST /faults/add", app.addFault)
+
 	////
 
 	router.HandleFunc("POST /adduser", app.addUser)

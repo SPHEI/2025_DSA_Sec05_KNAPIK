@@ -189,6 +189,37 @@ func SetEndDate(db *sql.DB, id int, endDate string) error {
 	return err
 }
 
+func GetFaultReports(db *sql.DB) ([]int, []string, []string, []int, []int, error) {
+	query := `SELECT id FROM FaultReport`
+	id, err := getMultiRowInt(db, query)
+
+	query = `SELECT description FROM FaultReport`
+	description, err := getMultiRow(db, query)
+
+	query = `SELECT date_reported FROM FaultReport`
+	dateReported, err := getMultiRow(db, query)
+
+	query = `SELECT status_id FROM FaultReport`
+	statudId, err := getMultiRowInt(db, query)
+
+	query = `SELECT apartment_id FROM FaultReport`
+	apartamentId, err := getMultiRowInt(db, query)
+
+	return id, description, dateReported, statudId, apartamentId, err
+}
+
+func AddFault(db *sql.DB, description, dateReported string, statusId, apartamentId int) error {
+	query := "INSERT INTO FaultReport (description, date_reported, status_id, apartment_id) VALUES(?, ?, ?, ?)"
+	date, err := time.Parse("DateOnly", dateReported)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(query, description, date, statusId, apartamentId)
+
+	return err
+}
+
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
