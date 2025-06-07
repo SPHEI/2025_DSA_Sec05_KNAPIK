@@ -25,10 +25,10 @@ function App() {
 
           <div className="relative z-10 flex flex-col items-center justify-start pt-80 h-screen w-full text-center px-4">
             <h1 className="text-white text-7xl font-bold mb-4 drop-shadow-lg">
-              tutaj duzy tekst
+              The amazing building-management app
             </h1>
             <p className="text-white text-2xl drop-shadow-md max-w-3xl mx-auto">
-              tutaj jakis maly tekst gowno chuj
+              Everyday we bring humanity closer to the end of everyday with our products of today.
             </p>
           </div>
         </main>
