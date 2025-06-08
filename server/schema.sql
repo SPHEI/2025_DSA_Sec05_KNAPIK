@@ -91,7 +91,7 @@ CREATE TABLE FaultReport (
     FOREIGN KEY (apartment_id) REFERENCES Apartament(id)
 );
 
-CREATE TABLE Repair (
+CREATE TABLE repair (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     fault_report_id INTEGER,
     date_assigned DATE NOT NULL,
@@ -143,7 +143,7 @@ CREATE TABLE Expenses (
     description TEXT NOT NULL,
     category_id INTEGER NOT NULL,
     repair_id INTEGER NULL,
-    FOREIGN KEY (repair_id) REFERENCES Repair(id),
+    FOREIGN KEY (repair_id) REFERENCES repair(id),
     FOREIGN KEY (category_id) REFERENCES ExpenseCategory(id)
 );
 
@@ -241,7 +241,7 @@ INSERT OR IGNORE INTO RepairStatus (name) VALUES
 ('completed');
 
 -- repairs
-INSERT INTO Repair (fault_report_id, date_assigned, date_completed, status_id, subcontractor_id) VALUES
+INSERT INTO repair (fault_report_id, date_assigned, date_completed, status_id, subcontractor_id) VALUES
 (1, '2025-05-11', NULL, 2, 1),
 (2, '2025-05-16', '2025-05-18', 3, 2),
 (3, '2025-06-02', '2025-06-02', 3, 2);

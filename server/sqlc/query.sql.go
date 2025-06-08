@@ -60,7 +60,7 @@ func (q *Queries) AddOwner(ctx context.Context, arg AddOwnerParams) error {
 }
 
 const addRepair = `-- name: AddRepair :exec
-INSERT INTO Repair (
+INSERT INTO repair (
   fault_report_id, date_assigned
 ) VALUES (
   ?, ?
@@ -127,7 +127,7 @@ func (q *Queries) GetRent(ctx context.Context, apartmentID int64) (float64, erro
 }
 
 const getRepair = `-- name: GetRepair :many
-SELECT id, fault_report_id, date_assigned, date_completed, status_id, subcontractor_id FROM Repair
+SELECT id, fault_report_id, date_assigned, date_completed, status_id, subcontractor_id FROM repair
 `
 
 func (q *Queries) GetRepair(ctx context.Context) ([]Repair, error) {
@@ -236,4 +236,30 @@ func (q *Queries) GetUserRole(ctx context.Context, id int64) (int64, error) {
 	var role_id int64
 	err := row.Scan(&role_id)
 	return role_id, err
+}
+
+const updateSubToRepair = `-- name: UpdateSubToRepair :one
+UPDATE repair
+SET subcontractor_id = ?
+WHERE id = ?
+RETURNING id, fault_report_id, date_assigned, date_completed, status_id, subcontractor_id
+`
+
+type UpdateSubToRepairParams struct {
+	SubcontractorID sql.NullInt64
+	ID              int64
+}
+
+func (q *Queries) UpdateSubToRepair(ctx context.Context, arg UpdateSubToRepairParams) (Repair, error) {
+	row := q.db.QueryRowContext(ctx, updateSubToRepair, arg.SubcontractorID, arg.ID)
+	var i Repair
+	err := row.Scan(
+		&i.ID,
+		&i.FaultReportID,
+		&i.DateAssigned,
+		&i.DateCompleted,
+		&i.StatusID,
+		&i.SubcontractorID,
+	)
+	return i, err
 }

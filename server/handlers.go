@@ -880,6 +880,30 @@ func (app *app) addRepair(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func (app *app) assignSubContractor(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	input := struct {
+		Token      string                       `json:"token"`
+		Contractor sqlc.UpdateSubToRepairParams `json:"contractor"`
+	}{}
+
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
+		return
+	}
+
+	output, err := app.Query.UpdateSubToRepair(app.Ctx, input.Contractor)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(&output); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func (app *app) checkRole(token string, role_id ...int) *Error {
 	userId, err := auth.ValidateSession(app.CACHE, token)
 	if err != nil {
