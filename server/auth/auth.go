@@ -18,14 +18,14 @@ func GenerateSecureToken(length int) (string, error) {
 	return base64.URLEncoding.EncodeToString(buffer)[:length], nil
 }
 
-func CreateSession(db *sql.DB, login string) (string, error) {
+func CreateSession(db *sql.DB, userId int) (string, error) {
 	token, err := GenerateSecureToken(64)
 	if err != nil {
 		//log.Println(err)
 		return "", err
 	}
 
-	if err = database.InsertToken(db, login, token); err != nil {
+	if err = database.InsertToken(db, userId, token); err != nil {
 		//log.Println(err)
 		return "", nil
 	}
@@ -34,8 +34,8 @@ func CreateSession(db *sql.DB, login string) (string, error) {
 	return token, nil
 }
 
-func ValidateSession(db *sql.DB, token string) (string, error) {
-	login, err := database.GetToken(db, token)
+func ValidateSession(db *sql.DB, token string) (int, error) {
+	userId, err := database.GetToken(db, token)
 
-	return login, err
+	return userId, err
 }

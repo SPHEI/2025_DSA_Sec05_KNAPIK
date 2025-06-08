@@ -30,6 +30,9 @@ func (app *app) routes() http.Handler {
 	router.HandleFunc("GET /subcon/list", app.getContractors)
 	router.HandleFunc("POST /subcon/add", app.addContractor)
 
+	router.HandleFunc("GET /repair/list", app.getRepairs)
+	router.HandleFunc("POST /repair/add", app.addRepair)
+
 	////
 
 	router.HandleFunc("POST /adduser", app.addUser)

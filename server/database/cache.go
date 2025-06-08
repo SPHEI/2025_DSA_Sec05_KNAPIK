@@ -10,34 +10,34 @@ func SetupCache(db *sql.DB) error {
 	_, err := db.Exec(`
     CREATE TABLE sessions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        login TEXT NOT NULL,
+        user_id INTEGER NOT NULL,
         token TEXT NOT NULL UNIQUE
     )`)
 	return err
 }
 
-func InsertToken(db *sql.DB, login, token string) error {
+func InsertToken(db *sql.DB, userId int, token string) error {
 	_, err := db.Exec(`
-        INSERT INTO sessions (login, token)
+        INSERT INTO sessions (user_id, token)
         VALUES (?, ?)`,
-		login, token)
+		userId, token)
 	return err
 }
 
-func GetToken(db *sql.DB, token string) (string, error) {
-	var login string
+func GetToken(db *sql.DB, token string) (int, error) {
+	var userId int
 
 	err := db.QueryRow(`
-        SELECT login FROM sessions 
-        WHERE token = ?`, token).Scan(&login)
+        SELECT id FROM sessions 
+        WHERE token = ?`, token).Scan(&userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return "", errors.New("invalid session")
+			return -1, errors.New("invalid session")
 		}
-		return "", err
+		return -1, err
 	}
 
-	return login, err
+	return userId, err
 }
 
 func DeleteToken(db *sql.DB, token string) {
