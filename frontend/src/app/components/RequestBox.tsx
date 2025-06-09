@@ -6,10 +6,11 @@ import { useRouter, usePathname } from 'next/navigation';
 import RepairBox from "./RepairBox";
 
 interface RequestProps {
+  id: number;
   title: string;
   description: string;
   date: string;
-  status: string;
+  status: number;
 }
 
 function RequestBox(props: RequestProps) {
@@ -46,7 +47,7 @@ useEffect(() => {
           <h1 className="text-xl">Status: {props.status}</h1>
           <button className="black-button w-[100%]" onClick={()=>{setShowPopup(true)}}>View Details</button>
         </div>
-        <div className={props.status === 'Open' ? "status-box-yellow" : "status-box-green"}></div>
+        <div className={props.status == 1 ? "status-box-yellow" : "status-box-green"}></div>
       </div>
       {showPopup && (
                 <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50 overflow-auto">
@@ -57,9 +58,9 @@ useEffect(() => {
                             <h1 className="input-box">{props.title}</h1>
                             <h1>Description</h1>
                             <h1 className="input-box">{props.description}</h1>
-                            <h1>Date Submitted: {props.date}</h1>
-                            <h1>Status: {props.status}</h1>
-                            <button className="black-button">{props.status === 'Open' ? "Close Request" : "Reopen Request"}</button>
+                            <h1>Date Submitted: {props.date.split("T")[0]}</h1>
+                            <h1>Status: {props.status == 1 ? "Open" : "Closed"}</h1>
+                            <button className="black-button">{props.status == 1 ? "Close Request" : "Reopen Request"}</button>
                             <div></div><div></div><div></div>
                             <div className="page-head w-[100%]">
                               <b className="text-4xl">Associated Repairs:</b>
@@ -99,10 +100,11 @@ useEffect(() => {
 }
 
 RequestBox.defaultProps = {
+  id: -1,
   title: "Electricity",
   description: "blablabla",
   date: "30 April 2137",
-  status: "Pending",
+  status: -1,
 };
 
 export default RequestBox;

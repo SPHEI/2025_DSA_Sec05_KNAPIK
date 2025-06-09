@@ -11,6 +11,8 @@ function Requests() {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("none");
 
+  const [requests, setRequests] = useState([{id: -1, description: '', date_reported: '', status_id: -1, apartament_id: -1}])
+
   const [role, setRole] = useState('')
   const pathname = usePathname();
   useEffect(() => {
@@ -20,6 +22,23 @@ function Requests() {
           if(a != null)
           {
             setRole(a)
+            var t = Cookies.get("token");
+            try{
+            const res = await fetch('http://localhost:8080/faults/list?token=' + t)
+                const data = await res.json();
+                if(data.message)
+                {
+                    setError(data.message)
+                }
+                else
+                {
+                    setRequests(data.faults);
+                }
+            }
+            catch(err: any)
+            {
+                setError(err.message);
+            }
           }
         }
         fetchData();
@@ -37,8 +56,6 @@ function Requests() {
             </div>
             <div className="flex flex-col w-[50%] gap-5">
               <RepairBox title="Fix cable" assigned_date="1-01-2024" completed_date="" status="in-progress" subcontractor="John" />
-              <RepairBox title="Fix cable" assigned_date="1-01-2024" completed_date="" status="pending" subcontractor="John" />
-              <RepairBox title="Fix cable" assigned_date="1-01-2024" completed_date="" status="completed" subcontractor="John" />
             </div>
           </main>
         );
@@ -50,24 +67,8 @@ function Requests() {
             <div className="page-head w-[50%]">
               <b className="text-4xl">My requests</b>
             </div>
-            <RequestBox
-              title="Water leak"
-              description="The water is truly leaking my lordThe water is truly leaking my lordThe water is truly leaking my lordThe water is truly leaking my lordThe water is truly leaking my lordThe water is truly leaking my lordThe water is truly leaking my lordThe water is truly leaking my lordThe water is truly leaking my lordThe water is truly leaking my lordThe water is truly leaking my lordThe water is truly leaking my lordThe water is truly leaking my lordThe water is truly leaking my lordThe water is truly leaking my lordThe water is truly leaking my lord"
-              date="10 May 2025"
-              status="Open"
-            />
-            <RequestBox
-              title="Water leak"
-              description="The water is truly leaking my lord"
-              date="10 May 2025"
-              status="Closed"
-            />
-            <RequestBox
-              title="Water leak"
-              description="The water is truly leaking my lord"
-              date="10 May 2025"
-              status="Open"
-            />
+            {requests != null ? requests.map((a, index) => <RequestBox key={index} id={a.id} title="null" description={a.description} date={a.date_reported} status={a.status_id}/>)
+            : <h1>No requests</h1>}
           </main>
         );
       }
