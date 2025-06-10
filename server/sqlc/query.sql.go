@@ -43,7 +43,7 @@ func (q *Queries) AddApartment(ctx context.Context, arg AddApartmentParams) erro
 }
 
 const addFault = `-- name: AddFault :exec
-INSERT INTO FaultReport (title, description, date_reported, status_id, apartment_id) VALUES(?, ?, ?, ?, ?)
+INSERT INTO faultreport (title, description, date_reported, status_id, apartment_id) VALUES(?, ?, ?, ?, ?)
 `
 
 type AddFaultParams struct {
@@ -105,7 +105,6 @@ INSERT INTO repair (
 ) VALUES (
   ?, ?, ?
 )
-RETURNING id, title, fault_report_id, date_assigned, date_completed, status_id, subcontractor_id
 `
 
 type AddRepairParams struct {
@@ -297,8 +296,8 @@ func (q *Queries) GetApartments(ctx context.Context) ([]GetApartmentsRow, error)
 }
 
 const getFaultReports = `-- name: GetFaultReports :many
-SELECT faultreport.id, faultreport.title, faultreport.description, faultreport.date_reported, faultreport.status_id, faultreport.apartment_id, Apartament.name FROM FaultReport
-INNER JOIN Apartament ON Apartament.id = FaultReport.apartment_id
+SELECT faultreport.id, faultreport.title, faultreport.description, faultreport.date_reported, faultreport.status_id, faultreport.apartment_id, Apartament.name FROM faultreport
+INNER JOIN Apartament ON Apartament.id = faultreport.apartment_id
 `
 
 type GetFaultReportsRow struct {
@@ -343,9 +342,9 @@ func (q *Queries) GetFaultReports(ctx context.Context) ([]GetFaultReportsRow, er
 }
 
 const getFaultReportsUser = `-- name: GetFaultReportsUser :many
-SELECT faultreport.id, faultreport.title, faultreport.description, faultreport.date_reported, faultreport.status_id, faultreport.apartment_id, Apartament.name FROM FaultReport
-INNER JOIN Apartament ON Apartament.id = FaultReport.apartment_id
-WHERE FaultReport.apartment_id = ?
+SELECT faultreport.id, faultreport.title, faultreport.description, faultreport.date_reported, faultreport.status_id, faultreport.apartment_id, Apartament.name FROM faultreport
+INNER JOIN Apartament ON Apartament.id = faultreport.apartment_id
+WHERE faultreport.apartment_id = ?
 `
 
 type GetFaultReportsUserRow struct {
@@ -802,6 +801,32 @@ type SetEndDateParams struct {
 func (q *Queries) SetEndDate(ctx context.Context, arg SetEndDateParams) error {
 	_, err := q.db.ExecContext(ctx, setEndDate, arg.EndDate, arg.ID)
 	return err
+}
+
+const updateFaultStatus = `-- name: UpdateFaultStatus :one
+UPDATE faultreport
+SET status_id = ?
+WHERE id = ?
+RETURNING id, title, description, date_reported, status_id, apartment_id
+`
+
+type UpdateFaultStatusParams struct {
+	StatusID int64
+	ID       int64
+}
+
+func (q *Queries) UpdateFaultStatus(ctx context.Context, arg UpdateFaultStatusParams) (Faultreport, error) {
+	row := q.db.QueryRowContext(ctx, updateFaultStatus, arg.StatusID, arg.ID)
+	var i Faultreport
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Description,
+		&i.DateReported,
+		&i.StatusID,
+		&i.ApartmentID,
+	)
+	return i, err
 }
 
 const updateRepairData = `-- name: UpdateRepairData :one

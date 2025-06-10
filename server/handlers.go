@@ -553,6 +553,38 @@ func (app *app) addFault(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func (app *app) updateFault(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	input := struct {
+		Token string                       `json:"token"`
+		Fault sqlc.UpdateFaultStatusParams `json:"fault"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
+		return
+	}
+
+	_, err = auth.ValidateSession(app.CACHE, input.Token)
+	if err != nil {
+		sendError(w, Error{401, "Incorrect Token", "Unauthorized"}, err)
+		return
+	}
+
+	output, err := app.Query.UpdateFaultStatus(app.Ctx, input.Fault)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	if err = json.NewEncoder(w).Encode(&output); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////

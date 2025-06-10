@@ -26,6 +26,7 @@ func (app *app) routes() http.Handler {
 
 	router.HandleFunc("GET /faults/list", app.getReports)
 	router.HandleFunc("POST /faults/add", app.addFault)
+	router.HandleFunc("POST /faults/status", app.updateFault)
 
 	router.HandleFunc("GET /subcon/list", app.getContractors)
 	router.HandleFunc("POST /subcon/add", app.addContractor)

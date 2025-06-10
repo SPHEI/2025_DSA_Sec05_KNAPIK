@@ -85,16 +85,22 @@ INSERT INTO renting_history (apartment_id, user_id, start_date) VALUES(?, ?, ?);
 UPDATE renting_history SET end_date = ? WHERE id = ?;
 
 -- name: GetFaultReports :many
-SELECT FaultReport.*, Apartament.name FROM FaultReport
-INNER JOIN Apartament ON Apartament.id = FaultReport.apartment_id;
+SELECT faultreport.*, Apartament.name FROM faultreport
+INNER JOIN Apartament ON Apartament.id = faultreport.apartment_id;
 
 -- name: GetFaultReportsUser :many
-SELECT FaultReport.*, Apartament.name FROM FaultReport
-INNER JOIN Apartament ON Apartament.id = FaultReport.apartment_id
-WHERE FaultReport.apartment_id = ?;
+SELECT faultreport.*, Apartament.name FROM faultreport
+INNER JOIN Apartament ON Apartament.id = faultreport.apartment_id
+WHERE faultreport.apartment_id = ?;
 
 -- name: AddFault :exec
-INSERT INTO FaultReport (title, description, date_reported, status_id, apartment_id) VALUES(?, ?, ?, ?, ?);
+INSERT INTO faultreport (title, description, date_reported, status_id, apartment_id) VALUES(?, ?, ?, ?, ?);
+
+-- name: UpdateFaultStatus :one
+UPDATE faultreport
+SET status_id = ?
+WHERE id = ?
+RETURNING *;
 
 -- name: GetTenets :many
 SELECT id, name, email, phone, role_id FROM User WHERE role_id = "2";
@@ -110,8 +116,7 @@ INSERT INTO repair (
   title, fault_report_id, date_assigned
 ) VALUES (
   ?, ?, ?
-)
-RETURNING *;
+);
 
 
 -- name: GetRepair :many
