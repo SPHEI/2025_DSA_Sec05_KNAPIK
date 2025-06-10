@@ -28,7 +28,7 @@ func GetToken(db *sql.DB, token string) (int, error) {
 	var userId int
 
 	err := db.QueryRow(`
-        SELECT id FROM sessions 
+        SELECT user_id FROM sessions 
         WHERE token = ?`, token).Scan(&userId)
 	if err != nil {
 		if err == sql.ErrNoRows {

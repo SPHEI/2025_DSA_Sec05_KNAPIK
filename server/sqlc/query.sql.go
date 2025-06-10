@@ -40,6 +40,44 @@ func (q *Queries) AddApartment(ctx context.Context, arg AddApartmentParams) erro
 	return err
 }
 
+const addFault = `-- name: AddFault :exec
+INSERT INTO FaultReport (title, description, date_reported, status_id, apartment_id) VALUES(?, ?, ?, ?, ?)
+`
+
+type AddFaultParams struct {
+	Title        string
+	Description  string
+	DateReported time.Time
+	StatusID     int64
+	ApartmentID  int64
+}
+
+func (q *Queries) AddFault(ctx context.Context, arg AddFaultParams) error {
+	_, err := q.db.ExecContext(ctx, addFault,
+		arg.Title,
+		arg.Description,
+		arg.DateReported,
+		arg.StatusID,
+		arg.ApartmentID,
+	)
+	return err
+}
+
+const addNewRenting = `-- name: AddNewRenting :exec
+INSERT INTO renting_history (apartment_id, user_id, start_date) VALUES(?, ?, ?)
+`
+
+type AddNewRentingParams struct {
+	ApartmentID int64
+	UserID      int64
+	StartDate   time.Time
+}
+
+func (q *Queries) AddNewRenting(ctx context.Context, arg AddNewRentingParams) error {
+	_, err := q.db.ExecContext(ctx, addNewRenting, arg.ApartmentID, arg.UserID, arg.StartDate)
+	return err
+}
+
 const addOwner = `-- name: AddOwner :exec
 INSERT INTO Owner (
   name, email, phone
@@ -61,19 +99,29 @@ func (q *Queries) AddOwner(ctx context.Context, arg AddOwnerParams) error {
 
 const addRepair = `-- name: AddRepair :exec
 INSERT INTO repair (
-  fault_report_id, date_assigned
+  title, fault_report_id, date_assigned
 ) VALUES (
-  ?, ?
+  ?, ?, ?
 )
 `
 
 type AddRepairParams struct {
+	Title         string
 	FaultReportID sql.NullInt64
 	DateAssigned  time.Time
 }
 
 func (q *Queries) AddRepair(ctx context.Context, arg AddRepairParams) error {
-	_, err := q.db.ExecContext(ctx, addRepair, arg.FaultReportID, arg.DateAssigned)
+	_, err := q.db.ExecContext(ctx, addRepair, arg.Title, arg.FaultReportID, arg.DateAssigned)
+	return err
+}
+
+const addSpec = `-- name: AddSpec :exec
+INSERT INTO Speciality (name) VALUES(?)
+`
+
+func (q *Queries) AddSpec(ctx context.Context, name string) error {
+	_, err := q.db.ExecContext(ctx, addSpec, name)
 	return err
 }
 
@@ -102,20 +150,277 @@ func (q *Queries) AddSubcontractor(ctx context.Context, arg AddSubcontractorPara
 	return err
 }
 
+const addUser = `-- name: AddUser :exec
+INSERT INTO User (name, password, email, phone, role_id) VALUES(?, ?, ?, ?, ?)
+`
+
+type AddUserParams struct {
+	Name     string
+	Password string
+	Email    string
+	Phone    string
+	RoleID   int64
+}
+
+func (q *Queries) AddUser(ctx context.Context, arg AddUserParams) error {
+	_, err := q.db.ExecContext(ctx, addUser,
+		arg.Name,
+		arg.Password,
+		arg.Email,
+		arg.Phone,
+		arg.RoleID,
+	)
+	return err
+}
+
+const changeRent1 = `-- name: ChangeRent1 :exec
+UPDATE pricinghistory
+	SET is_current = 1
+	WHERE is_current = 0 AND apartment_id = ?
+`
+
+func (q *Queries) ChangeRent1(ctx context.Context, apartmentID int64) error {
+	_, err := q.db.ExecContext(ctx, changeRent1, apartmentID)
+	return err
+}
+
+const changeRent2 = `-- name: ChangeRent2 :exec
+INSERT INTO pricinghistory (apartment_id, price) VALUES(?, ?)
+`
+
+type ChangeRent2Params struct {
+	ApartmentID int64
+	Price       float64
+}
+
+func (q *Queries) ChangeRent2(ctx context.Context, arg ChangeRent2Params) error {
+	_, err := q.db.ExecContext(ctx, changeRent2, arg.ApartmentID, arg.Price)
+	return err
+}
+
+const getActiveRenting = `-- name: GetActiveRenting :many
+SELECT id, apartment_id, user_id, start_date FROM renting_history WHERE end_date IS NULL
+`
+
+type GetActiveRentingRow struct {
+	ID          int64
+	ApartmentID int64
+	UserID      int64
+	StartDate   time.Time
+}
+
+func (q *Queries) GetActiveRenting(ctx context.Context) ([]GetActiveRentingRow, error) {
+	rows, err := q.db.QueryContext(ctx, getActiveRenting)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetActiveRentingRow
+	for rows.Next() {
+		var i GetActiveRentingRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ApartmentID,
+			&i.UserID,
+			&i.StartDate,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getApartmentID = `-- name: GetApartmentID :one
-SELECT apartment_id FROM Renting_History 
+SELECT apartment_id FROM renting_history 
 WHERE end_date IS NULL AND user_id = ?
 `
 
-func (q *Queries) GetApartmentID(ctx context.Context, userID sql.NullInt64) (sql.NullInt64, error) {
+func (q *Queries) GetApartmentID(ctx context.Context, userID int64) (int64, error) {
 	row := q.db.QueryRowContext(ctx, getApartmentID, userID)
-	var apartment_id sql.NullInt64
+	var apartment_id int64
 	err := row.Scan(&apartment_id)
 	return apartment_id, err
 }
 
+const getApartments = `-- name: GetApartments :many
+SELECT id, name street, building_number, building_name, flat_number, owner_id
+FROM Apartament
+`
+
+type GetApartmentsRow struct {
+	ID             int64
+	Street         string
+	BuildingNumber string
+	BuildingName   sql.NullString
+	FlatNumber     string
+	OwnerID        int64
+}
+
+func (q *Queries) GetApartments(ctx context.Context) ([]GetApartmentsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getApartments)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetApartmentsRow
+	for rows.Next() {
+		var i GetApartmentsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Street,
+			&i.BuildingNumber,
+			&i.BuildingName,
+			&i.FlatNumber,
+			&i.OwnerID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getFaultReports = `-- name: GetFaultReports :many
+SELECT faultreport.id, faultreport.title, faultreport.description, faultreport.date_reported, faultreport.status_id, faultreport.apartment_id, Apartament.name FROM FaultReport
+INNER JOIN Apartament ON Apartament.id = FaultReport.apartment_id
+`
+
+type GetFaultReportsRow struct {
+	ID           int64
+	Title        string
+	Description  string
+	DateReported time.Time
+	StatusID     int64
+	ApartmentID  int64
+	Name         string
+}
+
+func (q *Queries) GetFaultReports(ctx context.Context) ([]GetFaultReportsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getFaultReports)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetFaultReportsRow
+	for rows.Next() {
+		var i GetFaultReportsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Description,
+			&i.DateReported,
+			&i.StatusID,
+			&i.ApartmentID,
+			&i.Name,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getFaultReportsUser = `-- name: GetFaultReportsUser :many
+SELECT faultreport.id, faultreport.title, faultreport.description, faultreport.date_reported, faultreport.status_id, faultreport.apartment_id, Apartament.name FROM FaultReport
+INNER JOIN Apartament ON Apartament.id = FaultReport.apartment_id
+WHERE FaultReport.apartment_id = ?
+`
+
+type GetFaultReportsUserRow struct {
+	ID           int64
+	Title        string
+	Description  string
+	DateReported time.Time
+	StatusID     int64
+	ApartmentID  int64
+	Name         string
+}
+
+func (q *Queries) GetFaultReportsUser(ctx context.Context, apartmentID int64) ([]GetFaultReportsUserRow, error) {
+	rows, err := q.db.QueryContext(ctx, getFaultReportsUser, apartmentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetFaultReportsUserRow
+	for rows.Next() {
+		var i GetFaultReportsUserRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Description,
+			&i.DateReported,
+			&i.StatusID,
+			&i.ApartmentID,
+			&i.Name,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getOwners = `-- name: GetOwners :many
+SELECT id, name, email, phone
+FROM Owner
+`
+
+func (q *Queries) GetOwners(ctx context.Context) ([]Owner, error) {
+	rows, err := q.db.QueryContext(ctx, getOwners)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Owner
+	for rows.Next() {
+		var i Owner
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Email,
+			&i.Phone,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getRent = `-- name: GetRent :one
-SELECT price FROM Pricing_History 
+SELECT price FROM pricinghistory 
 WHERE is_current = 0 AND apartment_id = ?
 `
 
@@ -127,7 +432,7 @@ func (q *Queries) GetRent(ctx context.Context, apartmentID int64) (float64, erro
 }
 
 const getRepair = `-- name: GetRepair :many
-SELECT id, fault_report_id, date_assigned, date_completed, status_id, subcontractor_id FROM repair
+SELECT id, title, fault_report_id, date_assigned, date_completed, status_id, subcontractor_id FROM repair
 `
 
 func (q *Queries) GetRepair(ctx context.Context) ([]Repair, error) {
@@ -141,11 +446,56 @@ func (q *Queries) GetRepair(ctx context.Context) ([]Repair, error) {
 		var i Repair
 		if err := rows.Scan(
 			&i.ID,
+			&i.Title,
 			&i.FaultReportID,
 			&i.DateAssigned,
 			&i.DateCompleted,
 			&i.StatusID,
 			&i.SubcontractorID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getRepairSub = `-- name: GetRepairSub :many
+SELECT id, title, fault_report_id, date_assigned, date_completed, status_id FROM repair
+WHERE subcontractor_id = (SELECT id FROM Subcontractor WHERE user_id = ?)
+`
+
+type GetRepairSubRow struct {
+	ID            int64
+	Title         string
+	FaultReportID sql.NullInt64
+	DateAssigned  time.Time
+	DateCompleted sql.NullTime
+	StatusID      int64
+}
+
+func (q *Queries) GetRepairSub(ctx context.Context, userID int64) ([]GetRepairSubRow, error) {
+	rows, err := q.db.QueryContext(ctx, getRepairSub, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetRepairSubRow
+	for rows.Next() {
+		var i GetRepairSubRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.FaultReportID,
+			&i.DateAssigned,
+			&i.DateCompleted,
+			&i.StatusID,
 		); err != nil {
 			return nil, err
 		}
@@ -176,6 +526,108 @@ func (q *Queries) GetSubconInfo(ctx context.Context, userID int64) (GetSubconInf
 	var i GetSubconInfoRow
 	err := row.Scan(&i.Address, &i.Nip, &i.SpecialityID)
 	return i, err
+}
+
+const getSubcontractorSpec = `-- name: GetSubcontractorSpec :many
+SELECT id, name FROM Speciality
+`
+
+func (q *Queries) GetSubcontractorSpec(ctx context.Context) ([]Speciality, error) {
+	rows, err := q.db.QueryContext(ctx, getSubcontractorSpec)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Speciality
+	for rows.Next() {
+		var i Speciality
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getSubcontractors = `-- name: GetSubcontractors :many
+SELECT id, user_id, address, NIP, speciality_id 
+FROM Subcontractor
+`
+
+func (q *Queries) GetSubcontractors(ctx context.Context) ([]Subcontractor, error) {
+	rows, err := q.db.QueryContext(ctx, getSubcontractors)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Subcontractor
+	for rows.Next() {
+		var i Subcontractor
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Address,
+			&i.Nip,
+			&i.SpecialityID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getTenets = `-- name: GetTenets :many
+SELECT id, name, email, phone, role_id FROM User WHERE role_id = "2"
+`
+
+type GetTenetsRow struct {
+	ID     int64
+	Name   string
+	Email  string
+	Phone  string
+	RoleID int64
+}
+
+func (q *Queries) GetTenets(ctx context.Context) ([]GetTenetsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTenets)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTenetsRow
+	for rows.Next() {
+		var i GetTenetsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Email,
+			&i.Phone,
+			&i.RoleID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getUserId = `-- name: GetUserId :one
@@ -238,11 +690,53 @@ func (q *Queries) GetUserRole(ctx context.Context, id int64) (int64, error) {
 	return role_id, err
 }
 
+const setEndDate = `-- name: SetEndDate :exec
+UPDATE renting_history SET end_date = ? WHERE id = ?
+`
+
+type SetEndDateParams struct {
+	EndDate sql.NullTime
+	ID      int64
+}
+
+func (q *Queries) SetEndDate(ctx context.Context, arg SetEndDateParams) error {
+	_, err := q.db.ExecContext(ctx, setEndDate, arg.EndDate, arg.ID)
+	return err
+}
+
+const updateRepairData = `-- name: UpdateRepairData :one
+UPDATE repair
+SET status_id = ?, date_completed = ?
+WHERE (SELECT id FROM RepairStatus WHERE name = ?)
+RETURNING id, title, fault_report_id, date_assigned, date_completed, status_id, subcontractor_id
+`
+
+type UpdateRepairDataParams struct {
+	StatusID      int64
+	DateCompleted sql.NullTime
+	Name          string
+}
+
+func (q *Queries) UpdateRepairData(ctx context.Context, arg UpdateRepairDataParams) (Repair, error) {
+	row := q.db.QueryRowContext(ctx, updateRepairData, arg.StatusID, arg.DateCompleted, arg.Name)
+	var i Repair
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.FaultReportID,
+		&i.DateAssigned,
+		&i.DateCompleted,
+		&i.StatusID,
+		&i.SubcontractorID,
+	)
+	return i, err
+}
+
 const updateSubToRepair = `-- name: UpdateSubToRepair :one
 UPDATE repair
 SET subcontractor_id = ?
 WHERE id = ?
-RETURNING id, fault_report_id, date_assigned, date_completed, status_id, subcontractor_id
+RETURNING id, title, fault_report_id, date_assigned, date_completed, status_id, subcontractor_id
 `
 
 type UpdateSubToRepairParams struct {
@@ -255,6 +749,7 @@ func (q *Queries) UpdateSubToRepair(ctx context.Context, arg UpdateSubToRepairPa
 	var i Repair
 	err := row.Scan(
 		&i.ID,
+		&i.Title,
 		&i.FaultReportID,
 		&i.DateAssigned,
 		&i.DateCompleted,

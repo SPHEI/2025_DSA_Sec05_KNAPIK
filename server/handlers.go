@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -48,6 +47,7 @@ func (app *app) login(w http.ResponseWriter, r *http.Request) {
 	output := struct {
 		Token string `json:"token"`
 		Role  int64  `json:"role"`
+		ID    int64  `json:"id"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&input)
@@ -84,6 +84,8 @@ func (app *app) login(w http.ResponseWriter, r *http.Request) {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
+
+	output.ID = userId
 
 	log.Printf("Login -- User: %s - Token: %s - Admin: %d", input.Email, output.Token, output.Role)
 
@@ -137,32 +139,35 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	output := struct {
-		ApartamentId sql.NullInt64 `json:"apartament_id"`
-		Rent         float32       `json:"rent"`
+		ApartamentId int64   `json:"apartament_id"`
+		Rent         float64 `json:"rent"`
 	}{}
 
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
 
-	if erro := app.checkRole(token, 2); erro != nil {
+	if _, erro := app.checkRole(token, 2); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
 	userId, _ := auth.ValidateSession(app.CACHE, token)
 
-	//out, err := app.Query.GetApartmentID(app.Ctx, sql.NullInt64{Int64: int64(id)})
-	output.ApartamentId, err = app.Query.GetApartmentID(app.Ctx, sql.NullInt64{Int64: int64(userId)})
+	log.Println(sql.NullInt64{Int64: int64(userId)})
+
+	apartmentId, err := app.Query.GetApartmentID(app.Ctx, userId)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
 
-	output.Rent, err = database.GetRent(app.DB, int(output.ApartamentId.Int64))
+	output.Rent, err = app.Query.GetRent(app.Ctx, apartmentId)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
+
+	output.ApartamentId = apartmentId
 
 	err = json.NewEncoder(w).Encode(&output)
 	if err != nil {
@@ -173,26 +178,17 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 func (app *app) subInfo(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
-	var err error
-
-	output := struct {
-		Address      string `json:"address"`
-		NIP          string `json:"NIP"`
-		SpecialityId int    `json:"speciality_id"`
-	}{}
-
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
 
-	erro := app.checkRole(token, 3)
-	if erro != nil {
+	if _, erro := app.checkRole(token, 3); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	userId, _ := auth.ValidateSession(app.CACHE, token)
+	userID, _ := auth.ValidateSession(app.CACHE, token)
 
-	output.Address, output.NIP, output.SpecialityId, err = database.GetSubconInfo(app.DB, userId)
+	output, err := app.Query.GetSubconInfo(app.Ctx, int64(userID))
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
@@ -208,43 +204,19 @@ func (app *app) subInfo(w http.ResponseWriter, r *http.Request) {
 func (app *app) getContractors(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
-	type contractor struct {
-		Id           int    `json:"id"`
-		UserId       int    `json:"user_id"`
-		Address      string `json:"address"`
-		NIP          string `json:"NIP"`
-		SpecialityId int    `json:"speciality_id"`
-	}
-
-	output := struct {
-		Contractors []contractor `json:"apartaments"`
-	}{}
-
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
 
-	if erro := app.checkRole(token, 1); erro != nil {
+	if _, erro := app.checkRole(token, 1); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	id, useId, address, NIP, specialityId, err := database.GetContractorsData(app.DB)
+	output, err := app.Query.GetSubcontractors(app.Ctx)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
-
-	var data []contractor
-	for n := range id {
-		data = append(data,
-			contractor{
-				Id:           id[n],
-				UserId:       useId[n],
-				Address:      address[n],
-				NIP:          NIP[n],
-				SpecialityId: specialityId[n]})
-	}
-	output.Contractors = data
 
 	if err := json.NewEncoder(w).Encode(&output); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -256,11 +228,8 @@ func (app *app) addContractor(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
 	input := struct {
-		Token        string `json:"token"`
-		UserId       int    `json:"user_id"`
-		Address      string `json:"address"`
-		NIP          string `json:"NIP"`
-		SpecialityId int    `json:"speciality_id"`
+		Token         string                      `json:"token"`
+		Subcontractor sqlc.AddSubcontractorParams `json:"subcontractor"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&input)
@@ -269,12 +238,12 @@ func (app *app) addContractor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if erro := app.checkRole(input.Token, 1); erro != nil {
+	if _, erro := app.checkRole(input.Token, 1); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	err = database.AddContractor(app.DB, []string{input.Address, input.NIP}, input.UserId, input.SpecialityId)
+	err = app.Query.AddSubcontractor(app.Ctx, input.Subcontractor)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
@@ -286,43 +255,19 @@ func (app *app) addContractor(w http.ResponseWriter, r *http.Request) {
 func (app *app) getTenants(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
-	type tenent struct {
-		Id     int    `json:"id"`
-		Name   string `json:"name"`
-		Email  string `json:"email"`
-		Phone  string `json:"phone"`
-		RoleId int    `json:"role_id"`
-	}
-
-	output := struct {
-		Tenants []tenent `json:"apartaments"`
-	}{}
-
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
 
-	if erro := app.checkRole(token, 1); erro != nil {
+	if _, erro := app.checkRole(token, 1); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	id, name, email, phone, roleId, err := database.GetTenents(app.DB)
+	output, err := app.Query.GetTenets(app.Ctx)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
-
-	var data []tenent
-	for n := range id {
-		data = append(data,
-			tenent{
-				Id:     id[n],
-				Name:   name[n],
-				Email:  email[n],
-				Phone:  phone[n],
-				RoleId: roleId[n]})
-	}
-	output.Tenants = data
 
 	if err = json.NewEncoder(w).Encode(&output); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -333,54 +278,19 @@ func (app *app) getTenants(w http.ResponseWriter, r *http.Request) {
 func (app *app) getApartaments(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
-	type apartament struct {
-		Id             int     `json:"id"`
-		Name           string  `json:"name"`
-		Street         string  `json:"street"`
-		BuildingNumber string  `json:"building_number"`
-		Buildingname   string  `json:"building_name"`
-		FlatNumber     string  `json:"flat_number"`
-		OwnerId        int     `json:"owner_id"`
-		Rent           float32 `json:"rent"`
-	}
-
-	output := struct {
-		Apartaments []apartament `json:"apartaments"`
-	}{}
-
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
 
-	if erro := app.checkRole(token, 1); erro != nil {
+	if _, erro := app.checkRole(token, 1); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	id, name, street, buildingNumber, buildingName, flatNumber, ownerId, err := database.GetApartamentsData(app.DB)
+	output, err := app.Query.GetApartments(app.Ctx)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
-
-	var data []apartament
-	for n := range id {
-		rent, err := database.GetRent(app.DB, id[n])
-		if err != nil {
-			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-			return
-		}
-		data = append(data,
-			apartament{
-				Id:             id[n],
-				Name:           name[n],
-				Street:         street[n],
-				BuildingNumber: buildingNumber[n],
-				Buildingname:   buildingName[n],
-				FlatNumber:     flatNumber[n],
-				OwnerId:        ownerId[n],
-				Rent:           rent})
-	}
-	output.Apartaments = data
 
 	if err = json.NewEncoder(w).Encode(&output); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -392,13 +302,8 @@ func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
 	input := struct {
-		Token          string `json:"token"`
-		Name           string `json:"name"`
-		Street         string `json:"street"`
-		BuildingNumber string `json:"building_number"`
-		BuildingName   string `json:"building_name"`
-		FlatNumber     string `json:"flat_number"`
-		OwnerId        int    `json:"owner_id"`
+		Token     string                  `json:"token"`
+		Apartment sqlc.AddApartmentParams `json:"aparment"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&input)
@@ -407,12 +312,12 @@ func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if erro := app.checkRole(input.Token, 1); erro != nil {
+	if _, erro := app.checkRole(input.Token, 1); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	err = database.AddApartament(app.DB, []string{input.Name, input.Street, input.BuildingNumber, input.BuildingName, input.FlatNumber}, input.OwnerId)
+	err = app.Query.AddApartment(app.Ctx, input.Apartment)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
@@ -424,40 +329,18 @@ func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
 func (app *app) getOwners(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
-	type owner struct {
-		Id    int    `json:"id"`
-		Name  string `json:"name"`
-		Email string `json:"email"`
-		Phone string `json:"phone"`
-	}
-
-	output := struct {
-		Owners []owner `json:"owners"`
-	}{}
-
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
-	if erro := app.checkRole(token, 1); erro != nil {
+	if _, erro := app.checkRole(token, 1); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	id, name, email, phone, err := database.GetOwners(app.DB)
+	output, err := app.Query.GetOwners(app.Ctx)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
-
-	var data []owner
-	for n := range id {
-		data = append(data,
-			owner{
-				Id:    id[n],
-				Name:  name[n],
-				Email: email[n],
-				Phone: phone[n]})
-	}
-	output.Owners = data
 
 	if err = json.NewEncoder(w).Encode(&output); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -469,10 +352,8 @@ func (app *app) addOwner(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
 	input := struct {
-		Token string `json:"token"`
-		Name  string `json:"name"`
-		Email string `json:"email"`
-		Phone string `json:"phone"`
+		Token string              `json:"token"`
+		Owner sqlc.AddOwnerParams `json:"owner"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&input)
@@ -481,12 +362,12 @@ func (app *app) addOwner(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if erro := app.checkRole(input.Token, 1); erro != nil {
+	if _, erro := app.checkRole(input.Token, 1); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	err = database.AddOwner(app.DB, []string{input.Name, input.Email, input.Phone})
+	err = app.Query.AddOwner(app.Ctx, input.Owner)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
@@ -497,9 +378,8 @@ func (app *app) addOwner(w http.ResponseWriter, r *http.Request) {
 
 func (app *app) changeRent(w http.ResponseWriter, r *http.Request) {
 	data := struct {
-		Token        string  `json:"token"`
-		ApartamentId int     `json:"apartament_id"`
-		Rent         float32 `json:"rent"`
+		Token string                 `json:"token"`
+		Rent  sqlc.ChangeRent2Params `json:"rent"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&data)
@@ -508,53 +388,39 @@ func (app *app) changeRent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if erro := app.checkRole(data.Token, 1); erro != nil {
+	if _, erro := app.checkRole(data.Token, 1); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	if err = database.ChangeRent(app.DB, data.ApartamentId, data.Rent); err != nil {
+	if err := app.Query.ChangeRent1(app.Ctx, data.Rent.ApartmentID); err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
+
+	if err := app.Query.ChangeRent2(app.Ctx, data.Rent); err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
 }
 
 func (app *app) getCurrentRenting(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
-	type renting struct {
-		Id           int    `json:"id"`
-		ApartamentId int    `json:"apartament_id"`
-		UserId       int    `json:"user_id"`
-		StartDate    string `json:"start_date"`
-	}
-
-	output := struct {
-		Rentings []renting `json:"owners"`
-	}{}
-
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
-	if erro := app.checkRole(token, 1); erro != nil {
+	if _, erro := app.checkRole(token, 1); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	id, apartamentId, userId, startDate, err := database.GetActiveRentings(app.DB)
+	output, err := app.Query.GetActiveRenting(app.Ctx)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
-
-	var data []renting
-	for n := range id {
-		data = append(data,
-			renting{ApartamentId: apartamentId[n],
-				UserId:    userId[n],
-				StartDate: startDate[n]})
-	}
-	output.Rentings = data
 
 	if err = json.NewEncoder(w).Encode(&output); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -566,10 +432,8 @@ func (app *app) addNewRenting(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
 	input := struct {
-		Token        string `json:"token"`
-		ApartamentId int    `json:"apartament_id"`
-		UserId       int    `json:"user_id"`
-		StartDate    string `json:"start_date"` // DateOnly   = "2006-01-02"
+		Token   string                   `json:"token"`
+		Renting sqlc.AddNewRentingParams `josn:"renting"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&input)
@@ -578,12 +442,12 @@ func (app *app) addNewRenting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if erro := app.checkRole(input.Token, 1); erro != nil {
+	if _, erro := app.checkRole(input.Token, 1); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	err = database.AddNewRenting(app.DB, input.ApartamentId, input.UserId, input.StartDate)
+	err = app.Query.AddNewRenting(app.Ctx, input.Renting)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
@@ -596,9 +460,8 @@ func (app *app) setEndOfRenting(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
 	input := struct {
-		Token   string `json:"token"`
-		Id      int    `json:"id"`
-		EndDate string `json:"start_date"` // DateOnly   = "2006-01-02"
+		Token string                `json:"token"`
+		End   sqlc.SetEndDateParams `json:"end"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&input)
@@ -607,12 +470,12 @@ func (app *app) setEndOfRenting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if erro := app.checkRole(input.Token, 1); erro != nil {
+	if _, erro := app.checkRole(input.Token, 1); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	err = database.SetEndDate(app.DB, input.Id, input.EndDate)
+	err = app.Query.SetEndDate(app.Ctx, input.End)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
@@ -623,18 +486,6 @@ func (app *app) setEndOfRenting(w http.ResponseWriter, r *http.Request) {
 
 func (app *app) getReports(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
-
-	type fault struct {
-		Id           int    `json:"id"`
-		Description  string `json:"description"`
-		DateReported string `json:"date_reported"`
-		StatusId     int    `json:"status_id"`
-		ApartamentId int    `json:"apartament_id"`
-	}
-
-	output := struct {
-		Faults []fault `json:"faults"`
-	}{}
 
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
@@ -651,51 +502,42 @@ func (app *app) getReports(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	apartId := -1
-
 	if role == 2 {
-		apartId, err = database.GetApartamentId(app.DB, userId)
+		apart, err := app.Query.GetApartmentID(app.Ctx, userId)
 		if err != nil {
 			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 			return
 		}
-	}
+		output, err := app.Query.GetFaultReportsUser(app.Ctx, apart)
+		if err != nil {
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
 
-	id, description, dateReported, statusId, apartamentId, err := database.GetFaultReports(app.DB)
-	if err != nil {
-		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-		return
-	}
+		if err = json.NewEncoder(w).Encode(&output); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	} else {
+		output, err := app.Query.GetFaultReports(app.Ctx)
+		if err != nil {
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
 
-	var data []fault
-	for n := range id {
-		if apartamentId[n] == apartId {
-			data = append(data,
-				fault{Id: id[n],
-					Description:  description[n],
-					DateReported: dateReported[n],
-					StatusId:     statusId[n],
-					ApartamentId: apartamentId[n]})
+		if err = json.NewEncoder(w).Encode(&output); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 	}
-	output.Faults = data
-
-	if err = json.NewEncoder(w).Encode(&output); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
 }
 
 func (app *app) addFault(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
 	input := struct {
-		Token        string `json:"token"`
-		Description  string `json:"description"`
-		DateReported string `json:"date_reported"` // DateOnly   = "2006-01-02"
-		StatusId     int    `json:"status_id"`
-		ApartamentId int    `json:"apartament_id"`
+		Token string              `json:"token"`
+		Fault sqlc.AddFaultParams `json:"fault"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&input)
@@ -710,7 +552,7 @@ func (app *app) addFault(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = database.AddFault(app.DB, input.Description, input.DateReported, input.StatusId, input.ApartamentId)
+	err = app.Query.AddFault(app.Ctx, input.Fault)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
@@ -726,47 +568,45 @@ func (app *app) addFault(w http.ResponseWriter, r *http.Request) {
 func (app *app) addUser(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
-	user := struct {
-		Token    string `json:"token"`
-		Name     string `json:"name"`
-		Password string `json:"password"`
-		Email    string `json:"email"`
-		Phone    string `json:"phone"`
-		Role     int    `json:"role"`
-		Id       int    `json:"id"`
+	input := struct {
+		Token string             `json:"token"`
+		User  sqlc.AddUserParams `json:"user"`
 	}{}
 
-	err := json.NewDecoder(r.Body).Decode(&user)
+	output := struct {
+		Id int `json:"id"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
 		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
 		return
 	}
 
-	if erro := app.checkRole(user.Token, 1); erro != nil {
+	if _, erro := app.checkRole(input.Token, 1); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	_, err = bcrypt.GenerateFromPassword([]byte(user.Password), 12)
+	_, err = bcrypt.GenerateFromPassword([]byte(input.User.Password), 12)
 	if err != nil {
 		sendError(w, Error{500, "Could not generate hash from password", "Internal Server Error"}, err)
 		return
 	}
 
-	err = database.AddUser(app.DB, []string{user.Name, user.Password, user.Email, user.Phone}, user.Role)
+	err = app.Query.AddUser(app.Ctx, input.User)
 	if err != nil {
 		sendError(w, Error{500, "Could not add user", "Internal Server Error"}, err)
 		return
 	}
 
-	user.Id, err = database.GetId(app.DB, user.Email)
+	output.Id, err = database.GetId(app.DB, input.User.Email)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
 
-	user.Password = strings.Repeat("*", len(user.Password)) // should be changed
-	if err := json.NewEncoder(w).Encode(user); err != nil {
+	if err := json.NewEncoder(w).Encode(output); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -776,10 +616,7 @@ func (app *app) getSubContractorSpec(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
 	data := struct {
-		Token  string   `json:"token"`
-		Email  string   `json:"email"`
-		Spec   []string `json:"spec"`
-		SpecId []int    `json:"spec_id"`
+		Token string `json:"token"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&data)
@@ -788,18 +625,18 @@ func (app *app) getSubContractorSpec(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if erro := app.checkRole(data.Token, 1); erro != nil {
+	if _, erro := app.checkRole(data.Token, 1); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	data.SpecId, data.Spec, err = database.GetSubcontractorSpec(app.DB)
+	output, err := app.Query.GetSubcontractorSpec(app.Ctx)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(data); err != nil {
+	if err := json.NewEncoder(w).Encode(output); err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
@@ -819,12 +656,12 @@ func (app *app) addSubContractorSpec(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if erro := app.checkRole(data.Token, 1); erro != nil {
+	if _, erro := app.checkRole(data.Token, 1); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	err = database.AddSpec(app.DB, data.Name)
+	err = app.Query.AddSpec(app.Ctx, data.Name)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
@@ -838,20 +675,35 @@ func (app *app) getRepairs(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
 
-	if erro := app.checkRole(token, 1); erro != nil {
+	role, erro := app.checkRole(token, 1, 3)
+	if erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	output, err := app.Query.GetRepair(app.Ctx)
-	if err != nil {
-		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-		return
+	if role == 1 {
+		output, err := app.Query.GetRepair(app.Ctx)
+		if err != nil {
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
+
+		if err := json.NewEncoder(w).Encode(&output); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	} else {
+		userID, _ := auth.ValidateSession(app.CACHE, token)
+		output, err := app.Query.GetRepairSub(app.Ctx, int64(userID))
+		if err != nil {
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
+
+		if err := json.NewEncoder(w).Encode(&output); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 
-	if err := json.NewEncoder(w).Encode(&output); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }
 
 func (app *app) addRepair(w http.ResponseWriter, r *http.Request) {
@@ -867,7 +719,7 @@ func (app *app) addRepair(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if erro := app.checkRole(input.Token, 1); erro != nil {
+	if _, erro := app.checkRole(input.Token, 1); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -893,6 +745,11 @@ func (app *app) assignSubContractor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if _, erro := app.checkRole(input.Token, 1); erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
 	output, err := app.Query.UpdateSubToRepair(app.Ctx, input.Contractor)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
@@ -904,30 +761,62 @@ func (app *app) assignSubContractor(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *app) checkRole(token string, role_id ...int) *Error {
+func (app *app) updateRepairData(w http.ResponseWriter, r *http.Request) {
+
+	input := struct {
+		Token  string                      `json:"token"`
+		Repair sqlc.UpdateRepairDataParams `json:"repair"`
+	}{}
+
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
+		return
+	}
+
+	if _, erro := app.checkRole(input.Token, 1, 3); erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	output, err := app.Query.UpdateRepairData(app.Ctx, input.Repair)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(&output); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (app *app) checkRole(token string, role_id ...int64) (int64, *Error) {
 	userId, err := auth.ValidateSession(app.CACHE, token)
 	if err != nil {
 		log.Println(err)
-		return &Error{401, "Incorrect Token", "Unauthorized"}
+		return -1, &Error{401, "Incorrect Token", "Unauthorized"}
 	}
 
-	role, err := app.Query.GetUserRole(app.Ctx, int64(userId))
+	log.Printf("Id: %d", userId)
+
+	role, err := app.Query.GetUserRole(app.Ctx, userId)
 	if err != nil {
 		log.Println(err)
-		return &Error{401, "Database", "Internal Server Error"}
+		return -1, &Error{401, "Database", "Internal Server Error"}
 	}
 
 	valid := false
 
+	log.Printf("Role: %d", role)
+
 	for i := range role_id {
-		if role_id[i] == int(role) {
+		if role_id[i] == role {
 			valid = true
 		}
 	}
 
 	if !valid {
 		log.Println("Wrong role")
-		return &Error{401, "Wrong role", "Unauthorized"}
+		return role, &Error{401, "Wrong role", "Unauthorized"}
 	}
-	return nil
+	return role, nil
 }

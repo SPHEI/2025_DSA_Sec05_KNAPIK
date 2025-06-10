@@ -34,8 +34,8 @@ func CreateSession(db *sql.DB, userId int) (string, error) {
 	return token, nil
 }
 
-func ValidateSession(db *sql.DB, token string) (int, error) {
+func ValidateSession(db *sql.DB, token string) (int64, error) {
 	userId, err := database.GetToken(db, token)
 
-	return userId, err
+	return int64(userId), err
 }

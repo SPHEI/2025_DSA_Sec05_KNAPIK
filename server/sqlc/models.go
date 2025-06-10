@@ -35,6 +35,7 @@ type Expensecategory struct {
 
 type Faultreport struct {
 	ID           int64
+	Title        string
 	Description  string
 	DateReported time.Time
 	StatusID     int64
@@ -86,7 +87,7 @@ type Paymentstatus struct {
 	Name string
 }
 
-type PricingHistory struct {
+type Pricinghistory struct {
 	ID          int64
 	ApartmentID int64
 	Date        time.Time
@@ -96,14 +97,15 @@ type PricingHistory struct {
 
 type RentingHistory struct {
 	ID          int64
-	ApartmentID sql.NullInt64
-	UserID      sql.NullInt64
+	ApartmentID int64
+	UserID      int64
 	StartDate   time.Time
 	EndDate     sql.NullTime
 }
 
 type Repair struct {
 	ID              int64
+	Title           string
 	FaultReportID   sql.NullInt64
 	DateAssigned    time.Time
 	DateCompleted   sql.NullTime

@@ -32,7 +32,7 @@ CREATE TABLE Apartament (
     FOREIGN KEY (owner_id) REFERENCES Owner(id)
 );
 
-CREATE TABLE Pricing_History (
+CREATE TABLE pricinghistory (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     apartment_id INTEGER NOT NULL,
     date DATE NOT NULL DEFAULT CURRENT_DATE,
@@ -83,6 +83,7 @@ CREATE TABLE Subcontractor (
 
 CREATE TABLE FaultReport (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
     description TEXT NOT NULL,
     date_reported DATE NOT NULL,
     status_id INTEGER NOT NULL DEFAULT 1,  -- default'open'
@@ -93,6 +94,7 @@ CREATE TABLE FaultReport (
 
 CREATE TABLE repair (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
     fault_report_id INTEGER,
     date_assigned DATE NOT NULL,
     date_completed DATE,
@@ -103,10 +105,10 @@ CREATE TABLE repair (
     FOREIGN KEY (status_id) REFERENCES RepairStatus(id)
 );
 
-CREATE TABLE Renting_history (
+CREATE TABLE renting_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    apartment_id INTEGER,
-    user_id INTEGER,
+    apartment_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE,
     FOREIGN KEY (apartment_id) REFERENCES Apartament(id),
@@ -117,7 +119,7 @@ CREATE TABLE Repair_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     renting_history_id INTEGER,
     fault_report_id INTEGER,
-    FOREIGN KEY (renting_history_id) REFERENCES Renting_history(id),
+    FOREIGN KEY (renting_history_id) REFERENCES renting_history(id),
     FOREIGN KEY (fault_report_id) REFERENCES FaultReport(id)
 );
 
@@ -204,7 +206,7 @@ INSERT INTO Apartament (name, street, building_number, building_name, flat_numbe
 ('Luxury Penthouse', 'High Street', '1', 'Grand Tower', 'PH1', 1);
 
 -- pricing history
-INSERT INTO Pricing_History (apartment_id, date, price, is_current) VALUES
+INSERT INTO pricinghistory (apartment_id, date, price, is_current) VALUES
 (1, '2025-01-01', 1200.00, 1),
 (2, '2025-01-01', 850.00, 1),
 (3, '2025-01-01', 2500.00, 1),
@@ -229,10 +231,10 @@ INSERT OR IGNORE INTO FaultStatus (name) VALUES
 ('closed');
 
 -- fault reports
-INSERT INTO FaultReport (description, date_reported, status_id, apartment_id) VALUES
-('Leaky faucet in kitchen', '2025-05-10', 1, 1),
-('Broken heater', '2025-05-15', 1, 2),
-('Power outlet not working', '2025-06-01', 2, 2);
+INSERT INTO FaultReport (title, description, date_reported, status_id, apartment_id) VALUES
+('leak', 'Leaky faucet in kitchen', '2025-05-10', 1, 1),
+('tako', 'Broken heater', '2025-05-15', 1, 2),
+('power', 'Power outlet not working', '2025-06-01', 2, 2);
 
 -- repair statuses
 INSERT OR IGNORE INTO RepairStatus (name) VALUES 
@@ -241,15 +243,17 @@ INSERT OR IGNORE INTO RepairStatus (name) VALUES
 ('completed');
 
 -- repairs
-INSERT INTO repair (fault_report_id, date_assigned, date_completed, status_id, subcontractor_id) VALUES
-(1, '2025-05-11', NULL, 2, 1),
-(2, '2025-05-16', '2025-05-18', 3, 2),
-(3, '2025-06-02', '2025-06-02', 3, 2);
+INSERT INTO repair (fault_report_id, title, date_assigned, date_completed, status_id, subcontractor_id) VALUES
+(1, 'test', '2025-05-11', NULL, 2, 1),
+(2, 'title', '2025-05-16', '2025-05-18', 3, 2),
+(3, 'example','2025-06-02', '2025-06-02', 3, 2);
 
 -- renting history
-INSERT INTO Renting_history (apartment_id, user_id, start_date, end_date) VALUES
+INSERT INTO renting_history (apartment_id, user_id, start_date, end_date) VALUES
 (1, 3, '2025-01-15', '2025-06-30'),
 (2, 2, '2025-02-01', NULL),
+(2, 1, '2025-02-01', NULL),
+(1, 3, '2025-02-01', NULL),
 (3, 3, '2025-03-01', '2025-04-30');
 
 INSERT INTO Repair_history (renting_history_id, fault_report_id) VALUES
