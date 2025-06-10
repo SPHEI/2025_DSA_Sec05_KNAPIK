@@ -12,6 +12,8 @@ import (
 )
 
 const addApartment = `-- name: AddApartment :exec
+;
+
 INSERT INTO Apartament (
   name, street, building_number, building_name, flat_number, owner_id
 ) VALUES(
@@ -626,25 +628,35 @@ func (q *Queries) GetSubcontractorSpec(ctx context.Context) ([]Speciality, error
 }
 
 const getSubcontractors = `-- name: GetSubcontractors :many
-SELECT id, user_id, address, NIP, speciality_id 
-FROM Subcontractor
+SELECT subcontractor.id, subcontractor.user_id, subcontractor.address, subcontractor.nip, subcontractor.speciality_id, User.name FROM Subcontractor
+INNER JOIN User ON Subcontractor.user_id = User.id
 `
 
-func (q *Queries) GetSubcontractors(ctx context.Context) ([]Subcontractor, error) {
+type GetSubcontractorsRow struct {
+	ID           int64
+	UserID       int64
+	Address      string
+	Nip          string
+	SpecialityID int64
+	Name         string
+}
+
+func (q *Queries) GetSubcontractors(ctx context.Context) ([]GetSubcontractorsRow, error) {
 	rows, err := q.db.QueryContext(ctx, getSubcontractors)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Subcontractor
+	var items []GetSubcontractorsRow
 	for rows.Next() {
-		var i Subcontractor
+		var i GetSubcontractorsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,
 			&i.Address,
 			&i.Nip,
 			&i.SpecialityID,
+			&i.Name,
 		); err != nil {
 			return nil, err
 		}

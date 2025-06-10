@@ -37,8 +37,9 @@ INSERT INTO Subcontractor (
 );
 
 -- name: GetSubcontractors :many
-SELECT id, user_id, address, NIP, speciality_id 
-FROM Subcontractor;
+SELECT Subcontractor.*, User.name FROM Subcontractor
+INNER JOIN User ON Subcontractor.user_id = User.id;
+;
 
 -- name: AddApartment :exec
 INSERT INTO Apartament (
