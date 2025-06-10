@@ -81,7 +81,7 @@ CREATE TABLE Subcontractor (
     FOREIGN KEY (speciality_id) REFERENCES Speciality(id)
 );
 
-CREATE TABLE faultReport (
+CREATE TABLE faultreport (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     description TEXT NOT NULL,
@@ -100,7 +100,7 @@ CREATE TABLE repair (
     date_completed DATE,
     status_id INTEGER NOT NULL DEFAULT 1,  -- default 'pending'
     subcontractor_id INTEGER,
-    FOREIGN KEY (fault_report_id) REFERENCES faultReport(id),
+    FOREIGN KEY (fault_report_id) REFERENCES faultreport(id),
     FOREIGN KEY (subcontractor_id) REFERENCES Subcontractor(id),
     FOREIGN KEY (status_id) REFERENCES RepairStatus(id)
 );
@@ -120,7 +120,7 @@ CREATE TABLE Repair_history (
     renting_history_id INTEGER,
     fault_report_id INTEGER,
     FOREIGN KEY (renting_history_id) REFERENCES renting_history(id),
-    FOREIGN KEY (fault_report_id) REFERENCES faultReport(id)
+    FOREIGN KEY (fault_report_id) REFERENCES faultreport(id)
 );
 
 CREATE TABLE payments (
@@ -231,7 +231,7 @@ INSERT OR IGNORE INTO FaultStatus (name) VALUES
 ('closed');
 
 -- fault reports
-INSERT INTO faultReport (title, description, date_reported, status_id, apartment_id) VALUES
+INSERT INTO faultreport (title, description, date_reported, status_id, apartment_id) VALUES
 ('leak', 'Leaky faucet in kitchen', '2025-05-10', 1, 1),
 ('tako', 'Broken heater', '2025-05-15', 1, 2),
 ('power', 'Power outlet not working', '2025-06-01', 2, 2);
