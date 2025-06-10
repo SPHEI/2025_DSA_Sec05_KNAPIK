@@ -95,7 +95,7 @@ CREATE TABLE FaultReport (
 CREATE TABLE repair (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
-    fault_report_id INTEGER,
+    fault_report_id INTEGER NOT NULL,
     date_assigned DATE NOT NULL,
     date_completed DATE,
     status_id INTEGER NOT NULL DEFAULT 1,  -- default 'pending'
@@ -252,7 +252,7 @@ INSERT INTO repair (fault_report_id, title, date_assigned, date_completed, statu
 INSERT INTO renting_history (apartment_id, user_id, start_date, end_date) VALUES
 (1, 3, '2025-01-15', '2025-06-30'),
 (2, 2, '2025-02-01', NULL),
-(2, 1, '2025-02-01', NULL),
+(3, 1, '2025-02-01', NULL),
 (1, 3, '2025-02-01', NULL),
 (3, 3, '2025-03-01', '2025-04-30');
 
