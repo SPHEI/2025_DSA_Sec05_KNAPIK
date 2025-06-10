@@ -115,19 +115,19 @@ INSERT INTO repair (
 
 -- name: GetRepair :many
 SELECT repair.*, User.name FROM repair
-INNER JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
-INNER JOIN User ON Subcontractor.user_id = User.id;
+JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+JOIN User ON Subcontractor.user_id = User.id;
 
 -- name: GetRepairSub :many
 SELECT repair.*, User.name FROM repair
-INNER JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
-INNER JOIN User ON Subcontractor.user_id = User.id
+JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+JOIN User ON Subcontractor.user_id = User.id
 WHERE subcontractor_id = (SELECT id FROM Subcontractor WHERE Subcontractor.user_id = ?);
 
 -- name: GetRepairApart :many
 SELECT repair.*, User.name FROM repair
-INNER JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
-INNER JOIN User ON Subcontractor.user_id = User.id
+JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+JOIN User ON Subcontractor.user_id = User.id
 WHERE fault_report_id = (SELECT id FROM FaultReport WHERE apartment_id = ?);
 
 -- name: UpdateSubToRepair :one

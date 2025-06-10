@@ -435,8 +435,8 @@ func (q *Queries) GetRent(ctx context.Context, apartmentID int64) (float64, erro
 
 const getRepair = `-- name: GetRepair :many
 SELECT repair.id, repair.title, repair.fault_report_id, repair.date_assigned, repair.date_completed, repair.status_id, repair.subcontractor_id, User.name FROM repair
-INNER JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
-INNER JOIN User ON Subcontractor.user_id = User.id
+JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+JOIN User ON Subcontractor.user_id = User.id
 `
 
 type GetRepairRow struct {
@@ -484,8 +484,8 @@ func (q *Queries) GetRepair(ctx context.Context) ([]GetRepairRow, error) {
 
 const getRepairApart = `-- name: GetRepairApart :many
 SELECT repair.id, repair.title, repair.fault_report_id, repair.date_assigned, repair.date_completed, repair.status_id, repair.subcontractor_id, User.name FROM repair
-INNER JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
-INNER JOIN User ON Subcontractor.user_id = User.id
+JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+JOIN User ON Subcontractor.user_id = User.id
 WHERE fault_report_id = (SELECT id FROM FaultReport WHERE apartment_id = ?)
 `
 
@@ -534,8 +534,8 @@ func (q *Queries) GetRepairApart(ctx context.Context, apartmentID int64) ([]GetR
 
 const getRepairSub = `-- name: GetRepairSub :many
 SELECT repair.id, repair.title, repair.fault_report_id, repair.date_assigned, repair.date_completed, repair.status_id, repair.subcontractor_id, User.name FROM repair
-INNER JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
-INNER JOIN User ON Subcontractor.user_id = User.id
+JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+JOIN User ON Subcontractor.user_id = User.id
 WHERE subcontractor_id = (SELECT id FROM Subcontractor WHERE Subcontractor.user_id = ?)
 `
 
