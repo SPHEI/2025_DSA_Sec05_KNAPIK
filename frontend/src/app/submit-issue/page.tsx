@@ -79,7 +79,7 @@ function SubmitIssue() {
             }
             else
             {
-              alert(data.apartament_id)
+              //alert(data.apartament_id)
                 setApartment(data.apartament_id);
             }
         }
