@@ -105,6 +105,7 @@ INSERT INTO repair (
 ) VALUES (
   ?, ?, ?
 )
+RETURNING id, title, fault_report_id, date_assigned, date_completed, status_id, subcontractor_id
 `
 
 type AddRepairParams struct {
@@ -435,8 +436,8 @@ func (q *Queries) GetRent(ctx context.Context, apartmentID int64) (float64, erro
 
 const getRepair = `-- name: GetRepair :many
 SELECT repair.id, repair.title, repair.fault_report_id, repair.date_assigned, repair.date_completed, repair.status_id, repair.subcontractor_id, User.name FROM repair
-JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
-JOIN User ON Subcontractor.user_id = User.id
+LEFT JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+LEFT JOIN User ON Subcontractor.user_id = User.id
 `
 
 type GetRepairRow struct {
@@ -447,7 +448,7 @@ type GetRepairRow struct {
 	DateCompleted   sql.NullTime
 	StatusID        int64
 	SubcontractorID sql.NullInt64
-	Name            string
+	Name            sql.NullString
 }
 
 func (q *Queries) GetRepair(ctx context.Context) ([]GetRepairRow, error) {
@@ -484,8 +485,8 @@ func (q *Queries) GetRepair(ctx context.Context) ([]GetRepairRow, error) {
 
 const getRepairApart = `-- name: GetRepairApart :many
 SELECT repair.id, repair.title, repair.fault_report_id, repair.date_assigned, repair.date_completed, repair.status_id, repair.subcontractor_id, User.name FROM repair
-JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
-JOIN User ON Subcontractor.user_id = User.id
+LEFT JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+LEFT JOIN User ON Subcontractor.user_id = User.id
 WHERE fault_report_id = (SELECT id FROM FaultReport WHERE apartment_id = ?)
 `
 
@@ -497,7 +498,7 @@ type GetRepairApartRow struct {
 	DateCompleted   sql.NullTime
 	StatusID        int64
 	SubcontractorID sql.NullInt64
-	Name            string
+	Name            sql.NullString
 }
 
 func (q *Queries) GetRepairApart(ctx context.Context, apartmentID int64) ([]GetRepairApartRow, error) {
@@ -534,8 +535,8 @@ func (q *Queries) GetRepairApart(ctx context.Context, apartmentID int64) ([]GetR
 
 const getRepairSub = `-- name: GetRepairSub :many
 SELECT repair.id, repair.title, repair.fault_report_id, repair.date_assigned, repair.date_completed, repair.status_id, repair.subcontractor_id, User.name FROM repair
-JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
-JOIN User ON Subcontractor.user_id = User.id
+LEFT JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+LEFT JOIN User ON Subcontractor.user_id = User.id
 WHERE subcontractor_id = (SELECT id FROM Subcontractor WHERE Subcontractor.user_id = ?)
 `
 
@@ -547,7 +548,7 @@ type GetRepairSubRow struct {
 	DateCompleted   sql.NullTime
 	StatusID        int64
 	SubcontractorID sql.NullInt64
-	Name            string
+	Name            sql.NullString
 }
 
 func (q *Queries) GetRepairSub(ctx context.Context, userID int64) ([]GetRepairSubRow, error) {

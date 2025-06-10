@@ -110,24 +110,25 @@ INSERT INTO repair (
   title, fault_report_id, date_assigned
 ) VALUES (
   ?, ?, ?
-);
+)
+RETURNING *;
 
 
 -- name: GetRepair :many
 SELECT repair.*, User.name FROM repair
-JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
-JOIN User ON Subcontractor.user_id = User.id;
+LEFT JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+LEFT JOIN User ON Subcontractor.user_id = User.id;
 
 -- name: GetRepairSub :many
 SELECT repair.*, User.name FROM repair
-JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
-JOIN User ON Subcontractor.user_id = User.id
+LEFT JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+LEFT JOIN User ON Subcontractor.user_id = User.id
 WHERE subcontractor_id = (SELECT id FROM Subcontractor WHERE Subcontractor.user_id = ?);
 
 -- name: GetRepairApart :many
 SELECT repair.*, User.name FROM repair
-JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
-JOIN User ON Subcontractor.user_id = User.id
+LEFT JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+LEFT JOIN User ON Subcontractor.user_id = User.id
 WHERE fault_report_id = (SELECT id FROM FaultReport WHERE apartment_id = ?);
 
 -- name: UpdateSubToRepair :one
