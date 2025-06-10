@@ -705,6 +705,7 @@ func (app *app) getRepairs(w http.ResponseWriter, r *http.Request) {
 	} else {
 		userID, _ := auth.ValidateSession(app.CACHE, token)
 		apartId, err := app.Query.GetApartmentID(app.Ctx, userID)
+		log.Printf("Apart ID: %d", apartId)
 		if err != nil {
 			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 			return

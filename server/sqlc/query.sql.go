@@ -107,7 +107,7 @@ INSERT INTO repair (
 
 type AddRepairParams struct {
 	Title         string
-	FaultReportID sql.NullInt64
+	FaultReportID int64
 	DateAssigned  time.Time
 }
 
@@ -474,7 +474,7 @@ WHERE fault_report_id = (SELECT id FROM FaultReport WHERE apartment_id = ?)
 type GetRepairApartRow struct {
 	ID            int64
 	Title         string
-	FaultReportID sql.NullInt64
+	FaultReportID int64
 	DateAssigned  time.Time
 	DateCompleted sql.NullTime
 	StatusID      int64
@@ -518,7 +518,7 @@ WHERE subcontractor_id = (SELECT id FROM Subcontractor WHERE user_id = ?)
 type GetRepairSubRow struct {
 	ID            int64
 	Title         string
-	FaultReportID sql.NullInt64
+	FaultReportID int64
 	DateAssigned  time.Time
 	DateCompleted sql.NullTime
 	StatusID      int64

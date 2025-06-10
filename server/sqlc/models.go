@@ -106,7 +106,7 @@ type RentingHistory struct {
 type Repair struct {
 	ID              int64
 	Title           string
-	FaultReportID   sql.NullInt64
+	FaultReportID   int64
 	DateAssigned    time.Time
 	DateCompleted   sql.NullTime
 	StatusID        int64
