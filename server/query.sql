@@ -115,6 +115,10 @@ SELECT id, title, fault_report_id, date_assigned, date_completed, status_id, sub
 SELECT id, title, fault_report_id, date_assigned, date_completed, status_id FROM repair
 WHERE subcontractor_id = (SELECT id FROM Subcontractor WHERE user_id = ?);
 
+-- name: GetRepairApart :many
+SELECT id, title, fault_report_id, date_assigned, date_completed, status_id FROM repair
+WHERE fault_report_id = (SELECT id FROM FaultReport WHERE apartment_id = ?);
+
 -- name: UpdateSubToRepair :one
 UPDATE repair
 SET subcontractor_id = ?

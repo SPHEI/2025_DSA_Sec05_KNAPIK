@@ -675,7 +675,7 @@ func (app *app) getRepairs(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
 
-	role, erro := app.checkRole(token, 1, 3)
+	role, erro := app.checkRole(token, 1, 2, 3)
 	if erro != nil {
 		sendError(w, *erro, nil)
 		return
@@ -691,9 +691,26 @@ func (app *app) getRepairs(w http.ResponseWriter, r *http.Request) {
 		if err := json.NewEncoder(w).Encode(&output); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-	} else {
+	} else if role == 3 {
 		userID, _ := auth.ValidateSession(app.CACHE, token)
 		output, err := app.Query.GetRepairSub(app.Ctx, int64(userID))
+		if err != nil {
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
+
+		if err := json.NewEncoder(w).Encode(&output); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	} else {
+		userID, _ := auth.ValidateSession(app.CACHE, token)
+		apartId, err := app.Query.GetApartmentID(app.Ctx, userID)
+		if err != nil {
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
+
+		output, err := app.Query.GetRepairApart(app.Ctx, apartId)
 		if err != nil {
 			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 			return
@@ -796,8 +813,6 @@ func (app *app) checkRole(token string, role_id ...int64) (int64, *Error) {
 		return -1, &Error{401, "Incorrect Token", "Unauthorized"}
 	}
 
-	log.Printf("Id: %d", userId)
-
 	role, err := app.Query.GetUserRole(app.Ctx, userId)
 	if err != nil {
 		log.Println(err)
@@ -805,8 +820,6 @@ func (app *app) checkRole(token string, role_id ...int64) (int64, *Error) {
 	}
 
 	valid := false
-
-	log.Printf("Role: %d", role)
 
 	for i := range role_id {
 		if role_id[i] == role {

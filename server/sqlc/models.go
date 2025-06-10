@@ -14,7 +14,7 @@ type Apartament struct {
 	Name           string
 	Street         string
 	BuildingNumber string
-	BuildingName   sql.NullString
+	BuildingName   string
 	FlatNumber     string
 	OwnerID        int64
 }

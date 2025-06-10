@@ -23,7 +23,7 @@ type AddApartmentParams struct {
 	Name           string
 	Street         string
 	BuildingNumber string
-	BuildingName   sql.NullString
+	BuildingName   string
 	FlatNumber     string
 	OwnerID        int64
 }
@@ -258,7 +258,7 @@ type GetApartmentsRow struct {
 	ID             int64
 	Street         string
 	BuildingNumber string
-	BuildingName   sql.NullString
+	BuildingName   string
 	FlatNumber     string
 	OwnerID        int64
 }
@@ -452,6 +452,50 @@ func (q *Queries) GetRepair(ctx context.Context) ([]Repair, error) {
 			&i.DateCompleted,
 			&i.StatusID,
 			&i.SubcontractorID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getRepairApart = `-- name: GetRepairApart :many
+SELECT id, title, fault_report_id, date_assigned, date_completed, status_id FROM repair
+WHERE fault_report_id = (SELECT id FROM FaultReport WHERE apartment_id = ?)
+`
+
+type GetRepairApartRow struct {
+	ID            int64
+	Title         string
+	FaultReportID sql.NullInt64
+	DateAssigned  time.Time
+	DateCompleted sql.NullTime
+	StatusID      int64
+}
+
+func (q *Queries) GetRepairApart(ctx context.Context, apartmentID int64) ([]GetRepairApartRow, error) {
+	rows, err := q.db.QueryContext(ctx, getRepairApart, apartmentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetRepairApartRow
+	for rows.Next() {
+		var i GetRepairApartRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.FaultReportID,
+			&i.DateAssigned,
+			&i.DateCompleted,
+			&i.StatusID,
 		); err != nil {
 			return nil, err
 		}

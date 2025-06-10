@@ -26,7 +26,7 @@ CREATE TABLE Apartament (
     name TEXT NOT NULL,
     street TEXT NOT NULL,
     building_number TEXT NOT NULL,
-    building_name TEXT,
+    building_name TEXT NOT NULL,
     flat_number TEXT NOT NULL,
     owner_id INTEGER NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES Owner(id)
@@ -202,7 +202,7 @@ INSERT INTO Owner (name, email, phone) VALUES
 -- apartments
 INSERT INTO Apartament (name, street, building_number, building_name, flat_number, owner_id) VALUES
 ('Sunny Apartment', 'Main Street', '10', 'Sunshine Building', 'A5', 1),
-('Cozy Studio', 'Oak Avenue', '25', NULL, '3B', 2),
+('Cozy Studio', 'Oak Avenue', '25', 'pain', '3B', 2),
 ('Luxury Penthouse', 'High Street', '1', 'Grand Tower', 'PH1', 1);
 
 -- pricing history
