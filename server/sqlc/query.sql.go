@@ -831,19 +831,19 @@ func (q *Queries) UpdateFaultStatus(ctx context.Context, arg UpdateFaultStatusPa
 
 const updateRepairData = `-- name: UpdateRepairData :one
 UPDATE repair
-SET status_id = ?, date_completed = ?
-WHERE (SELECT id FROM RepairStatus WHERE name = ?)
+SET status_id = (SELECT id FROM RepairStatus WHERE name = ?), date_completed = ?
+WHERE repair.id = ?
 RETURNING id, title, fault_report_id, date_assigned, date_completed, status_id, subcontractor_id
 `
 
 type UpdateRepairDataParams struct {
-	StatusID      int64
-	DateCompleted sql.NullTime
 	Name          string
+	DateCompleted sql.NullTime
+	ID            int64
 }
 
 func (q *Queries) UpdateRepairData(ctx context.Context, arg UpdateRepairDataParams) (Repair, error) {
-	row := q.db.QueryRowContext(ctx, updateRepairData, arg.StatusID, arg.DateCompleted, arg.Name)
+	row := q.db.QueryRowContext(ctx, updateRepairData, arg.Name, arg.DateCompleted, arg.ID)
 	var i Repair
 	err := row.Scan(
 		&i.ID,

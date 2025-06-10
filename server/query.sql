@@ -145,5 +145,5 @@ RETURNING *;
 -- name: UpdateRepairData :one
 UPDATE repair
 SET status_id = (SELECT id FROM RepairStatus WHERE name = ?), date_completed = ?
-WHERE id = ?
+WHERE repair.id = ?
 RETURNING *;
