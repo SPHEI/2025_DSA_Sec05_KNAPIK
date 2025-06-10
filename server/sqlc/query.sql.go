@@ -432,18 +432,31 @@ func (q *Queries) GetRent(ctx context.Context, apartmentID int64) (float64, erro
 }
 
 const getRepair = `-- name: GetRepair :many
-SELECT id, title, fault_report_id, date_assigned, date_completed, status_id, subcontractor_id FROM repair
+SELECT repair.id, repair.title, repair.fault_report_id, repair.date_assigned, repair.date_completed, repair.status_id, repair.subcontractor_id, User.name FROM repair
+INNER JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+INNER JOIN User ON Subcontractor.user_id = User.id
 `
 
-func (q *Queries) GetRepair(ctx context.Context) ([]Repair, error) {
+type GetRepairRow struct {
+	ID              int64
+	Title           string
+	FaultReportID   int64
+	DateAssigned    time.Time
+	DateCompleted   sql.NullTime
+	StatusID        int64
+	SubcontractorID sql.NullInt64
+	Name            string
+}
+
+func (q *Queries) GetRepair(ctx context.Context) ([]GetRepairRow, error) {
 	rows, err := q.db.QueryContext(ctx, getRepair)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Repair
+	var items []GetRepairRow
 	for rows.Next() {
-		var i Repair
+		var i GetRepairRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
@@ -452,6 +465,7 @@ func (q *Queries) GetRepair(ctx context.Context) ([]Repair, error) {
 			&i.DateCompleted,
 			&i.StatusID,
 			&i.SubcontractorID,
+			&i.Name,
 		); err != nil {
 			return nil, err
 		}
@@ -467,17 +481,21 @@ func (q *Queries) GetRepair(ctx context.Context) ([]Repair, error) {
 }
 
 const getRepairApart = `-- name: GetRepairApart :many
-SELECT id, title, fault_report_id, date_assigned, date_completed, status_id FROM repair
+SELECT repair.id, repair.title, repair.fault_report_id, repair.date_assigned, repair.date_completed, repair.status_id, repair.subcontractor_id, User.name FROM repair
+INNER JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+INNER JOIN User ON Subcontractor.user_id = User.id
 WHERE fault_report_id = (SELECT id FROM FaultReport WHERE apartment_id = ?)
 `
 
 type GetRepairApartRow struct {
-	ID            int64
-	Title         string
-	FaultReportID int64
-	DateAssigned  time.Time
-	DateCompleted sql.NullTime
-	StatusID      int64
+	ID              int64
+	Title           string
+	FaultReportID   int64
+	DateAssigned    time.Time
+	DateCompleted   sql.NullTime
+	StatusID        int64
+	SubcontractorID sql.NullInt64
+	Name            string
 }
 
 func (q *Queries) GetRepairApart(ctx context.Context, apartmentID int64) ([]GetRepairApartRow, error) {
@@ -496,6 +514,8 @@ func (q *Queries) GetRepairApart(ctx context.Context, apartmentID int64) ([]GetR
 			&i.DateAssigned,
 			&i.DateCompleted,
 			&i.StatusID,
+			&i.SubcontractorID,
+			&i.Name,
 		); err != nil {
 			return nil, err
 		}
@@ -511,17 +531,21 @@ func (q *Queries) GetRepairApart(ctx context.Context, apartmentID int64) ([]GetR
 }
 
 const getRepairSub = `-- name: GetRepairSub :many
-SELECT id, title, fault_report_id, date_assigned, date_completed, status_id FROM repair
-WHERE subcontractor_id = (SELECT id FROM Subcontractor WHERE user_id = ?)
+SELECT repair.id, repair.title, repair.fault_report_id, repair.date_assigned, repair.date_completed, repair.status_id, repair.subcontractor_id, User.name FROM repair
+INNER JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+INNER JOIN User ON Subcontractor.user_id = User.id
+WHERE subcontractor_id = (SELECT id FROM Subcontractor WHERE Subcontractor.user_id = ?)
 `
 
 type GetRepairSubRow struct {
-	ID            int64
-	Title         string
-	FaultReportID int64
-	DateAssigned  time.Time
-	DateCompleted sql.NullTime
-	StatusID      int64
+	ID              int64
+	Title           string
+	FaultReportID   int64
+	DateAssigned    time.Time
+	DateCompleted   sql.NullTime
+	StatusID        int64
+	SubcontractorID sql.NullInt64
+	Name            string
 }
 
 func (q *Queries) GetRepairSub(ctx context.Context, userID int64) ([]GetRepairSubRow, error) {
@@ -540,6 +564,8 @@ func (q *Queries) GetRepairSub(ctx context.Context, userID int64) ([]GetRepairSu
 			&i.DateAssigned,
 			&i.DateCompleted,
 			&i.StatusID,
+			&i.SubcontractorID,
+			&i.Name,
 		); err != nil {
 			return nil, err
 		}
@@ -720,6 +746,23 @@ func (q *Queries) GetUserPassword(ctx context.Context, id int64) (string, error)
 	var password string
 	err := row.Scan(&password)
 	return password, err
+}
+
+const getUserPasswordEmail = `-- name: GetUserPasswordEmail :one
+SELECT id, password FROM User 
+WHERE email = ?
+`
+
+type GetUserPasswordEmailRow struct {
+	ID       int64
+	Password string
+}
+
+func (q *Queries) GetUserPasswordEmail(ctx context.Context, email string) (GetUserPasswordEmailRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserPasswordEmail, email)
+	var i GetUserPasswordEmailRow
+	err := row.Scan(&i.ID, &i.Password)
+	return i, err
 }
 
 const getUserRole = `-- name: GetUserRole :one

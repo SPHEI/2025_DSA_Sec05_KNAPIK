@@ -56,36 +56,28 @@ func (app *app) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId, err := app.Query.GetUserId(app.Ctx, input.Email)
+	result, err := app.Query.GetUserPasswordEmail(app.Ctx, input.Email)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
 
-	password, err := app.Query.GetUserPassword(app.Ctx, userId)
-	if err != nil {
-		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-		return
-	}
-
-	if password != input.Password || password == "" {
+	if result.Password != input.Password || result.Password == "" {
 		sendError(w, Error{401, "Wrong password or login", "Unauthorized"}, err)
 		return
 	}
 
-	output.Token, err = auth.CreateSession(app.CACHE, int(userId))
+	output.Token, err = auth.CreateSession(app.CACHE, int(result.ID))
 	if err != nil {
 		sendError(w, Error{500, "Could not generate a new token", "Internal Server Error"}, err)
 		return
 	}
 
-	output.Role, err = app.Query.GetUserRole(app.Ctx, userId)
+	output.Role, err = app.Query.GetUserRole(app.Ctx, result.ID)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
-
-	output.ID = userId
 
 	log.Printf("Login -- User: %s - Token: %s - Admin: %d", input.Email, output.Token, output.Role)
 

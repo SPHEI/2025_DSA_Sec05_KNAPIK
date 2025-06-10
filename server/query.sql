@@ -13,6 +13,10 @@ WHERE email = ?;
 SELECT password FROM User 
 WHERE id = ?;
 
+-- name: GetUserPasswordEmail :one
+SELECT id, password FROM User 
+WHERE email = ?;
+
 -- name: GetUserRole :one
 SELECT role_id FROM User 
 WHERE id = ?;
@@ -109,14 +113,20 @@ INSERT INTO repair (
 
 
 -- name: GetRepair :many
-SELECT id, title, fault_report_id, date_assigned, date_completed, status_id, subcontractor_id FROM repair;
+SELECT repair.*, User.name FROM repair
+INNER JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+INNER JOIN User ON Subcontractor.user_id = User.id;
 
 -- name: GetRepairSub :many
-SELECT id, title, fault_report_id, date_assigned, date_completed, status_id FROM repair
-WHERE subcontractor_id = (SELECT id FROM Subcontractor WHERE user_id = ?);
+SELECT repair.*, User.name FROM repair
+INNER JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+INNER JOIN User ON Subcontractor.user_id = User.id
+WHERE subcontractor_id = (SELECT id FROM Subcontractor WHERE Subcontractor.user_id = ?);
 
 -- name: GetRepairApart :many
-SELECT id, title, fault_report_id, date_assigned, date_completed, status_id FROM repair
+SELECT repair.*, User.name FROM repair
+INNER JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
+INNER JOIN User ON Subcontractor.user_id = User.id
 WHERE fault_report_id = (SELECT id FROM FaultReport WHERE apartment_id = ?);
 
 -- name: UpdateSubToRepair :one
