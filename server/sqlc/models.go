@@ -6,8 +6,8 @@ package sqlc
 
 import (
 	"database/sql"
-	"server/types"
 	"time"
+	"server/types"
 )
 
 type Apartament struct {

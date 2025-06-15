@@ -49,7 +49,7 @@ INSERT INTO Apartament (
 );
 
 -- name: GetApartments :many
-SELECT id, name street, building_number, building_name, flat_number, owner_id
+SELECT id, name, street, building_number, building_name, flat_number, owner_id
 FROM Apartament;
 
 -- name: AddOwner :exec

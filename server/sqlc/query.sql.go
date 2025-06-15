@@ -7,8 +7,8 @@ package sqlc
 
 import (
 	"context"
-	"server/types"
 	"time"
+	"server/types"
 )
 
 const addApartment = `-- name: AddApartment :exec
@@ -252,30 +252,22 @@ func (q *Queries) GetApartmentID(ctx context.Context, userID int64) (int64, erro
 }
 
 const getApartments = `-- name: GetApartments :many
-SELECT id, name street, building_number, building_name, flat_number, owner_id
+SELECT id, name, street, building_number, building_name, flat_number, owner_id
 FROM Apartament
 `
 
-type GetApartmentsRow struct {
-	ID             int64  `json:"id"`
-	Street         string `json:"street"`
-	BuildingNumber string `json:"building_number"`
-	BuildingName   string `json:"building_name"`
-	FlatNumber     string `json:"flat_number"`
-	OwnerID        int64  `json:"owner_id"`
-}
-
-func (q *Queries) GetApartments(ctx context.Context) ([]GetApartmentsRow, error) {
+func (q *Queries) GetApartments(ctx context.Context) ([]Apartament, error) {
 	rows, err := q.db.QueryContext(ctx, getApartments)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetApartmentsRow
+	var items []Apartament
 	for rows.Next() {
-		var i GetApartmentsRow
+		var i Apartament
 		if err := rows.Scan(
 			&i.ID,
+			&i.Name,
 			&i.Street,
 			&i.BuildingNumber,
 			&i.BuildingName,
