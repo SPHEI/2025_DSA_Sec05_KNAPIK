@@ -11,15 +11,15 @@ function Requests() {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("none");
 
-  const [requests, setRequests] = useState([{ID: -1, Title : '',Description: '', DateReported: '', StatusID: -1, ApartmentID: -1, Name: ''}])
-  const [repairs, setRepairs] = useState([{ID: -1, Title: '', FaultReportID: -1, DateAssigned: '', DateCompleted: {Time: '', Valid: false}, StatusID: -1, SubcontractorID: {Int64: -1, Valid: false}, Name: {String: '', Valid: false}}])
+  const [requests, setRequests] = useState([{id: -1, title : '',description: '', date_reported: '', status_id: -1, apartment_id: -1, name: ''}])
+  const [repairs, setRepairs] = useState([{id: -1, title: '', fault_report_id: -1, date_assigned: '', date_completed: '', status_id: -1, subcontractor_id: -1, name: ''}])
 
   const [role, setRole] = useState('')
   const pathname = usePathname();
 
   function mapRepairsToRequest(faultID: number)
   {
-    const a = repairs.filter(item => item.FaultReportID == faultID);
+    const a = repairs.filter(item => item.fault_report_id == faultID);
     var b: {
           ID: number,
           Title: string,
@@ -31,10 +31,12 @@ function Requests() {
     a.forEach((c) => {
       b.push(
         {
-          ID: c.ID,
-          Title: c.Title,
-          DateAssigned: c.DateAssigned,
-          StatusID: c.StatusID
+          ID: c.id,
+          Title: c.title,
+          DateAssigned: c.date_assigned,
+          DateCompleted: c.date_completed,
+          StatusID: c.status_id,
+          Subcontractor: c.name
         }
       )
     })
@@ -102,7 +104,7 @@ function Requests() {
             </div>
             <div className="flex flex-col w-[50%] gap-5">
               {repairs != null ? repairs.map((a, index) => <RepairBox
-              key={index} id={a.ID} title={a.Title} assigned_date={a.DateAssigned} completed_date={a.DateCompleted.Time} status={a.StatusID} subcontractor={a.Name.String}
+              key={index} id={a.id} title={a.title} assigned_date={a.date_assigned} completed_date={a.date_completed} status={a.status_id} subcontractor={a.name}
               refresh={refresh}/>)
               : <h1>No Repairs</h1>
             }
@@ -118,8 +120,8 @@ function Requests() {
               <b className="text-4xl">My requests</b>
             </div>
             {requests != null ? requests.map((a, index) => <RequestBox 
-            key={index} id={a.ID} title={a.Title}description={a.Description} date={a.DateReported} status={a.StatusID}
-            apartment_id={a.ApartmentID} name={a.Name} repairs={mapRepairsToRequest(a.ID)} refresh={refresh}/>)
+            key={index} id={a.id} title={a.title}description={a.description} date={a.date_reported} status={a.status_id}
+            apartment_id={a.apartment_id} name={a.name} repairs={mapRepairsToRequest(a.id)} refresh={refresh}/>)
             : <h1>No requests</h1>}
           </main>
         );

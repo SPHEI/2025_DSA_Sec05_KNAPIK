@@ -10,8 +10,7 @@ function Dashboard() {
     const [error, setError] = useState('none')
 
     const [apartaments,setApartaments] = useState([{id: -1,name: '', street: '', building_number: '', building_name: '',flat_number:'',owner_id:-1 }])
-    const [specialities,setSpecialities] = useState([''])
-    const [specialitiesID,setSpecialitiesID] = useState([1])
+    const [specialities,setSpecialities] = useState([{id: -1, name: ''}])
 
     const router = useRouter();
 
@@ -47,7 +46,7 @@ function Dashboard() {
             }
             else
             {
-                setApartaments(data.apartaments);
+                setApartaments(data);
             }
         }
         catch(err: any)
@@ -78,8 +77,8 @@ function Dashboard() {
             }
             else
             {
-                setSpecialities(data.spec);
-                setSpecialitiesID(data.spec_id);
+                //alert(JSON.stringify(data))
+                setSpecialities(data);
             }
         }
         catch(err: any)
@@ -326,7 +325,7 @@ function Dashboard() {
                                         <input className="input-box w-[26%]" placeholder="Address" value={address} onChange={(a) => {setAddress(a.target.value)}}/>
                                         <input className="input-box w-[26%]" placeholder="NIP" value={nip} onChange={nipChange}/>
                                         <select className="input-box w-[26%]" onChange={(a) => {setSpeciality(Number(a.target.value))}}>
-                                            {specialitiesID.map((a,index) => (<option key={index} value={a}>{specialities[a-1]}</option>))}
+                                            {specialities.map((a,index) => (<option key={index} value={a.id}>{a.name}</option>))}
                                         </select>
                                     </div>
                                 </div>

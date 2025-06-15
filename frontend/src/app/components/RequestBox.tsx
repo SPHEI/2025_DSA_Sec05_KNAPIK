@@ -39,12 +39,14 @@ function RequestBox(props: RequestProps) {
   const pathname = usePathname();
   async function changeStatus()
   {
+    alert("a")
     var t = Cookies.get("token");
     var i = 1;
     if(props.status == 1)
     {
       i = 2;
     }
+    alert(i)
     const res = await fetch('http://localhost:8080/faults/status',{
               method:'POST',
               body: JSON.stringify({ 

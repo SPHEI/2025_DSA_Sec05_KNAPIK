@@ -369,6 +369,8 @@ func (app *app) addOwner(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *app) changeRent(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+	
 	data := struct {
 		Token string                 `json:"token"`
 		Rent  sqlc.ChangeRent2Params `json:"rent"`

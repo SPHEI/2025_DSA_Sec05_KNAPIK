@@ -11,7 +11,7 @@ function SubmitIssue() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  const [apartaments,setApartaments] = useState([{id: -1,name: '', street: '', building_number: '', building_name: '',flat_number:'',owner_id:-1 }])
+  const [apartaments,setApartaments] = useState([{id: -1,name: '', street: '', building_number: '', building_name: '',flat_number:'',owner_id:-1, rent: -1 }])
   const [apartment, setApartment] = useState(1);
   const [role, setRole] = useState('')
 
@@ -23,21 +23,23 @@ function SubmitIssue() {
                 body: JSON.stringify({ 
                     "token" : t,
                     "fault" : {
-                      description,
-                      "date_reported" : "2025-01-02T15:04:05Z",
+                      "title" : title,
+                      "description": description,
                       "status_id" : 1,
-                      apartament_id : apartment
+                      "date_reported" : "2006-01-02T15:04:05Z",
+                      "apartment_id" : apartment
                     }
                 })
             });
             if(res.ok)
             {
-                alert("Issue submitted succesfully.");
+                console.log("Issue submitted succesfully.");
             }
             else
             {
                 var data = await res.json()
                 alert(data.message)
+                console.log(data.message)
             }
   };
 
@@ -62,7 +64,7 @@ function SubmitIssue() {
             }
             else
             {
-                setApartaments(data.apartaments);
+                setApartaments(data);
             }
         }
         catch(err: any)

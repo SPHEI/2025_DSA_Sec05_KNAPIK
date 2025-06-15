@@ -3,16 +3,16 @@ import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 
 interface ApartmentProps {
-    id: number
-    name: String
-    street: String
-    building_number: String
-    building_name: String
-    flat_number: String
-    owner_id: number
-    rent: number
-    refresh: Function
-  }
+  id: number;
+  name: string;
+  street: string;
+  building_number: string;
+  building_name: string;
+  flat_number: string;
+  owner_id: number;
+  rent: number;
+  changeRent: (id: number, newRent: number) => void;
+}
 
 function ApartmentBox(props : ApartmentProps)
 {
@@ -27,34 +27,10 @@ function ApartmentBox(props : ApartmentProps)
         setNewRent(a);
     }
 
-    async function changeRent()
+    function callChangeRent()
     {
-        var t = Cookies.get("token");
-        try {
-            const res = await fetch('http://localhost:8080/changerent',{
-                method:'POST',
-                body: JSON.stringify({ 
-                    "token" : t,
-                    "apartament_id" : props.id,
-                    "rent": Number(newRent)
-                })
-            });
-            if(res.ok)
-            {
-                alert("Rent changed succesfully.");
-            }
-            else
-            {
-                var data = await res.json()
-                alert(data.message)
-            }
-            setShowPopup(false)
-        } catch (err: any) {
-            //alert(err.message)
-            setShowPopup(false)
-        } finally{
-            props.refresh()
-        }
+        props.changeRent(props.id, Number(newRent))
+        setShowPopup(false)
     }
 
     return(
@@ -77,7 +53,7 @@ function ApartmentBox(props : ApartmentProps)
                             <b className="text-4xl">Change Rent</b>
                             <div className="flex flex-row gap-1">
                                 <input className="input-box w-[34%]" placeholder="New rent" value={newRent} onChange={numberChange}/>
-                                <button className="black-button w-[34%]" onClick={changeRent}>Change</button>
+                                <button className="black-button w-[34%]" onClick={callChangeRent}>Change</button>
                             </div>
                         </div>
                         <button onClick={() => setShowPopup(false)}className="absolute top-4 right-4 text-xl font-bold cursor-pointer">x</button>

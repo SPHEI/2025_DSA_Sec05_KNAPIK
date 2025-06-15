@@ -71,7 +71,7 @@ function Apartments() {
             }
             else
             {
-                setApartaments(data.apartaments);
+                setApartaments(data);
             }
             const res2 = await fetch('http://localhost:8080/owner/list?token=' + t)
             const data2 = await res2.json();
@@ -82,7 +82,7 @@ function Apartments() {
             }
             else
             {
-                setOwners(data2.owners);
+                setOwners(data2);
             }
         }catch(err: any){
             setError(err.message);
@@ -108,12 +108,14 @@ function Apartments() {
                 method:'POST',
                 body: JSON.stringify({ 
                     "token" : t,
-                    name,
-                    street,
-                    "building_number" : number,
-                    "building_name" : bname,
-                    "flat_number" : fnumber,
-                    "owner_id": ownerId
+                    "aparment":{
+                        "name": name,
+                        "street": street,
+                        "building_number" : number,
+                        "building_name" : bname,
+                        "flat_number" : fnumber,
+                        "owner_id": ownerId
+                    }
                 })
             });
             if(res.ok)
@@ -142,19 +144,21 @@ function Apartments() {
                 method:'POST',
                 body: JSON.stringify({ 
                     "token" : t,
-                    "name": newOwnerName,
-                    "email": newOwnerEmail,
-                    "phone": newOwnerPhone
+                    "owner":{
+                        "name": newOwnerName,
+                        "email": newOwnerEmail,
+                        "phone": newOwnerPhone
+                    }
                 })
             });
             if(res.ok)
             {
-                alert("Owner added succesfully.");
+                console.log("Owner added succesfully.");
             }
             else
             {
                 var data = await res.json()
-                alert(data.message)
+                console.log(data.message)
             }
             setShowPopup2(false)
             refresh()
@@ -162,6 +166,37 @@ function Apartments() {
             setError(err.message)
         } finally{
             setReady(true);
+        }
+    }
+
+    const changeRent = async (id: number, newRent: number) => 
+    {
+        console.log(id + " " + newRent)
+        var t = Cookies.get("token");
+        try {
+            const res = await fetch('http://localhost:8080/changerent',{
+                method:'POST',
+                body: JSON.stringify({ 
+                    "token" : t,
+                    "rent":{
+                    "apartment_id" : id,
+                    "price": newRent
+                    }
+                })
+            });
+            if(res.ok)
+            {
+                console.log("Rent changed succesfully.");
+            }
+            else
+            {
+                var data = await res.json()
+                console.log(data.message)
+            }
+        } catch (err: any) {
+            console.log(err.message)
+        } finally{
+            refresh()
         }
     }
 
@@ -177,7 +212,7 @@ function Apartments() {
                         <b className="text-4xl">Apartments</b> 
                         <button className="black-button" onClick={() => {setShowPopup(true)}}>+ Add Apartment</button>
                     </div>
-                    {apartaments.map((a,index) => <ApartmentBox key={index} id={a.id} name={a.name} street={a.street} building_number={a.building_number} building_name={a.building_name} flat_number={a.flat_number} owner_id={a.owner_id} rent={a.rent} refresh={refresh}/>)}
+                    {apartaments.map((a,index) => <ApartmentBox key={index} id={a.id} name={a.name} street={a.street} building_number={a.building_number} building_name={a.building_name} flat_number={a.flat_number} owner_id={a.owner_id} rent={a.rent} changeRent={changeRent}/>)}
                     {showPopup && (
                     <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50">
                         <div className="white-box w-[40%] py-4 rounded-lg relative">

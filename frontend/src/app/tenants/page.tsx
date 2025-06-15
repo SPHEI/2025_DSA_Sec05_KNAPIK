@@ -26,7 +26,7 @@ function Tenants() {
               }
               else
               {
-                setNames(data.apartaments)
+                setNames(data)
               }
             } catch (err: any) {
                 setError(err.message)
