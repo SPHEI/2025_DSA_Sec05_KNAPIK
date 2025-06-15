@@ -6,6 +6,7 @@ package sqlc
 
 import (
 	"database/sql"
+	"server/types"
 	"time"
 )
 
@@ -74,7 +75,7 @@ type Payment struct {
 	PaymentDate          time.Time      `json:"payment_date"`
 	StatusID             int64          `json:"status_id"`
 	PaymentMethodID      int64          `json:"payment_method_id"`
-	TransactionReference sql.NullString `json:"transaction_reference"`
+	TransactionReference types.JSONNullString `json:"transaction_reference"`
 }
 
 type Paymentmethod struct {
@@ -100,7 +101,7 @@ type RentingHistory struct {
 	ApartmentID int64        `json:"apartment_id"`
 	UserID      int64        `json:"user_id"`
 	StartDate   time.Time    `json:"start_date"`
-	EndDate     sql.NullTime `json:"end_date"`
+	EndDate     types.JSONNullTime `json:"end_date"`
 }
 
 type Repair struct {
@@ -108,15 +109,15 @@ type Repair struct {
 	Title           string        `json:"title"`
 	FaultReportID   int64         `json:"fault_report_id"`
 	DateAssigned    time.Time     `json:"date_assigned"`
-	DateCompleted   sql.NullTime  `json:"date_completed"`
+	DateCompleted   types.JSONNullTime  `json:"date_completed"`
 	StatusID        int64         `json:"status_id"`
-	SubcontractorID sql.NullInt64 `json:"subcontractor_id"`
+	SubcontractorID types.JSONNullInt64 `json:"subcontractor_id"`
 }
 
 type RepairHistory struct {
 	ID               int64         `json:"id"`
-	RentingHistoryID sql.NullInt64 `json:"renting_history_id"`
-	FaultReportID    sql.NullInt64 `json:"fault_report_id"`
+	RentingHistoryID types.JSONNullInt64 `json:"renting_history_id"`
+	FaultReportID    types.JSONNullInt64 `json:"fault_report_id"`
 }
 
 type Repairstatus struct {

@@ -7,7 +7,7 @@ package sqlc
 
 import (
 	"context"
-	"database/sql"
+	"server/types"
 	"time"
 )
 
@@ -444,10 +444,10 @@ type GetRepairRow struct {
 	Title           string         `json:"title"`
 	FaultReportID   int64          `json:"fault_report_id"`
 	DateAssigned    time.Time      `json:"date_assigned"`
-	DateCompleted   sql.NullTime   `json:"date_completed"`
+	DateCompleted   types.JSONNullTime   `json:"date_completed"`
 	StatusID        int64          `json:"status_id"`
-	SubcontractorID sql.NullInt64  `json:"subcontractor_id"`
-	Name            sql.NullString `json:"name"`
+	SubcontractorID types.JSONNullInt64  `json:"subcontractor_id"`
+	Name            types.JSONNullString `json:"name"`
 }
 
 func (q *Queries) GetRepair(ctx context.Context) ([]GetRepairRow, error) {
@@ -494,10 +494,10 @@ type GetRepairApartRow struct {
 	Title           string         `json:"title"`
 	FaultReportID   int64          `json:"fault_report_id"`
 	DateAssigned    time.Time      `json:"date_assigned"`
-	DateCompleted   sql.NullTime   `json:"date_completed"`
+	DateCompleted   types.JSONNullTime   `json:"date_completed"`
 	StatusID        int64          `json:"status_id"`
-	SubcontractorID sql.NullInt64  `json:"subcontractor_id"`
-	Name            sql.NullString `json:"name"`
+	SubcontractorID types.JSONNullInt64  `json:"subcontractor_id"`
+	Name            types.JSONNullString `json:"name"`
 }
 
 func (q *Queries) GetRepairApart(ctx context.Context, apartmentID int64) ([]GetRepairApartRow, error) {
@@ -544,10 +544,10 @@ type GetRepairSubRow struct {
 	Title           string         `json:"title"`
 	FaultReportID   int64          `json:"fault_report_id"`
 	DateAssigned    time.Time      `json:"date_assigned"`
-	DateCompleted   sql.NullTime   `json:"date_completed"`
+	DateCompleted   types.JSONNullTime   `json:"date_completed"`
 	StatusID        int64          `json:"status_id"`
-	SubcontractorID sql.NullInt64  `json:"subcontractor_id"`
-	Name            sql.NullString `json:"name"`
+	SubcontractorID types.JSONNullInt64  `json:"subcontractor_id"`
+	Name            types.JSONNullString `json:"name"`
 }
 
 func (q *Queries) GetRepairSub(ctx context.Context, userID int64) ([]GetRepairSubRow, error) {
@@ -794,7 +794,7 @@ UPDATE renting_history SET end_date = ? WHERE id = ?
 `
 
 type SetEndDateParams struct {
-	EndDate sql.NullTime `json:"end_date"`
+	EndDate types.JSONNullTime `json:"end_date"`
 	ID      int64        `json:"id"`
 }
 
@@ -838,7 +838,7 @@ RETURNING id, title, fault_report_id, date_assigned, date_completed, status_id, 
 
 type UpdateRepairDataParams struct {
 	Name          string       `json:"name"`
-	DateCompleted sql.NullTime `json:"date_completed"`
+	DateCompleted types.JSONNullTime `json:"date_completed"`
 	ID            int64        `json:"id"`
 }
 
@@ -865,7 +865,7 @@ RETURNING id, title, fault_report_id, date_assigned, date_completed, status_id, 
 `
 
 type UpdateSubToRepairParams struct {
-	SubcontractorID sql.NullInt64 `json:"subcontractor_id"`
+	SubcontractorID types.JSONNullInt64 `json:"subcontractor_id"`
 	ID              int64         `json:"id"`
 }
 
