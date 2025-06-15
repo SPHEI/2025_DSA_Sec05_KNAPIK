@@ -22,12 +22,12 @@ INSERT INTO Apartament (
 `
 
 type AddApartmentParams struct {
-	Name           string
-	Street         string
-	BuildingNumber string
-	BuildingName   string
-	FlatNumber     string
-	OwnerID        int64
+	Name           string `json:"name"`
+	Street         string `json:"street"`
+	BuildingNumber string `json:"building_number"`
+	BuildingName   string `json:"building_name"`
+	FlatNumber     string `json:"flat_number"`
+	OwnerID        int64  `json:"owner_id"`
 }
 
 func (q *Queries) AddApartment(ctx context.Context, arg AddApartmentParams) error {
@@ -47,11 +47,11 @@ INSERT INTO faultreport (title, description, date_reported, status_id, apartment
 `
 
 type AddFaultParams struct {
-	Title        string
-	Description  string
-	DateReported time.Time
-	StatusID     int64
-	ApartmentID  int64
+	Title        string    `json:"title"`
+	Description  string    `json:"description"`
+	DateReported time.Time `json:"date_reported"`
+	StatusID     int64     `json:"status_id"`
+	ApartmentID  int64     `json:"apartment_id"`
 }
 
 func (q *Queries) AddFault(ctx context.Context, arg AddFaultParams) error {
@@ -70,9 +70,9 @@ INSERT INTO renting_history (apartment_id, user_id, start_date) VALUES(?, ?, ?)
 `
 
 type AddNewRentingParams struct {
-	ApartmentID int64
-	UserID      int64
-	StartDate   time.Time
+	ApartmentID int64     `json:"apartment_id"`
+	UserID      int64     `json:"user_id"`
+	StartDate   time.Time `json:"start_date"`
 }
 
 func (q *Queries) AddNewRenting(ctx context.Context, arg AddNewRentingParams) error {
@@ -89,9 +89,9 @@ INSERT INTO Owner (
 `
 
 type AddOwnerParams struct {
-	Name  string
-	Email string
-	Phone string
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	Phone string `json:"phone"`
 }
 
 func (q *Queries) AddOwner(ctx context.Context, arg AddOwnerParams) error {
@@ -108,9 +108,9 @@ INSERT INTO repair (
 `
 
 type AddRepairParams struct {
-	Title         string
-	FaultReportID int64
-	DateAssigned  time.Time
+	Title         string    `json:"title"`
+	FaultReportID int64     `json:"fault_report_id"`
+	DateAssigned  time.Time `json:"date_assigned"`
 }
 
 func (q *Queries) AddRepair(ctx context.Context, arg AddRepairParams) error {
@@ -136,10 +136,10 @@ INSERT INTO Subcontractor (
 `
 
 type AddSubcontractorParams struct {
-	UserID       int64
-	Address      string
-	Nip          string
-	SpecialityID int64
+	UserID       int64  `json:"user_id"`
+	Address      string `json:"address"`
+	Nip          string `json:"nip"`
+	SpecialityID int64  `json:"speciality_id"`
 }
 
 func (q *Queries) AddSubcontractor(ctx context.Context, arg AddSubcontractorParams) error {
@@ -157,11 +157,11 @@ INSERT INTO User (name, password, email, phone, role_id) VALUES(?, ?, ?, ?, ?)
 `
 
 type AddUserParams struct {
-	Name     string
-	Password string
-	Email    string
-	Phone    string
-	RoleID   int64
+	Name     string `json:"name"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	RoleID   int64  `json:"role_id"`
 }
 
 func (q *Queries) AddUser(ctx context.Context, arg AddUserParams) error {
@@ -191,8 +191,8 @@ INSERT INTO pricinghistory (apartment_id, price) VALUES(?, ?)
 `
 
 type ChangeRent2Params struct {
-	ApartmentID int64
-	Price       float64
+	ApartmentID int64   `json:"apartment_id"`
+	Price       float64 `json:"price"`
 }
 
 func (q *Queries) ChangeRent2(ctx context.Context, arg ChangeRent2Params) error {
@@ -205,10 +205,10 @@ SELECT id, apartment_id, user_id, start_date FROM renting_history WHERE end_date
 `
 
 type GetActiveRentingRow struct {
-	ID          int64
-	ApartmentID int64
-	UserID      int64
-	StartDate   time.Time
+	ID          int64     `json:"id"`
+	ApartmentID int64     `json:"apartment_id"`
+	UserID      int64     `json:"user_id"`
+	StartDate   time.Time `json:"start_date"`
 }
 
 func (q *Queries) GetActiveRenting(ctx context.Context) ([]GetActiveRentingRow, error) {
@@ -257,12 +257,12 @@ FROM Apartament
 `
 
 type GetApartmentsRow struct {
-	ID             int64
-	Street         string
-	BuildingNumber string
-	BuildingName   string
-	FlatNumber     string
-	OwnerID        int64
+	ID             int64  `json:"id"`
+	Street         string `json:"street"`
+	BuildingNumber string `json:"building_number"`
+	BuildingName   string `json:"building_name"`
+	FlatNumber     string `json:"flat_number"`
+	OwnerID        int64  `json:"owner_id"`
 }
 
 func (q *Queries) GetApartments(ctx context.Context) ([]GetApartmentsRow, error) {
@@ -301,13 +301,13 @@ INNER JOIN Apartament ON Apartament.id = faultreport.apartment_id
 `
 
 type GetFaultReportsRow struct {
-	ID           int64
-	Title        string
-	Description  string
-	DateReported time.Time
-	StatusID     int64
-	ApartmentID  int64
-	Name         string
+	ID           int64     `json:"id"`
+	Title        string    `json:"title"`
+	Description  string    `json:"description"`
+	DateReported time.Time `json:"date_reported"`
+	StatusID     int64     `json:"status_id"`
+	ApartmentID  int64     `json:"apartment_id"`
+	Name         string    `json:"name"`
 }
 
 func (q *Queries) GetFaultReports(ctx context.Context) ([]GetFaultReportsRow, error) {
@@ -348,13 +348,13 @@ WHERE faultreport.apartment_id = ?
 `
 
 type GetFaultReportsUserRow struct {
-	ID           int64
-	Title        string
-	Description  string
-	DateReported time.Time
-	StatusID     int64
-	ApartmentID  int64
-	Name         string
+	ID           int64     `json:"id"`
+	Title        string    `json:"title"`
+	Description  string    `json:"description"`
+	DateReported time.Time `json:"date_reported"`
+	StatusID     int64     `json:"status_id"`
+	ApartmentID  int64     `json:"apartment_id"`
+	Name         string    `json:"name"`
 }
 
 func (q *Queries) GetFaultReportsUser(ctx context.Context, apartmentID int64) ([]GetFaultReportsUserRow, error) {
@@ -440,14 +440,14 @@ LEFT JOIN User ON Subcontractor.user_id = User.id
 `
 
 type GetRepairRow struct {
-	ID              int64
-	Title           string
-	FaultReportID   int64
-	DateAssigned    time.Time
-	DateCompleted   sql.NullTime
-	StatusID        int64
-	SubcontractorID sql.NullInt64
-	Name            sql.NullString
+	ID              int64          `json:"id"`
+	Title           string         `json:"title"`
+	FaultReportID   int64          `json:"fault_report_id"`
+	DateAssigned    time.Time      `json:"date_assigned"`
+	DateCompleted   sql.NullTime   `json:"date_completed"`
+	StatusID        int64          `json:"status_id"`
+	SubcontractorID sql.NullInt64  `json:"subcontractor_id"`
+	Name            sql.NullString `json:"name"`
 }
 
 func (q *Queries) GetRepair(ctx context.Context) ([]GetRepairRow, error) {
@@ -490,14 +490,14 @@ WHERE fault_report_id = (SELECT id FROM FaultReport WHERE apartment_id = ?)
 `
 
 type GetRepairApartRow struct {
-	ID              int64
-	Title           string
-	FaultReportID   int64
-	DateAssigned    time.Time
-	DateCompleted   sql.NullTime
-	StatusID        int64
-	SubcontractorID sql.NullInt64
-	Name            sql.NullString
+	ID              int64          `json:"id"`
+	Title           string         `json:"title"`
+	FaultReportID   int64          `json:"fault_report_id"`
+	DateAssigned    time.Time      `json:"date_assigned"`
+	DateCompleted   sql.NullTime   `json:"date_completed"`
+	StatusID        int64          `json:"status_id"`
+	SubcontractorID sql.NullInt64  `json:"subcontractor_id"`
+	Name            sql.NullString `json:"name"`
 }
 
 func (q *Queries) GetRepairApart(ctx context.Context, apartmentID int64) ([]GetRepairApartRow, error) {
@@ -540,14 +540,14 @@ WHERE subcontractor_id = (SELECT id FROM Subcontractor WHERE Subcontractor.user_
 `
 
 type GetRepairSubRow struct {
-	ID              int64
-	Title           string
-	FaultReportID   int64
-	DateAssigned    time.Time
-	DateCompleted   sql.NullTime
-	StatusID        int64
-	SubcontractorID sql.NullInt64
-	Name            sql.NullString
+	ID              int64          `json:"id"`
+	Title           string         `json:"title"`
+	FaultReportID   int64          `json:"fault_report_id"`
+	DateAssigned    time.Time      `json:"date_assigned"`
+	DateCompleted   sql.NullTime   `json:"date_completed"`
+	StatusID        int64          `json:"status_id"`
+	SubcontractorID sql.NullInt64  `json:"subcontractor_id"`
+	Name            sql.NullString `json:"name"`
 }
 
 func (q *Queries) GetRepairSub(ctx context.Context, userID int64) ([]GetRepairSubRow, error) {
@@ -588,9 +588,9 @@ WHERE user_id = ?
 `
 
 type GetSubconInfoRow struct {
-	Address      string
-	Nip          string
-	SpecialityID int64
+	Address      string `json:"address"`
+	Nip          string `json:"nip"`
+	SpecialityID int64  `json:"speciality_id"`
 }
 
 func (q *Queries) GetSubconInfo(ctx context.Context, userID int64) (GetSubconInfoRow, error) {
@@ -633,12 +633,12 @@ INNER JOIN User ON Subcontractor.user_id = User.id
 `
 
 type GetSubcontractorsRow struct {
-	ID           int64
-	UserID       int64
-	Address      string
-	Nip          string
-	SpecialityID int64
-	Name         string
+	ID           int64  `json:"id"`
+	UserID       int64  `json:"user_id"`
+	Address      string `json:"address"`
+	Nip          string `json:"nip"`
+	SpecialityID int64  `json:"speciality_id"`
+	Name         string `json:"name"`
 }
 
 func (q *Queries) GetSubcontractors(ctx context.Context) ([]GetSubcontractorsRow, error) {
@@ -676,11 +676,11 @@ SELECT id, name, email, phone, role_id FROM User WHERE role_id = "2"
 `
 
 type GetTenetsRow struct {
-	ID     int64
-	Name   string
-	Email  string
-	Phone  string
-	RoleID int64
+	ID     int64  `json:"id"`
+	Name   string `json:"name"`
+	Email  string `json:"email"`
+	Phone  string `json:"phone"`
+	RoleID int64  `json:"role_id"`
 }
 
 func (q *Queries) GetTenets(ctx context.Context) ([]GetTenetsRow, error) {
@@ -730,10 +730,10 @@ WHERE id = ?
 `
 
 type GetUserInfoRow struct {
-	ID     int64
-	Name   string
-	Phone  string
-	RoleID int64
+	ID     int64  `json:"id"`
+	Name   string `json:"name"`
+	Phone  string `json:"phone"`
+	RoleID int64  `json:"role_id"`
 }
 
 func (q *Queries) GetUserInfo(ctx context.Context, id int64) (GetUserInfoRow, error) {
@@ -766,8 +766,8 @@ WHERE email = ?
 `
 
 type GetUserPasswordEmailRow struct {
-	ID       int64
-	Password string
+	ID       int64  `json:"id"`
+	Password string `json:"password"`
 }
 
 func (q *Queries) GetUserPasswordEmail(ctx context.Context, email string) (GetUserPasswordEmailRow, error) {
@@ -794,8 +794,8 @@ UPDATE renting_history SET end_date = ? WHERE id = ?
 `
 
 type SetEndDateParams struct {
-	EndDate sql.NullTime
-	ID      int64
+	EndDate sql.NullTime `json:"end_date"`
+	ID      int64        `json:"id"`
 }
 
 func (q *Queries) SetEndDate(ctx context.Context, arg SetEndDateParams) error {
@@ -811,8 +811,8 @@ RETURNING id, title, description, date_reported, status_id, apartment_id
 `
 
 type UpdateFaultStatusParams struct {
-	StatusID int64
-	ID       int64
+	StatusID int64 `json:"status_id"`
+	ID       int64 `json:"id"`
 }
 
 func (q *Queries) UpdateFaultStatus(ctx context.Context, arg UpdateFaultStatusParams) (Faultreport, error) {
@@ -837,9 +837,9 @@ RETURNING id, title, fault_report_id, date_assigned, date_completed, status_id, 
 `
 
 type UpdateRepairDataParams struct {
-	Name          string
-	DateCompleted sql.NullTime
-	ID            int64
+	Name          string       `json:"name"`
+	DateCompleted sql.NullTime `json:"date_completed"`
+	ID            int64        `json:"id"`
 }
 
 func (q *Queries) UpdateRepairData(ctx context.Context, arg UpdateRepairDataParams) (Repair, error) {
@@ -865,8 +865,8 @@ RETURNING id, title, fault_report_id, date_assigned, date_completed, status_id, 
 `
 
 type UpdateSubToRepairParams struct {
-	SubcontractorID sql.NullInt64
-	ID              int64
+	SubcontractorID sql.NullInt64 `json:"subcontractor_id"`
+	ID              int64         `json:"id"`
 }
 
 func (q *Queries) UpdateSubToRepair(ctx context.Context, arg UpdateSubToRepairParams) (Repair, error) {

@@ -22,10 +22,12 @@ function SubmitIssue() {
                 method:'POST',
                 body: JSON.stringify({ 
                     "token" : t,
-                    description,
-                    "date_reported" : "2025-10-10",
-                    "status_id" : 1,
-                    apartament_id : apartment
+                    "fault" : {
+                      description,
+                      "date_reported" : "2025-01-02T15:04:05Z",
+                      "status_id" : 1,
+                      apartament_id : apartment
+                    }
                 })
             });
             if(res.ok)

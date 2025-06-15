@@ -10,143 +10,143 @@ import (
 )
 
 type Apartament struct {
-	ID             int64
-	Name           string
-	Street         string
-	BuildingNumber string
-	BuildingName   string
-	FlatNumber     string
-	OwnerID        int64
+	ID             int64  `json:"id"`
+	Name           string `json:"name"`
+	Street         string `json:"street"`
+	BuildingNumber string `json:"building_number"`
+	BuildingName   string `json:"building_name"`
+	FlatNumber     string `json:"flat_number"`
+	OwnerID        int64  `json:"owner_id"`
 }
 
 type Expense struct {
-	ID          int64
-	Amount      float64
-	ExpenseDate time.Time
-	Description string
-	CategoryID  int64
-	RepairID    interface{}
+	ID          int64       `json:"id"`
+	Amount      float64     `json:"amount"`
+	ExpenseDate time.Time   `json:"expense_date"`
+	Description string      `json:"description"`
+	CategoryID  int64       `json:"category_id"`
+	RepairID    interface{} `json:"repair_id"`
 }
 
 type Expensecategory struct {
-	ID   int64
-	Name string
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type Faultreport struct {
-	ID           int64
-	Title        string
-	Description  string
-	DateReported time.Time
-	StatusID     int64
-	ApartmentID  int64
+	ID           int64     `json:"id"`
+	Title        string    `json:"title"`
+	Description  string    `json:"description"`
+	DateReported time.Time `json:"date_reported"`
+	StatusID     int64     `json:"status_id"`
+	ApartmentID  int64     `json:"apartment_id"`
 }
 
 type Faultstatus struct {
-	ID   int64
-	Name string
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type FinancialRecord struct {
-	Type             string
-	SourceID         int64
-	Amount           float64
-	RecordDate       time.Time
-	Description      string
-	RelatedPaymentID int64
-	RelatedExpenseID interface{}
-	UserName         string
-	ApartmentName    string
+	Type             string      `json:"type"`
+	SourceID         int64       `json:"source_id"`
+	Amount           float64     `json:"amount"`
+	RecordDate       time.Time   `json:"record_date"`
+	Description      string      `json:"description"`
+	RelatedPaymentID int64       `json:"related_payment_id"`
+	RelatedExpenseID interface{} `json:"related_expense_id"`
+	UserName         string      `json:"user_name"`
+	ApartmentName    string      `json:"apartment_name"`
 }
 
 type Owner struct {
-	ID    int64
-	Name  string
-	Email string
-	Phone string
+	ID    int64  `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	Phone string `json:"phone"`
 }
 
 type Payment struct {
-	ID                   int64
-	UserID               int64
-	ApartamentID         int64
-	Amount               float64
-	PaymentDate          time.Time
-	StatusID             int64
-	PaymentMethodID      int64
-	TransactionReference sql.NullString
+	ID                   int64          `json:"id"`
+	UserID               int64          `json:"user_id"`
+	ApartamentID         int64          `json:"apartament_id"`
+	Amount               float64        `json:"amount"`
+	PaymentDate          time.Time      `json:"payment_date"`
+	StatusID             int64          `json:"status_id"`
+	PaymentMethodID      int64          `json:"payment_method_id"`
+	TransactionReference sql.NullString `json:"transaction_reference"`
 }
 
 type Paymentmethod struct {
-	ID   int64
-	Name string
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type Paymentstatus struct {
-	ID   int64
-	Name string
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type Pricinghistory struct {
-	ID          int64
-	ApartmentID int64
-	Date        time.Time
-	Price       float64
-	IsCurrent   sql.NullBool
+	ID          int64        `json:"id"`
+	ApartmentID int64        `json:"apartment_id"`
+	Date        time.Time    `json:"date"`
+	Price       float64      `json:"price"`
+	IsCurrent   sql.NullBool `json:"is_current"`
 }
 
 type RentingHistory struct {
-	ID          int64
-	ApartmentID int64
-	UserID      int64
-	StartDate   time.Time
-	EndDate     sql.NullTime
+	ID          int64        `json:"id"`
+	ApartmentID int64        `json:"apartment_id"`
+	UserID      int64        `json:"user_id"`
+	StartDate   time.Time    `json:"start_date"`
+	EndDate     sql.NullTime `json:"end_date"`
 }
 
 type Repair struct {
-	ID              int64
-	Title           string
-	FaultReportID   int64
-	DateAssigned    time.Time
-	DateCompleted   sql.NullTime
-	StatusID        int64
-	SubcontractorID sql.NullInt64
+	ID              int64         `json:"id"`
+	Title           string        `json:"title"`
+	FaultReportID   int64         `json:"fault_report_id"`
+	DateAssigned    time.Time     `json:"date_assigned"`
+	DateCompleted   sql.NullTime  `json:"date_completed"`
+	StatusID        int64         `json:"status_id"`
+	SubcontractorID sql.NullInt64 `json:"subcontractor_id"`
 }
 
 type RepairHistory struct {
-	ID               int64
-	RentingHistoryID sql.NullInt64
-	FaultReportID    sql.NullInt64
+	ID               int64         `json:"id"`
+	RentingHistoryID sql.NullInt64 `json:"renting_history_id"`
+	FaultReportID    sql.NullInt64 `json:"fault_report_id"`
 }
 
 type Repairstatus struct {
-	ID   int64
-	Name string
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type Role struct {
-	ID   int64
-	Name string
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type Speciality struct {
-	ID   int64
-	Name string
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type Subcontractor struct {
-	ID           int64
-	UserID       int64
-	Address      string
-	Nip          string
-	SpecialityID int64
+	ID           int64  `json:"id"`
+	UserID       int64  `json:"user_id"`
+	Address      string `json:"address"`
+	Nip          string `json:"nip"`
+	SpecialityID int64  `json:"speciality_id"`
 }
 
 type User struct {
-	ID       int64
-	Name     string
-	Email    string
-	Phone    string
-	RoleID   int64
-	Password string
+	ID       int64  `json:"id"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	RoleID   int64  `json:"role_id"`
+	Password string `json:"password"`
 }

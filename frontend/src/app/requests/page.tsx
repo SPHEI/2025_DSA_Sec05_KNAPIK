@@ -34,9 +34,7 @@ function Requests() {
           ID: c.ID,
           Title: c.Title,
           DateAssigned: c.DateAssigned,
-          DateCompleted: c.DateCompleted.Time,
-          StatusID: c.StatusID,
-          Subcontractor: c.Name.String
+          StatusID: c.StatusID
         }
       )
     })

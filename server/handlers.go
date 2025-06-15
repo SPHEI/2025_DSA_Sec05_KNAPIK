@@ -538,6 +538,8 @@ func (app *app) addFault(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println(input.Fault)
+
 	_, err = auth.ValidateSession(app.CACHE, input.Token)
 	if err != nil {
 		sendError(w, Error{401, "Incorrect Token", "Unauthorized"}, err)
