@@ -26,7 +26,6 @@ function SubmitIssue() {
                       "title" : title,
                       "description": description,
                       "status_id" : 1,
-                      "date_reported" : "2006-01-02T15:04:05Z",
                       "apartment_id" : apartment
                     }
                 })
