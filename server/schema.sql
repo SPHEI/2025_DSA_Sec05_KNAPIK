@@ -85,7 +85,7 @@ CREATE TABLE faultreport (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     description TEXT NOT NULL,
-    date_reported DATE NOT NULL,
+    date_reported DATE NOT NULL DEFAULT CURRENT_DATE,
     status_id INTEGER NOT NULL DEFAULT 1,  -- default'open'
     apartment_id INTEGER NOT NULL,
     FOREIGN KEY (status_id) REFERENCES FaultStatus(id),

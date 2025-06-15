@@ -94,7 +94,7 @@ INNER JOIN Apartament ON Apartament.id = faultreport.apartment_id
 WHERE faultreport.apartment_id = ?;
 
 -- name: AddFault :exec
-INSERT INTO faultreport (title, description, date_reported, status_id, apartment_id) VALUES(?, ?, ?, ?, ?);
+INSERT INTO faultreport (title, description, status_id, apartment_id) VALUES(?, ?, ?, ?);
 
 -- name: UpdateFaultStatus :one
 UPDATE faultreport

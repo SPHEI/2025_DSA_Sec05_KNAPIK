@@ -43,22 +43,20 @@ func (q *Queries) AddApartment(ctx context.Context, arg AddApartmentParams) erro
 }
 
 const addFault = `-- name: AddFault :exec
-INSERT INTO faultreport (title, description, date_reported, status_id, apartment_id) VALUES(?, ?, ?, ?, ?)
+INSERT INTO faultreport (title, description, status_id, apartment_id) VALUES(?, ?, ?, ?)
 `
 
 type AddFaultParams struct {
-	Title        string    `json:"title"`
-	Description  string    `json:"description"`
-	DateReported time.Time `json:"date_reported"`
-	StatusID     int64     `json:"status_id"`
-	ApartmentID  int64     `json:"apartment_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	StatusID    int64  `json:"status_id"`
+	ApartmentID int64  `json:"apartment_id"`
 }
 
 func (q *Queries) AddFault(ctx context.Context, arg AddFaultParams) error {
 	_, err := q.db.ExecContext(ctx, addFault,
 		arg.Title,
 		arg.Description,
-		arg.DateReported,
 		arg.StatusID,
 		arg.ApartmentID,
 	)
