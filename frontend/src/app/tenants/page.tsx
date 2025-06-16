@@ -43,7 +43,7 @@ function Tenants() {
         {
             return (
                 <main>
-                    <div className="page-head w-[50%]">
+                    <div className="page-head w-[50%] min-w-[600px]">
                         <b className="text-4xl">Tenants</b> 
                         <button className="black-button" onClick={() =>{router.push("/accounts")}}>+ Add Tenants</button>
                     </div>

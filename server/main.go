@@ -30,7 +30,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cache, err := sql.Open("sqlite", ":memory:")
+	cache, err := sql.Open("sqlite", "file::memory:?cache=shared")
 	if err != nil {
 		log.Fatal(err)
 	}

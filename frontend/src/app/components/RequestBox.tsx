@@ -23,6 +23,7 @@ interface RequestProps {
     Subcontractor: string;
   }[]
   refresh: Function;
+  subcontractors: {ID: number, UserID: number, Address: string, Nip: string, SpecialityID: number, Name: string}[];
 }
 
 function RequestBox(props: RequestProps) {
@@ -30,9 +31,6 @@ function RequestBox(props: RequestProps) {
   const [showPopup2,setShowPopup2] = useState(false)
 
   const [title, setTitle] = useState('')
-  const [subcontractor, setSubcontractor] = useState(1)
-
-  const [subcontractors, setSubcontractors] = useState([{ID: -1, UserID: -1, Address: '', Nip: '', SpecialityID: -1, Name: ''}])
 
   const [role, setRole] = useState('')
 
@@ -69,23 +67,12 @@ function RequestBox(props: RequestProps) {
         props.refresh()
   }
 useEffect(() => {
-        const fetchData = async () => {
-          //Page setup goes here
-          var a = Cookies.get("role");
-          if(a != null)
-          {
-            setRole(a)
-            if(a == "1")
-            {
-              var t = Cookies.get("token");
-              const res = await fetch('http://localhost:8080/subcon/list?token=' + t)
-              const data = await res.json();
-              //alert(JSON.stringify(data))
-              setSubcontractors(data);
-            }
-          }
+        //Page setup goes here
+        var a = Cookies.get("role");
+        if(a != null)
+        {
+          setRole(a)
         }
-        fetchData();
     },[pathname])
 
   async function addRepair()
@@ -117,7 +104,7 @@ useEffect(() => {
 
   const line = "flex flex-row gap-1";
   return (
-    <div className="white-box w-[50%] h-[200px]">
+    <div className="white-box w-[50%] h-[200px] min-w-[500px]">
       <div className="flex flex-row items-center justify-between gap-8 w-full px-8 ">
         <div className="flex flex-col w-[50%]">
           <b className="text-xl">Title: {props.title}</b>
@@ -128,7 +115,7 @@ useEffect(() => {
       </div>
       {showPopup && (
                 <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50 overflow-auto">
-                    <div className="white-box w-[60%] py-4 rounded-lg relative max-h-[80vh] overflow-y-auto">
+                    <div className="white-box w-[60%] py-4 rounded-lg relative max-h-[80vh] overflow-y-auto min-w-[600px]">
                         <div className={"flex flex-col gap-2 w-[100%] py-4 relative top-" + String(props.repairs.length * 50)}>
                             <b className="text-4xl">Request Details</b>
                             <h1>Title</h1>
@@ -145,7 +132,8 @@ useEffect(() => {
                               {role === "1" && <button className="black-button w-[50%]" onClick={() => {setShowPopup2(true)}}>+ Add Repair</button>}
                             </div>
                             {props.repairs != null ? props.repairs.map((a, index) => <RepairBox
-                                key={index} id={a.ID} title={a.Title} assigned_date={a.DateAssigned} completed_date={a.DateCompleted} status={a.StatusID} subcontractor={a.Subcontractor}
+                                key={index} id={a.ID} title={a.Title} assigned_date={a.DateAssigned} completed_date={a.DateCompleted} status={a.StatusID} 
+                                subcontractor={a.Subcontractor} subcontractors={props.subcontractors}
                                 refresh={props.refresh}/>)
                                 : <h1>No Repairs</h1>
                             }

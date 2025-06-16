@@ -228,9 +228,9 @@ function Dashboard() {
                         body: JSON.stringify({ 
                             "token": t,
                             "renting" : {
-                                "apartament_id" : apartment,
+                                "apartment_id" : apartment,
                                 "user_id" : data.id,
-                                "start_date" : date
+                                "start_date" : date + "T00:00:00Z"
                             }
                         })
                     });
@@ -291,10 +291,10 @@ function Dashboard() {
         {
             return (
                 <main>
-                    <div className="page-head w-[55%]">
+                    <div className="page-head w-[55%] min-w-[500px]">
                         <b className="text-4xl">Add Users</b> 
                     </div>
-                    <div className="white-box w-[55%] py-8">
+                    <div className="white-box w-[55%] py-8 min-w-[500px]">
                         <div className="flex flex-col gap-2 w-[100%]">
                             <select className="input-box w-[26%]" defaultValue={'Tenant'} onChange={(a) => {setRole(a.target.value)}}>
                                 <option value="Admin">Admin</option>
@@ -362,7 +362,7 @@ function Dashboard() {
                     </div>
                     {showPopup && (
                     <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50">
-                        <div className="white-box w-[20%] py-4 rounded-lg relative">
+                        <div className="white-box w-[20%] py-4 rounded-lg relative min-w-[400px]">
                             <div className="flex flex-col gap-2 w-[100%]">
                                 <b className="text-4xl">Add Speciality</b>
                                 <input className="input-box" placeholder="Speciality Name" onChange={(a)=>{setNewSpeciality(a.target.value)}}/>

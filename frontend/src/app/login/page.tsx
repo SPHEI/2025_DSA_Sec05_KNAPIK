@@ -56,7 +56,7 @@ function Login() {
         {
             return (
                 <main>
-                    <div className="white-box w-[16%] py-4 relative top-50">
+                    <div className="white-box w-[16%] min-w-[225px] py-4 relative top-50">
                         <div className="flex flex-col gap-6 py-1">
                             <div className="flex flex-col">
                                 <b>Email</b>

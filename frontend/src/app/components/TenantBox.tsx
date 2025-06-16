@@ -1,4 +1,5 @@
 import React from "react";
+import { useState, useEffect } from "react";
 
 interface TenantProps {
     id: number
@@ -10,8 +11,11 @@ interface TenantProps {
 
 function TenantBox(props : TenantProps)
 {
+    const [showChange, setShowChange] = useState(false)
+    const [showChange2, setShowChange2] = useState(false)
+    const [showPayments, setShowPayments] = useState(false)
     return(
-        <div className="white-box w-[50%] h-[200px]">
+        <div className="white-box w-[50%] h-[200px] min-w-[600px]">
             <div className="flex flex-col">
                 <h1>Name: {props.name}</h1>
                 <h1>Email: {props.email}</h1>
@@ -23,10 +27,10 @@ function TenantBox(props : TenantProps)
             <div className="flex flex-row justify-end items-center gap-10">
                 <p className="status-box-green"></p>
                 <div className="flex flex-col w-[160px] gap-2">
-                    <button className="black-button">Change Apartment</button>
-                    <button className="black-button">Change Rent</button>
+                    <button className="black-button" onClick={()=>{setShowChange(true)}}>Change Apartment</button>
+                    <button className="black-button" onClick={()=>{setShowChange2(true)}}>Change Rent</button>
                     <button className="black-button">Evict</button>
-                    <button className="black-button">View Payments</button>
+                    <button className="black-button" onClick={()=>{setShowPayments(true)}}>View Payments</button>
                 </div>
             </div>
         </div>

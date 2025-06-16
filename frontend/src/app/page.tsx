@@ -20,10 +20,10 @@ function App() {
           <img
             src={bghp.src}
             alt="Background"
-            className="absolute top-0 left-0 w-screen h-screen object-cover -z-10"
+            className="absolute top-0 left-0 w-screen h-screen z-[-1]"
           />
 
-          <div className="relative z-10 flex flex-col items-center justify-start pt-80 h-screen w-full text-center px-4">
+          <div className="relative z-10 flex flex-col items-center justify-start pt-60 w-full text-center px-4">
             <h1 className="text-white text-7xl font-bold mb-4 drop-shadow-lg">
               The amazing building-management app
             </h1>

@@ -34,7 +34,7 @@ function ApartmentBox(props : ApartmentProps)
     }
 
     return(
-        <div className="flex justify-center w-[100%]">
+        <div className="flex justify-center w-[100%] min-w-[900px]">
             <div className="white-box w-[50%] h-[200px]">
                 <div className="flex flex-col">
                     <h1>Name: {props.name}</h1>
@@ -48,8 +48,8 @@ function ApartmentBox(props : ApartmentProps)
             </div>
             {showPopup && (
                 <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50">
-                    <div className="white-box w-[40%] py-4 rounded-lg relative">
-                        <div className="flex flex-col gap-2 w-[100%]">
+                    <div className="white-box w-[40%] py-4 rounded-lg relative min-w-[400px]">
+                        <div className="flex flex-col gap-2 w-[100%] ">
                             <b className="text-4xl">Change Rent</b>
                             <div className="flex flex-row gap-1">
                                 <input className="input-box w-[34%]" placeholder="New rent" value={newRent} onChange={numberChange}/>

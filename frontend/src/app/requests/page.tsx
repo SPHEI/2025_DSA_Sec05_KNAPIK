@@ -16,6 +16,8 @@ function Requests() {
 
   const [role, setRole] = useState('')
   const pathname = usePathname();
+  const [subcontractors, setSubcontractors] = useState([{ID: -1, UserID: -1, Address: '', Nip: '', SpecialityID: -1, Name: ''}])
+  
 
   function mapRepairsToRequest(faultID: number)
   {
@@ -90,6 +92,19 @@ function Requests() {
             {
                 setError(err.message);
             }
+            if(a == "1")
+            {
+              try{
+                const res = await fetch('http://localhost:8080/subcon/list?token=' + t)
+                const data = await res.json();
+                //alert(JSON.stringify(data))
+                setSubcontractors(data);
+              }
+              catch(err: any)
+              {
+                  setError(err.message);
+              }
+            }
           }
   }
 
@@ -99,12 +114,13 @@ function Requests() {
       {
         return (
           <main>
-            <div className="page-head w-[50%]">
+            <div className="page-head w-[50%] min-w-[500px]">
               <b className="text-4xl">Assigned Repairs</b>
             </div>
             <div className="flex flex-col w-[50%] gap-5">
               {repairs != null ? repairs.map((a, index) => <RepairBox
-              key={index} id={a.id} title={a.title} assigned_date={a.date_assigned} completed_date={a.date_completed} status={a.status_id} subcontractor={a.name}
+              key={index} id={a.id} title={a.title} assigned_date={a.date_assigned} completed_date={a.date_completed} status={a.status_id} 
+              subcontractor={a.name} subcontractors={subcontractors}
               refresh={refresh}/>)
               : <h1>No Repairs</h1>
             }
@@ -116,12 +132,13 @@ function Requests() {
       {
         return (
           <main>
-            <div className="page-head w-[50%]">
+            <div className="page-head w-[50%] min-w-[500px]">
               <b className="text-4xl">My requests</b>
             </div>
             {requests != null ? requests.map((a, index) => <RequestBox 
             key={index} id={a.id} title={a.title}description={a.description} date={a.date_reported} status={a.status_id}
-            apartment_id={a.apartment_id} name={a.name} repairs={mapRepairsToRequest(a.id)} refresh={refresh}/>)
+            apartment_id={a.apartment_id} name={a.name} repairs={mapRepairsToRequest(a.id)} refresh={refresh}
+            subcontractors={subcontractors}/>)
             : <h1>No requests</h1>}
           </main>
         );

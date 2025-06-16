@@ -11,6 +11,7 @@ interface RepairProps {
   status: number;
   subcontractor: string;
   refresh:Function;
+  subcontractors: {ID: number, UserID: number, Address: string, Nip: string, SpecialityID: number, Name: string}[];
 }
 
 function RepairBox(props: RepairProps) {
@@ -19,8 +20,6 @@ function RepairBox(props: RepairProps) {
   const [showPopup3,setShowPopup3] = useState(false)
 
   const [subcontractor, setSubcontractor] = useState(1)
-  const [subcontractors, setSubcontractors] = useState([{ID: -1, UserID: -1, Address: '', Nip: '', SpecialityID: -1, Name: ''}])
-
 
   const [state, setState] = useState('Pending')
 
@@ -29,24 +28,12 @@ function RepairBox(props: RepairProps) {
 
   const pathname = usePathname();
   useEffect(() => {
-        const fetchData = async () => {
-          //Page setup goes here
           var a = Cookies.get("role");
           if(a != null)
           {
             setRole(a)
-            if(a == "1")
-            {
-              var t = Cookies.get("token");
-              const res = await fetch('http://localhost:8080/subcon/list?token=' + t)
-              const data = await res.json();
-              //alert(JSON.stringify(data))
-              setSubcontractors(data)
-            }
           }
-        }
-        fetchData();
-    },[pathname])
+        },[pathname])
 
     async function changeSubcon()
     {
@@ -134,7 +121,7 @@ function RepairBox(props: RepairProps) {
                             <b className="text-4xl">Change Subcontractor</b>
                             <b className=" w-[100%]">Subcontractor</b>
                             <select className="input-box  w-[100%]" value={subcontractor}onChange={(a) => {setSubcontractor(Number(a.target.value))}}>
-                                {subcontractors.map((a,index) => (<option key={index} value={a.ID}>{a.Name}</option>))}
+                                {props.subcontractors.map((a,index) => (<option key={index} value={a.ID}>{a.Name}</option>))}
                             </select>
                             <button className="black-button  w-[100%]" onClick={changeSubcon}>Change</button>
                         </div>
