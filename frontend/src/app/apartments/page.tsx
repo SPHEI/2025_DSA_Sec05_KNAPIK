@@ -120,7 +120,7 @@ function Apartments() {
             });
             if(res.ok)
             {
-                alert("Apartment added succesfully.");
+                console.log("Apartment added succesfully.");
             }
             else
             {

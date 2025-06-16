@@ -32,7 +32,7 @@ function SubmitIssue() {
             });
             if(res.ok)
             {
-                console.log("Issue submitted succesfully.");
+                alert("Issue submitted succesfully.");
             }
             else
             {
@@ -94,6 +94,7 @@ function SubmitIssue() {
     setReady(true);
   }
   if (ready) {
+    
     if (error == "none") {
       return (
         <main className="flex flex-col items-center justify-start gap-6 mt-10">

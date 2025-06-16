@@ -22,9 +22,11 @@ function TenantBox(props : TenantProps)
             </div>
             <div className="flex flex-row justify-end items-center gap-10">
                 <p className="status-box-green"></p>
-                <div className="flex flex-col w-[150px] gap-2">
+                <div className="flex flex-col w-[160px] gap-2">
+                    <button className="black-button">Change Apartment</button>
                     <button className="black-button">Change Rent</button>
-                    <button className="black-button">View History</button>
+                    <button className="black-button">Evict</button>
+                    <button className="black-button">View Payments</button>
                 </div>
             </div>
         </div>

@@ -134,9 +134,9 @@ function Navbar() {
                                     Payments
                                 </button>
 
-                                <button className={currentPage == "reports" ? buttonSelected : button}          onClick={() => router.push("/reports")}>
+                                {/* <button className={currentPage == "reports" ? buttonSelected : button}          onClick={() => router.push("/reports")}>
                                     Reports
-                                </button>
+                                </button> */}
 
                                 <button className={currentPage == "accounts" ? buttonSelected : button}         onClick={() => router.push("/accounts")}>
                                     Add Users

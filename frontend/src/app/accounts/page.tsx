@@ -155,6 +155,21 @@ function Dashboard() {
         }
     }
 
+    function clear()
+    {
+        setName('')
+        setEmail('')
+        setPhone('')
+        setPassword('')
+        setRepassword('')
+        setApartment(1)
+        setDate('')
+        setAddress('')
+        setNip('')
+        setSpeciality(1)
+        setNewSpeciality('')
+    }
+
     async function sendData()
     {
         var a = 0;
@@ -190,11 +205,13 @@ function Dashboard() {
                 method:'POST',
                 body: JSON.stringify({ 
                     "token": t,
-                    name, 
-                    password,
-                    email,
-                    phone,
-                    "role":a
+                    "user" :{
+                        "name": name, 
+                        "password": password,
+                        "email" : email,
+                        "phone" : phone,
+                        "role_id":a
+                    }
                 })
             });
             const data = await res.json();
@@ -210,14 +227,17 @@ function Dashboard() {
                         method:'POST',
                         body: JSON.stringify({ 
                             "token": t,
-                            "apartament_id" : apartment,
-                            "user_id" : data.id,
-                            "start_date" : date
+                            "renting" : {
+                                "apartament_id" : apartment,
+                                "user_id" : data.id,
+                                "start_date" : date
+                            }
                         })
                     });
                     if(res2.ok)
                     {
                         alert("Tenant Added Succesfully")
+                        clear()
                     }
                     else
                     {
@@ -232,15 +252,18 @@ function Dashboard() {
                         method:'POST',
                         body: JSON.stringify({ 
                             "token": t,
-                            "user_id" : data.id,
-                            "address" : address,
-                            "NIP" : nip,
-                            "speciality_id" : speciality
+                            "subcontractor":{
+                                "user_id" : data.id,
+                                "address" : address,
+                                "NIP" : nip,
+                                "speciality_id" : speciality
+                            }
                         })
                     });
                     if(res2.ok)
                     {
                         alert("Subcontractor Added Succesfully")
+                        clear()
                     }
                     else
                     {
@@ -251,6 +274,7 @@ function Dashboard() {
                 else
                 {
                     alert("Admin added succesfully.");
+                    clear()
                 }
             }
         } catch (err: any) {
