@@ -22,8 +22,12 @@ interface RequestProps {
     StatusID: number;
     Subcontractor: string;
   }[]
-  refresh: Function;
-  subcontractors: {ID: number, UserID: number, Address: string, Nip: string, SpecialityID: number, Name: string}[];
+  subcontractors: {id: number, user_id: number, address: string, nip: string, speciality_id: number, name: string}[];
+  changeRepairSubcon: (sub: number, id: number) => void;
+  changeRepairStatus: (id: number, s: string) => void;
+  changeFaultStatus: (i: number, id: number) => void;
+  addRepair: (id: number, tit: string) => void;
+
 }
 
 function RequestBox(props: RequestProps) {
@@ -35,37 +39,6 @@ function RequestBox(props: RequestProps) {
   const [role, setRole] = useState('')
 
   const pathname = usePathname();
-  async function changeStatus()
-  {
-    alert("a")
-    var t = Cookies.get("token");
-    var i = 1;
-    if(props.status == 1)
-    {
-      i = 2;
-    }
-    alert(i)
-    const res = await fetch('http://localhost:8080/faults/status',{
-              method:'POST',
-              body: JSON.stringify({ 
-                  "token" : t,
-                  "fault" : {
-                    StatusID : i,
-                    ID : props.id
-                  }
-              })
-          });
-          if(res.ok)
-          {
-            //alert("a")
-          }
-          else
-          {
-              var data = await res.json()
-              alert(data.message)
-          }
-        props.refresh()
-  }
 useEffect(() => {
         //Page setup goes here
         var a = Cookies.get("role");
@@ -75,32 +48,6 @@ useEffect(() => {
         }
     },[pathname])
 
-  async function addRepair()
-  {
-    var t = Cookies.get("token");
-    const res = await fetch('http://localhost:8080/repair/add',{
-              method:'POST',
-              body: JSON.stringify({ 
-                  "token" : t,
-                  "repair" : {
-                    Title : title,
-                    FaultReportID : props.id,
-                    DateAssigned : "2006-01-02T15:04:05Z"
-                  }
-              })
-          });
-          if(res.ok)
-          {
-              //alert("Repair created succesfully.");
-          }
-          else
-          {
-              var data = await res.json()
-              alert(data.message)
-          }
-          props.refresh()
-          setShowPopup2(false)
-  }
 
   const line = "flex flex-row gap-1";
   return (
@@ -125,7 +72,7 @@ useEffect(() => {
                             <h1>Related Apartment: {props.name}</h1>
                             <h1>Date Submitted: {props.date.split("T")[0]}</h1>
                             <h1>Status: {props.status == 1 ? "Open" : "Closed"}</h1>
-                            <button className="black-button" onClick={changeStatus}>{props.status == 1 ? "Close Request" : "Reopen Request"}</button>
+                            <button className="black-button" onClick={() => props.changeFaultStatus(props.status, props.id)}>{props.status == 1 ? "Close Request" : "Reopen Request"}</button>
                             <div></div><div></div><div></div>
                             <div className="page-head w-[100%]">
                               <b className="text-4xl">Associated Repairs:</b>
@@ -134,7 +81,7 @@ useEffect(() => {
                             {props.repairs != null ? props.repairs.map((a, index) => <RepairBox
                                 key={index} id={a.ID} title={a.Title} assigned_date={a.DateAssigned} completed_date={a.DateCompleted} status={a.StatusID} 
                                 subcontractor={a.Subcontractor} subcontractors={props.subcontractors}
-                                refresh={props.refresh}/>)
+                                changeRepairSubcon={props.changeRepairSubcon} changeRepairStatus={props.changeRepairStatus}/>)
                                 : <h1>No Repairs</h1>
                             }
                         </div>
@@ -157,7 +104,7 @@ useEffect(() => {
                                         {subcontractors.map((a,index) => (<option key={index} value={a.ID}>{a.Name}</option>))}
                                     </select> */}
                                 </div>
-                                <button className="black-button w-[34%]" onClick={addRepair}>Add</button>
+                                <button className="black-button w-[34%]" onClick={() => {props.addRepair(props.id, title); setShowPopup2(false)}}>Add</button>
                         </div>
                         <button onClick={() => setShowPopup2(false)}className="absolute top-4 right-4 text-xl font-bold cursor-pointer">x</button>
                     </div>

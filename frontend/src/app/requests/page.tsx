@@ -16,7 +16,7 @@ function Requests() {
 
   const [role, setRole] = useState('')
   const pathname = usePathname();
-  const [subcontractors, setSubcontractors] = useState([{ID: -1, UserID: -1, Address: '', Nip: '', SpecialityID: -1, Name: ''}])
+  const [subcontractors, setSubcontractors] = useState([{id: -1, user_id: -1, address: '', nip: '', speciality_id: -1, name: ''}])
   
 
   function mapRepairsToRequest(faultID: number)
@@ -44,6 +44,7 @@ function Requests() {
     })
     return b;
   }
+
 
   useEffect(() => {
     refresh()
@@ -108,6 +109,133 @@ function Requests() {
           }
   }
 
+  async function changeRepairSubcon(sub: number, id: number)
+  {
+    //alert(sub + " " + id)
+    var t = Cookies.get("token");
+    const res = await fetch('http://localhost:8080/repair/contractor',{
+              method:'POST',
+              body: JSON.stringify({ 
+                  "token" : t,
+                  "contractor" : {
+                    "subcontractor_id" : sub,
+                    "id" : id
+                    }
+              })
+          });
+          if(res.ok)
+          {
+              //alert("Subcontractor changed succesfully.");
+          }
+          else
+          {
+              var data = await res.json()
+              alert(data.message)
+          }
+          refresh()
+  }
+
+  async function changeRepairStatus(id: number, s: string)
+  {
+    
+    //alert(id + " " + s)
+    var t = Cookies.get("token");
+    var d = new Date()
+    var dd = String(d.getDate()).padStart(2,'0')
+    var m = String(d.getMonth() + 1).padStart(2,'0')
+    var y = String(d.getFullYear())
+
+    var date = y + "-" + m + "-" + dd
+    var t = Cookies.get("token");
+    const res = await fetch('http://localhost:8080/repair/data',{
+              method:'POST',
+              body: JSON.stringify({ 
+                  "token" : t,
+                  "repair" : {
+                    "name": s,
+                    "date_completed" : date + "T15:04:05Z",
+                    "id": id
+                    }
+              })
+          });
+    if(res.ok)
+    {
+        //alert("Status changed succesfully.");
+    }
+    else
+    {
+        var data = await res.json()
+        alert(data.message)
+    }
+    refresh()
+  }
+
+  async function changeFaultStatus(i: number, id: number)
+  {
+    //alert(id)
+    var t = Cookies.get("token");
+    if(i == 1)
+    {
+      i = 2
+    }
+    else
+    {
+      i = 1
+    }
+    const res = await fetch('http://localhost:8080/faults/status',{
+              method:'POST',
+              body: JSON.stringify({ 
+                  "token" : t,
+                  "fault" : {
+                    "status_id" : i,
+                    "id" : id
+                  }
+              })
+          });
+          if(res.ok)
+          {
+            //alert("a")
+          }
+          else
+          {
+              var data = await res.json()
+              alert(data.message)
+          }
+        refresh()
+  }
+
+  async function addRepair(id: number, tit: string)
+  {
+    var t = Cookies.get("token");
+    var d = new Date()
+    var dd = String(d.getDate()).padStart(2,'0')
+    var m = String(d.getMonth() + 1).padStart(2,'0')
+    var y = String(d.getFullYear())
+
+    var date = y + "-" + m + "-" + dd
+    const res = await fetch('http://localhost:8080/repair/add',{
+              method:'POST',
+              body: JSON.stringify({ 
+                  "token" : t,
+                  "repair" : {
+                    "title" : tit,
+                    "fault_report_id" : id,
+                    "date_assigned" : date + "T15:04:05Z"
+                  }
+              })
+          });
+          if(res.ok)
+          {
+              //alert("Repair created succesfully.");
+          }
+          else
+          {
+              var data = await res.json()
+              alert(data.message)
+          }
+          refresh()
+  }
+
   if (ready) {
     if (error == "none") {
       if(role == "3")
@@ -121,7 +249,7 @@ function Requests() {
               {repairs != null ? repairs.map((a, index) => <RepairBox
               key={index} id={a.id} title={a.title} assigned_date={a.date_assigned} completed_date={a.date_completed} status={a.status_id} 
               subcontractor={a.name} subcontractors={subcontractors}
-              refresh={refresh}/>)
+              changeRepairSubcon={changeRepairSubcon} changeRepairStatus={changeRepairStatus}/>)
               : <h1>No Repairs</h1>
             }
             </div>
@@ -137,7 +265,9 @@ function Requests() {
             </div>
             {requests != null ? requests.map((a, index) => <RequestBox 
             key={index} id={a.id} title={a.title}description={a.description} date={a.date_reported} status={a.status_id}
-            apartment_id={a.apartment_id} name={a.name} repairs={mapRepairsToRequest(a.id)} refresh={refresh}
+            apartment_id={a.apartment_id} name={a.name} repairs={mapRepairsToRequest(a.id)} 
+            changeRepairSubcon={changeRepairSubcon} changeRepairStatus={changeRepairStatus}
+            changeFaultStatus={changeFaultStatus} addRepair={addRepair}
             subcontractors={subcontractors}/>)
             : <h1>No requests</h1>}
           </main>

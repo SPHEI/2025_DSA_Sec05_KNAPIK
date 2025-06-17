@@ -808,7 +808,8 @@ func (app *app) assignSubContractor(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *app) updateRepairData(w http.ResponseWriter, r *http.Request) {
-
+	prepareResponse(w)
+	
 	input := struct {
 		Token  string                      `json:"token"`
 		Repair sqlc.UpdateRepairDataParams `json:"repair"`

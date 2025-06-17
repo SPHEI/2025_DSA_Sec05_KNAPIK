@@ -10,8 +10,9 @@ interface RepairProps {
   completed_date: string;
   status: number;
   subcontractor: string;
-  refresh:Function;
-  subcontractors: {ID: number, UserID: number, Address: string, Nip: string, SpecialityID: number, Name: string}[];
+  subcontractors: {id: number, user_id: number, address: string, nip: string, speciality_id: number, name: string}[];
+  changeRepairSubcon: (sub: number, id: number) => void;
+  changeRepairStatus: (id: number, s: string) => void;
 }
 
 function RepairBox(props: RepairProps) {
@@ -21,7 +22,7 @@ function RepairBox(props: RepairProps) {
 
   const [subcontractor, setSubcontractor] = useState(1)
 
-  const [state, setState] = useState('Pending')
+  const [state, setState] = useState('pending')
 
 
   const [role, setRole] = useState('')
@@ -34,58 +35,6 @@ function RepairBox(props: RepairProps) {
             setRole(a)
           }
         },[pathname])
-
-    async function changeSubcon()
-    {
-      var t = Cookies.get("token");
-          const res = await fetch('http://localhost:8080/repair/contractor',{
-                    method:'POST',
-                    body: JSON.stringify({ 
-                        "token" : t,
-                        "repair" : {
-                          SubcontractorID : subcontractor,
-                          ID : props.id
-                          }
-                    })
-                });
-                if(res.ok)
-                {
-                    alert("Subcontractor changed succesfully.");
-                }
-                else
-                {
-                    var data = await res.json()
-                    alert(data.message)
-                }
-                props.refresh()
-                setShowPopup2(false)
-    }
-    async function changeStatus()
-    {
-      var t = Cookies.get("token");
-          const res = await fetch('http://localhost:8080/repair/data',{
-                    method:'POST',
-                    body: JSON.stringify({ 
-                        "token" : t,
-                        "repair" : {
-                          StatusID: props.id,
-                          DateCompleted : "2006-01-02T15:04:05Z",
-                          Name : state
-                          }
-                    })
-                });
-                if(res.ok)
-                {
-                    alert("Subcontractor changed succesfully.");
-                }
-                else
-                {
-                    var data = await res.json()
-                    alert(data.message)
-                }
-                props.refresh()
-                setShowPopup3(false)
-    }
   return (
     <div className="white-box w-[100%] h-[200px]">
       <div className="flex flex-row items-center justify-between gap-8 w-full px-8 ">
@@ -121,9 +70,9 @@ function RepairBox(props: RepairProps) {
                             <b className="text-4xl">Change Subcontractor</b>
                             <b className=" w-[100%]">Subcontractor</b>
                             <select className="input-box  w-[100%]" value={subcontractor}onChange={(a) => {setSubcontractor(Number(a.target.value))}}>
-                                {props.subcontractors.map((a,index) => (<option key={index} value={a.ID}>{a.Name}</option>))}
+                                {props.subcontractors.map((a,index) => (<option key={index} value={a.id}>{a.name}</option>))}
                             </select>
-                            <button className="black-button  w-[100%]" onClick={changeSubcon}>Change</button>
+                            <button className="black-button  w-[100%]" onClick={()=>{props.changeRepairSubcon(subcontractor, props.id) ; setShowPopup2(false)}}>Change</button>
                         </div>
                         <button onClick={() => setShowPopup2(false)}className="absolute top-4 right-4 text-xl font-bold cursor-pointer">x</button>
                     </div>
@@ -139,14 +88,14 @@ function RepairBox(props: RepairProps) {
                                 <h1>Pending</h1>
                             </div>
                             <div className="flex flex-row gap-1">
-                                <input type="radio" value= "in-progress" checked={state === "in-progress"} onChange={(a) => {setState(a.target.value)}}></input>
+                                <input type="radio" value= "in_progress" checked={state === "in_progress"} onChange={(a) => {setState(a.target.value)}}></input>
                                 <h1>In-Progress</h1>
                             </div>
                             <div className="flex flex-row gap-1">
                                 <input type="radio" value= "completed" checked={state === "completed"} onChange={(a) => {setState(a.target.value)}}></input>
                                 <h1>Completed</h1>
                             </div>
-                            <button className="black-button  w-[100%]" onClick={changeStatus}>Change</button>
+                            <button className="black-button  w-[100%]" onClick={() => {props.changeRepairStatus(props.id, state); setShowPopup3(false)}}>Change</button>
                         </div>
                         <button onClick={() => setShowPopup3(false)}className="absolute top-4 right-4 text-xl font-bold cursor-pointer">x</button>
                     </div>
