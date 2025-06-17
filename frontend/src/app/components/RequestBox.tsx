@@ -61,33 +61,41 @@ useEffect(() => {
         <div className={props.status == 1 ? "status-box-yellow" : "status-box-green"}></div>
       </div>
       {showPopup && (
-                <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50 overflow-auto">
-                    <div className="white-box w-[60%] py-4 rounded-lg relative max-h-[80vh] overflow-y-auto min-w-[600px]">
-                        <div className={"flex flex-col gap-2 w-[100%] py-4 relative top-" + String(props.repairs.length * 50)}>
-                            <b className="text-4xl">Request Details</b>
-                            <h1>Title</h1>
-                            <h1 className="input-box">{props.title}</h1>
-                            <h1>Description</h1>
-                            <h1 className="input-box">{props.description}</h1>
-                            <h1>Related Apartment: {props.name}</h1>
-                            <h1>Date Submitted: {props.date.split("T")[0]}</h1>
-                            <h1>Status: {props.status == 1 ? "Open" : "Closed"}</h1>
-                            <button className="black-button" onClick={() => props.changeFaultStatus(props.status, props.id)}>{props.status == 1 ? "Close Request" : "Reopen Request"}</button>
-                            <div></div><div></div><div></div>
-                            <div className="page-head w-[100%]">
-                              <b className="text-4xl">Associated Repairs:</b>
-                              {role === "1" && <button className="black-button w-[50%]" onClick={() => {setShowPopup2(true)}}>+ Add Repair</button>}
-                            </div>
-                            {props.repairs != null ? props.repairs.map((a, index) => <RepairBox
-                                key={index} id={a.ID} title={a.Title} assigned_date={a.DateAssigned} completed_date={a.DateCompleted} status={a.StatusID} 
+                <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50">
+                    <div className="white-box w-[60%] min-w-[600px] max-h-[80vh] rounded-lg bg-white flex flex-col relative">
+                      <button onClick={() => setShowPopup(false)} className="absolute top-4 right-4 text-xl font-bold cursor-pointer">x</button>
+                      <div className="overflow-y-auto w-[100%] px-6 py-4 flex-1">
+                        <div className="flex flex-col gap-4 w-full">
+                          <b className="text-4xl">Request Details</b>
+                          <h1>Title</h1>
+                          <h1 className="input-box">{props.title}</h1>
+                          <h1>Description</h1>
+                          <h1 className="input-box">{props.description}</h1>
+                          <h1>Related Apartment: {props.name}</h1>
+                          <h1>Date Submitted: {props.date.split("T")[0]}</h1>
+                          <h1>Status: {props.status == 1 ? "Open" : "Closed"}</h1>
+                          <button className="black-button"onClick={() => props.changeFaultStatus(props.status, props.id)}>
+                            {props.status == 1 ? "Close Request" : "Reopen Request"}
+                          </button>
+                          <div className="page-head w-full flex items-center justify-between mt-6">
+                            <b className="text-4xl">Associated Repairs:</b>
+                            {role === "1" && (
+                              <button className="black-button w-[50%]"onClick={() => setShowPopup2(true)}>+ Add Repair</button>
+                            )}
+                          </div>
+                          {props.repairs?.length ? (
+                            props.repairs.map((a, index) => (
+                              <RepairBox key={index} id={a.ID} title={a.Title}
+                                assigned_date={a.DateAssigned} completed_date={a.DateCompleted}
+                                status={a.StatusID}
                                 subcontractor={a.Subcontractor} subcontractors={props.subcontractors}
-                                changeRepairSubcon={props.changeRepairSubcon} changeRepairStatus={props.changeRepairStatus}/>)
-                                : <h1>No Repairs</h1>
-                            }
+                                changeRepairSubcon={props.changeRepairSubcon} changeRepairStatus={props.changeRepairStatus}
+                              />
+                            ))) : (<h1>No Repairs</h1>)}
                         </div>
-                        <button onClick={() => setShowPopup(false)}className="absolute top-4 right-4 text-xl font-bold cursor-pointer">x</button>
+                      </div>
                     </div>
-                </div>
+                  </div>
       )}
       {showPopup2 && (
                 <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50">

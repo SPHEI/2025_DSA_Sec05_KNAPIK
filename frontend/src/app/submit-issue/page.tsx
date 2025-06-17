@@ -33,6 +33,9 @@ function SubmitIssue() {
             if(res.ok)
             {
                 alert("Issue submitted succesfully.");
+                setTitle('')
+                setDescription('')
+                setApartment(1)
             }
             else
             {
