@@ -34,6 +34,9 @@ func (app *app) routes() http.Handler {
 	router.Handle("POST /repair/contractor", logger(http.HandlerFunc(app.assignSubContractor)))
 	router.Handle("POST /repair/data", logger(http.HandlerFunc(app.updateRepairData)))
 
+	router.Handle("GET /payments/list", logger(http.HandlerFunc(app.getPayments)))
+	router.Handle("POST /payments/pay", logger(http.HandlerFunc(app.pay)))
+
 	////
 
 	router.Handle("POST /adduser", logger(http.HandlerFunc(app.addUser)))

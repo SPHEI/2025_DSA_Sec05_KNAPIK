@@ -50,15 +50,15 @@ type FaultStatus struct {
 }
 
 type FinancialRecord struct {
-	Type             string      `json:"type"`
-	SourceID         int64       `json:"source_id"`
-	Amount           float64     `json:"amount"`
-	RecordDate       time.Time   `json:"record_date"`
-	Description      string      `json:"description"`
-	RelatedPaymentID int64       `json:"related_payment_id"`
-	RelatedExpenseID interface{} `json:"related_expense_id"`
-	UserName         string      `json:"user_name"`
-	ApartmentName    string      `json:"apartment_name"`
+	Type             string       `json:"type"`
+	SourceID         int64        `json:"source_id"`
+	Amount           float64      `json:"amount"`
+	RecordDate       types.JSONNullTime `json:"record_date"`
+	Description      string       `json:"description"`
+	RelatedPaymentID int64        `json:"related_payment_id"`
+	RelatedExpenseID interface{}  `json:"related_expense_id"`
+	UserName         string       `json:"user_name"`
+	ApartmentName    string       `json:"apartment_name"`
 }
 
 type Payment struct {
@@ -66,7 +66,8 @@ type Payment struct {
 	UserID               int64          `json:"user_id"`
 	ApartmentID          int64          `json:"apartment_id"`
 	Amount               float64        `json:"amount"`
-	PaymentDate          time.Time      `json:"payment_date"`
+	PaymentDate          types.JSONNullTime   `json:"payment_date"`
+	DueDate              time.Time      `json:"due_date"`
 	StatusID             int64          `json:"status_id"`
 	TransactionReference types.JSONNullString `json:"transaction_reference"`
 }

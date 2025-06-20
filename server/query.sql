@@ -71,7 +71,7 @@ UPDATE pricing_history
 INSERT INTO pricing_history (apartment_id, price) VALUES(?, ?);
 
 -- name: GetActiveRenting :many
-SELECT id, apartment_id, user_id, start_date FROM renting_history WHERE end_date IS NULL;
+SELECT id, apartment_id, user_id, start_date, end_date FROM renting_history WHERE is_current = 1;
 
 -- name: AddNewRenting :exec
 INSERT INTO renting_history (apartment_id, user_id, start_date) VALUES(?, ?, ?);
@@ -99,6 +99,17 @@ RETURNING *;
 
 -- name: GetTenets :many
 SELECT id, name, email, phone, role_id FROM user WHERE role_id = "2";
+
+-- name: GetTenetsWithRent :many
+SELECT user.id, user.name, user.email, user.phone, 
+  apartment.id, apartment.name, pricing_history.price
+FROM user 
+LEFT JOIN renting_history ON renting_history.user_id = user.id 
+LEFT JOIN apartment ON renting_history.apartment_id = apartment.id
+AND renting_history.is_current = 1
+LEFT JOIN pricing_history ON pricing_history.apartment_id = apartment.id
+AND pricing_history.is_current = 1
+WHERE role_id = "2";
 
 -- name: GetSubcontractorSpec :many
 SELECT id, name FROM speciality;
@@ -141,4 +152,27 @@ RETURNING *;
 UPDATE repair
 SET status_id = (SELECT id FROM repair_status WHERE name = ?), date_completed = ?
 WHERE repair.id = ?
+RETURNING *;
+
+-- name: GetAllPayment :many
+SELECT * FROM payments;
+
+-- name: GetPayment :many
+SELECT * FROM payments
+WHERE user_id = ?;
+
+-- name: AddPayment :exec
+INSERT INTO payments (
+  user_id, apartment_id, amount, due_date
+  ) VALUES (
+  ?, 
+  (SELECT renting_history.apartment_id 
+    FROM renting_history WHERE renting_history.user_id = ?),
+  ?, ?
+);
+
+-- name: UpdatePayment :one
+UPDATE payments
+SET status_id = 2, transaction_reference = ?, payment_date = ?
+WHERE id = ?
 RETURNING *;

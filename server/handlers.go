@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -260,7 +262,7 @@ func (app *app) getTenants(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output, err := app.Query.GetTenets(app.Ctx)
+	output, err := app.Query.GetTenetsWithRent(app.Ctx)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
@@ -816,4 +818,146 @@ func (app *app) checkRole(token string, role_in ...string) (string, *Error) {
 		return role, &Error{401, "Wrong role", "Unauthorized"}
 	}
 	return role, nil
+}
+
+func (app *app) getPayments(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	r.ParseMultipartForm(32 << 20)
+	token := r.FormValue("token")
+
+	role, erro := app.checkRole(token, "tenant", "admin")
+	if erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	if role == "admin" {
+		output, err := app.Query.GetAllPayment(app.Ctx)
+		if err != nil {
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
+
+		if err = json.NewEncoder(w).Encode(&output); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	} else {
+
+		id, _ := auth.ValidateSession(app.CACHE, token)
+
+		ctx := context.WithValue(r.Context(), "id", id)
+		app.updatePayment(w, r.WithContext(ctx))
+
+		output, err := app.Query.GetPayment(app.Ctx, id)
+		if err != nil {
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
+
+		if err = json.NewEncoder(w).Encode(&output); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
+func (app *app) updatePayment(w http.ResponseWriter, r *http.Request) {
+	id := r.Context().Value("id").(int64)
+	apartmentID, err := app.Query.GetApartmentID(app.Ctx, id)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	output, err := app.Query.GetActiveRenting(app.Ctx)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	for _, rent := range output {
+		if rent.ApartmentID == apartmentID && rent.UserID == id {
+			startDate := rent.StartDate
+			payments, err := app.Query.GetPayment(app.Ctx, id)
+			if err != nil {
+				sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+				return
+			}
+
+			price, err := app.Query.GetRent(app.Ctx, rent.ApartmentID)
+			if err != nil {
+				sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+				return
+			}
+
+			amount := 0
+			for x := range payments {
+				if startDate.Before(payments[x].DueDate) {
+					amount++
+				}
+			}
+
+			startDate = time.Date(
+				startDate.Year(),
+				startDate.Month(),
+				1, // Set the day to 1
+				0, // Set hour to 0
+				0, // Set minute to 0
+				0, // Set second to 0
+				0, // Set nanosecond to 0
+				startDate.Location(),
+			)
+
+			endDate := time.Date(
+				time.Now().Year(),
+				time.Now().Month(),
+				1, // Set the day to 1
+				0, // Set hour to 0
+				0, // Set minute to 0
+				0, // Set second to 0
+				0, // Set nanosecond to 0
+				time.Now().Location(),
+			)
+			endDate = endDate.AddDate(0, 1, 0)
+
+			for startDate.Before(endDate) {
+				if amount <= 0 {
+					app.Query.AddPayment(app.Ctx, sqlc.AddPaymentParams{UserID: id, UserID_2: id, Amount: price, DueDate: startDate.AddDate(0, 1, 0)})
+				}
+				startDate = startDate.AddDate(0, 1, 0)
+				amount--
+			}
+		}
+	}
+}
+
+func (app *app) pay(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	input := struct {
+		Token   string                   `json:"token"`
+		Payment sqlc.UpdatePaymentParams `json:"payment"`
+	}{}
+
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
+		return
+	}
+
+	if _, erro := app.checkRole(input.Token, "tenant", "subcontractor"); erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	output, err := app.Query.UpdatePayment(app.Ctx, input.Payment)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(&output); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

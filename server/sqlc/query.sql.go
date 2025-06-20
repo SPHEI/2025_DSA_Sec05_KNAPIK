@@ -80,6 +80,34 @@ func (q *Queries) AddNewRenting(ctx context.Context, arg AddNewRentingParams) er
 	return err
 }
 
+const addPayment = `-- name: AddPayment :exec
+INSERT INTO payments (
+  user_id, apartment_id, amount, due_date
+  ) VALUES (
+  ?, 
+  (SELECT renting_history.apartment_id 
+    FROM renting_history WHERE renting_history.user_id = ?),
+  ?, ?
+)
+`
+
+type AddPaymentParams struct {
+	UserID   int64     `json:"user_id"`
+	UserID_2 int64     `json:"user_id_2"`
+	Amount   float64   `json:"amount"`
+	DueDate  time.Time `json:"due_date"`
+}
+
+func (q *Queries) AddPayment(ctx context.Context, arg AddPaymentParams) error {
+	_, err := q.db.ExecContext(ctx, addPayment,
+		arg.UserID,
+		arg.UserID_2,
+		arg.Amount,
+		arg.DueDate,
+	)
+	return err
+}
+
 const addRepair = `-- name: AddRepair :exec
 INSERT INTO repair (
   title, fault_report_id, date_assigned
@@ -182,14 +210,15 @@ func (q *Queries) ChangeRent2(ctx context.Context, arg ChangeRent2Params) error 
 }
 
 const getActiveRenting = `-- name: GetActiveRenting :many
-SELECT id, apartment_id, user_id, start_date FROM renting_history WHERE end_date IS NULL
+SELECT id, apartment_id, user_id, start_date, end_date FROM renting_history WHERE is_current = 1
 `
 
 type GetActiveRentingRow struct {
-	ID          int64     `json:"id"`
-	ApartmentID int64     `json:"apartment_id"`
-	UserID      int64     `json:"user_id"`
-	StartDate   time.Time `json:"start_date"`
+	ID          int64        `json:"id"`
+	ApartmentID int64        `json:"apartment_id"`
+	UserID      int64        `json:"user_id"`
+	StartDate   time.Time    `json:"start_date"`
+	EndDate     types.JSONNullTime `json:"end_date"`
 }
 
 func (q *Queries) GetActiveRenting(ctx context.Context) ([]GetActiveRentingRow, error) {
@@ -206,6 +235,43 @@ func (q *Queries) GetActiveRenting(ctx context.Context) ([]GetActiveRentingRow, 
 			&i.ApartmentID,
 			&i.UserID,
 			&i.StartDate,
+			&i.EndDate,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllPayment = `-- name: GetAllPayment :many
+SELECT id, user_id, apartment_id, amount, payment_date, due_date, status_id, transaction_reference FROM payments
+`
+
+func (q *Queries) GetAllPayment(ctx context.Context) ([]Payment, error) {
+	rows, err := q.db.QueryContext(ctx, getAllPayment)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Payment
+	for rows.Next() {
+		var i Payment
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.ApartmentID,
+			&i.Amount,
+			&i.PaymentDate,
+			&i.DueDate,
+			&i.StatusID,
+			&i.TransactionReference,
 		); err != nil {
 			return nil, err
 		}
@@ -400,6 +466,43 @@ func (q *Queries) GetFaultReportsUser(ctx context.Context, apartmentID int64) ([
 			&i.ApartmentID,
 			&i.UserID,
 			&i.Name,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPayment = `-- name: GetPayment :many
+SELECT id, user_id, apartment_id, amount, payment_date, due_date, status_id, transaction_reference FROM payments
+WHERE user_id = ?
+`
+
+func (q *Queries) GetPayment(ctx context.Context, userID int64) ([]Payment, error) {
+	rows, err := q.db.QueryContext(ctx, getPayment, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Payment
+	for rows.Next() {
+		var i Payment
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.ApartmentID,
+			&i.Amount,
+			&i.PaymentDate,
+			&i.DueDate,
+			&i.StatusID,
+			&i.TransactionReference,
 		); err != nil {
 			return nil, err
 		}
@@ -705,6 +808,59 @@ func (q *Queries) GetTenets(ctx context.Context) ([]GetTenetsRow, error) {
 	return items, nil
 }
 
+const getTenetsWithRent = `-- name: GetTenetsWithRent :many
+SELECT user.id, user.name, user.email, user.phone, 
+  apartment.id, apartment.name, pricing_history.price
+FROM user 
+LEFT JOIN renting_history ON renting_history.user_id = user.id 
+LEFT JOIN apartment ON renting_history.apartment_id = apartment.id
+AND renting_history.is_current = 1
+LEFT JOIN pricing_history ON pricing_history.apartment_id = apartment.id
+AND pricing_history.is_current = 1
+WHERE role_id = "2"
+`
+
+type GetTenetsWithRentRow struct {
+	ID     int64           `json:"id"`
+	Name   string          `json:"name"`
+	Email  string          `json:"email"`
+	Phone  string          `json:"phone"`
+	ID_2   types.JSONNullInt64   `json:"id_2"`
+	Name_2 types.JSONNullString  `json:"name_2"`
+	Price  types.JSONNullFloat `json:"price"`
+}
+
+func (q *Queries) GetTenetsWithRent(ctx context.Context) ([]GetTenetsWithRentRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTenetsWithRent)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTenetsWithRentRow
+	for rows.Next() {
+		var i GetTenetsWithRentRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Email,
+			&i.Phone,
+			&i.ID_2,
+			&i.Name_2,
+			&i.Price,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserId = `-- name: GetUserId :one
 SELECT id FROM user 
 WHERE email = ?
@@ -820,6 +976,35 @@ func (q *Queries) UpdateFaultStatus(ctx context.Context, arg UpdateFaultStatusPa
 		&i.StatusID,
 		&i.ApartmentID,
 		&i.UserID,
+	)
+	return i, err
+}
+
+const updatePayment = `-- name: UpdatePayment :one
+UPDATE payments
+SET status_id = 2, transaction_reference = ?, payment_date = ?
+WHERE id = ?
+RETURNING id, user_id, apartment_id, amount, payment_date, due_date, status_id, transaction_reference
+`
+
+type UpdatePaymentParams struct {
+	TransactionReference types.JSONNullString `json:"transaction_reference"`
+	PaymentDate          types.JSONNullTime   `json:"payment_date"`
+	ID                   int64          `json:"id"`
+}
+
+func (q *Queries) UpdatePayment(ctx context.Context, arg UpdatePaymentParams) (Payment, error) {
+	row := q.db.QueryRowContext(ctx, updatePayment, arg.TransactionReference, arg.PaymentDate, arg.ID)
+	var i Payment
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.ApartmentID,
+		&i.Amount,
+		&i.PaymentDate,
+		&i.DueDate,
+		&i.StatusID,
+		&i.TransactionReference,
 	)
 	return i, err
 }
