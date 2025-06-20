@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -73,13 +72,21 @@ func (app *app) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output.Role, err = app.Query.GetUserRole(app.Ctx, result.ID)
+	role, err := app.Query.GetUserRole(app.Ctx, result.ID)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
+	switch role {
+	case "admin":
+		output.Role = 1
+	case "tenant":
+		output.Role = 2
+	case "subcontractor":
+		output.Role = 3
+	}
 
-	log.Printf("Login -- User: %s - Token: %s - Admin: %d", input.Email, output.Token, output.Role)
+	log.Printf("Login -- User: %s - Token: %s - Role: %d", input.Email, output.Token, output.Role)
 
 	if err := json.NewEncoder(w).Encode(output); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -138,14 +145,12 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
 
-	if _, erro := app.checkRole(token, 2); erro != nil {
+	if _, erro := app.checkRole(token, "tenant"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
 	userId, _ := auth.ValidateSession(app.CACHE, token)
-
-	log.Println(sql.NullInt64{Int64: int64(userId)})
 
 	apartmentId, err := app.Query.GetApartmentID(app.Ctx, userId)
 	if err != nil {
@@ -173,7 +178,7 @@ func (app *app) subInfo(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
 
-	if _, erro := app.checkRole(token, 3); erro != nil {
+	if _, erro := app.checkRole(token, "subcontractor"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -199,7 +204,7 @@ func (app *app) getContractors(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
 
-	if _, erro := app.checkRole(token, 1); erro != nil {
+	if _, erro := app.checkRole(token, "admin"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -230,7 +235,7 @@ func (app *app) addContractor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, erro := app.checkRole(input.Token, 1); erro != nil {
+	if _, erro := app.checkRole(input.Token, "admin"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -250,7 +255,7 @@ func (app *app) getTenants(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
 
-	if _, erro := app.checkRole(token, 1); erro != nil {
+	if _, erro := app.checkRole(token, "admin"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -273,12 +278,12 @@ func (app *app) getApartaments(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
 
-	if _, erro := app.checkRole(token, 1); erro != nil {
+	if _, erro := app.checkRole(token, "admin"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	output, err := app.Query.GetApartments(app.Ctx)
+	output, err := app.Query.GetApartmentsAndRent(app.Ctx)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
@@ -304,7 +309,7 @@ func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, erro := app.checkRole(input.Token, 1); erro != nil {
+	if _, erro := app.checkRole(input.Token, "admin"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -318,59 +323,9 @@ func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (app *app) getOwners(w http.ResponseWriter, r *http.Request) {
-	prepareResponse(w)
-
-	r.ParseMultipartForm(32 << 20)
-	token := r.FormValue("token")
-	if _, erro := app.checkRole(token, 1); erro != nil {
-		sendError(w, *erro, nil)
-		return
-	}
-
-	output, err := app.Query.GetOwners(app.Ctx)
-	if err != nil {
-		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-		return
-	}
-
-	if err = json.NewEncoder(w).Encode(&output); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-}
-
-func (app *app) addOwner(w http.ResponseWriter, r *http.Request) {
-	prepareResponse(w)
-
-	input := struct {
-		Token string              `json:"token"`
-		Owner sqlc.AddOwnerParams `json:"owner"`
-	}{}
-
-	err := json.NewDecoder(r.Body).Decode(&input)
-	if err != nil {
-		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
-		return
-	}
-
-	if _, erro := app.checkRole(input.Token, 1); erro != nil {
-		sendError(w, *erro, nil)
-		return
-	}
-
-	err = app.Query.AddOwner(app.Ctx, input.Owner)
-	if err != nil {
-		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-}
-
 func (app *app) changeRent(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
-	
+
 	data := struct {
 		Token string                 `json:"token"`
 		Rent  sqlc.ChangeRent2Params `json:"rent"`
@@ -382,7 +337,7 @@ func (app *app) changeRent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, erro := app.checkRole(data.Token, 1); erro != nil {
+	if _, erro := app.checkRole(data.Token, "admin"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -405,7 +360,7 @@ func (app *app) getCurrentRenting(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
-	if _, erro := app.checkRole(token, 1); erro != nil {
+	if _, erro := app.checkRole(token, "admin"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -436,7 +391,7 @@ func (app *app) addNewRenting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, erro := app.checkRole(input.Token, 1); erro != nil {
+	if _, erro := app.checkRole(input.Token, "admin"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -464,7 +419,7 @@ func (app *app) setEndOfRenting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, erro := app.checkRole(input.Token, 1); erro != nil {
+	if _, erro := app.checkRole(input.Token, "admin"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -484,24 +439,25 @@ func (app *app) getReports(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
 
-	userId, err := auth.ValidateSession(app.CACHE, token)
+	userID, err := auth.ValidateSession(app.CACHE, token)
 	if err != nil {
 		sendError(w, Error{401, "Incorrect Token", "Unauthorized"}, err)
 		return
 	}
 
-	role, err := app.Query.GetUserRole(app.Ctx, int64(userId))
+	role, err := app.Query.GetUserRole(app.Ctx, int64(userID))
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
 
-	if role == 2 {
-		apart, err := app.Query.GetApartmentID(app.Ctx, userId)
+	if string(role) == "tenant" {
+		apart, err := app.Query.GetApartmentID(app.Ctx, userID)
 		if err != nil {
 			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 			return
 		}
+		log.Println(apart)
 		output, err := app.Query.GetFaultReportsUser(app.Ctx, apart)
 		if err != nil {
 			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
@@ -540,9 +496,7 @@ func (app *app) addFault(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println(input.Fault)
-
-	_, err = auth.ValidateSession(app.CACHE, input.Token)
+	input.Fault.UserID, err = auth.ValidateSession(app.CACHE, input.Token)
 	if err != nil {
 		sendError(w, Error{401, "Incorrect Token", "Unauthorized"}, err)
 		return
@@ -611,7 +565,7 @@ func (app *app) addUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, erro := app.checkRole(input.Token, 1); erro != nil {
+	if _, erro := app.checkRole(input.Token, "admin"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -653,7 +607,7 @@ func (app *app) getSubContractorSpec(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, erro := app.checkRole(data.Token, 1); erro != nil {
+	if _, erro := app.checkRole(data.Token, "admin"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -684,7 +638,7 @@ func (app *app) addSubContractorSpec(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, erro := app.checkRole(data.Token, 1); erro != nil {
+	if _, erro := app.checkRole(data.Token, "admin"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -703,13 +657,13 @@ func (app *app) getRepairs(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
 
-	role, erro := app.checkRole(token, 1, 2, 3)
+	role, erro := app.checkRole(token, "admin", "tenant", "subcontractor")
 	if erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
-	if role == 1 {
+	if role == "admin" {
 		output, err := app.Query.GetRepair(app.Ctx)
 		if err != nil {
 			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
@@ -719,7 +673,7 @@ func (app *app) getRepairs(w http.ResponseWriter, r *http.Request) {
 		if err := json.NewEncoder(w).Encode(&output); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-	} else if role == 3 {
+	} else if role == "subcontractor" {
 		userID, _ := auth.ValidateSession(app.CACHE, token)
 		output, err := app.Query.GetRepairSub(app.Ctx, int64(userID))
 		if err != nil {
@@ -765,7 +719,7 @@ func (app *app) addRepair(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, erro := app.checkRole(input.Token, 1); erro != nil {
+	if _, erro := app.checkRole(input.Token, "admin"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -791,7 +745,7 @@ func (app *app) assignSubContractor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, erro := app.checkRole(input.Token, 1); erro != nil {
+	if _, erro := app.checkRole(input.Token, "admin"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -809,7 +763,7 @@ func (app *app) assignSubContractor(w http.ResponseWriter, r *http.Request) {
 
 func (app *app) updateRepairData(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
-	
+
 	input := struct {
 		Token  string                      `json:"token"`
 		Repair sqlc.UpdateRepairDataParams `json:"repair"`
@@ -820,7 +774,7 @@ func (app *app) updateRepairData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, erro := app.checkRole(input.Token, 1, 3); erro != nil {
+	if _, erro := app.checkRole(input.Token, "admin", "subcontractor"); erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
@@ -836,23 +790,23 @@ func (app *app) updateRepairData(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *app) checkRole(token string, role_id ...int64) (int64, *Error) {
+func (app *app) checkRole(token string, role_in ...string) (string, *Error) {
 	userId, err := auth.ValidateSession(app.CACHE, token)
 	if err != nil {
 		log.Println(err)
-		return -1, &Error{401, "Incorrect Token", "Unauthorized"}
+		return "", &Error{401, "Incorrect Token", "Unauthorized"}
 	}
 
 	role, err := app.Query.GetUserRole(app.Ctx, userId)
 	if err != nil {
 		log.Println(err)
-		return -1, &Error{401, "Database", "Internal Server Error"}
+		return "", &Error{401, "Database", "Internal Server Error"}
 	}
 
 	valid := false
 
-	for i := range role_id {
-		if role_id[i] == role {
+	for i := range role_in {
+		if role_in[i] == role {
 			valid = true
 		}
 	}

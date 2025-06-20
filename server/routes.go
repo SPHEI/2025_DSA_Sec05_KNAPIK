@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 )
 
@@ -9,41 +10,45 @@ func (app *app) routes() http.Handler {
 	router.HandleFunc("POST /login", app.login)
 	router.HandleFunc("POST /logout", app.logout)
 
-	router.HandleFunc("GET /info", app.info)
-	router.HandleFunc("GET /tenant/info", app.tenantInfo)
-	router.HandleFunc("GET /tenant/list", app.getTenants)
-	router.HandleFunc("GET /subcon/info", app.subInfo)
+	router.Handle("GET /info", logger(http.HandlerFunc(app.info)))
+	router.Handle("GET /tenant/info", logger(http.HandlerFunc(app.tenantInfo)))
+	router.Handle("GET /tenant/list", logger(http.HandlerFunc(app.getTenants)))
+	router.Handle("GET /subcon/info", logger(http.HandlerFunc(app.subInfo)))
 
-	router.HandleFunc("GET /owner/list", app.getOwners)
-	router.HandleFunc("POST /owner/add", app.addOwner)
+	router.Handle("GET /apartament/list", logger(http.HandlerFunc(app.getApartaments)))
+	router.Handle("POST /apartament/add", logger(http.HandlerFunc(app.addApartament)))
 
-	router.HandleFunc("GET /apartament/list", app.getApartaments)
-	router.HandleFunc("POST /apartament/add", app.addApartament)
+	router.Handle("GET /renting/current", logger(http.HandlerFunc(app.getCurrentRenting)))
+	router.Handle("POST /renting/start", logger(http.HandlerFunc(app.addNewRenting)))
+	router.Handle("POST /renting/end", logger(http.HandlerFunc(app.setEndOfRenting)))
 
-	router.HandleFunc("GET /renting/current", app.getCurrentRenting)
-	router.HandleFunc("POST /renting/start", app.addNewRenting)
-	router.HandleFunc("POST /renting/end", app.setEndOfRenting)
+	router.Handle("GET /faults/list", logger(http.HandlerFunc(app.getReports)))
+	router.Handle("POST /faults/add", logger(http.HandlerFunc(app.addFault)))
+	router.Handle("POST /faults/status", logger(http.HandlerFunc(app.updateFault)))
 
-	router.HandleFunc("GET /faults/list", app.getReports)
-	router.HandleFunc("POST /faults/add", app.addFault)
-	router.HandleFunc("POST /faults/status", app.updateFault)
+	router.Handle("GET /subcon/list", logger(http.HandlerFunc(app.getContractors)))
+	router.Handle("POST /subcon/add", logger(http.HandlerFunc(app.addContractor)))
 
-	router.HandleFunc("GET /subcon/list", app.getContractors)
-	router.HandleFunc("POST /subcon/add", app.addContractor)
-
-	router.HandleFunc("GET /repair/list", app.getRepairs)
-	router.HandleFunc("POST /repair/add", app.addRepair)
-	router.HandleFunc("POST /repair/contractor", app.assignSubContractor)
-	router.HandleFunc("POST /repair/data", app.updateRepairData)
+	router.Handle("GET /repair/list", logger(http.HandlerFunc(app.getRepairs)))
+	router.Handle("POST /repair/add", logger(http.HandlerFunc(app.addRepair)))
+	router.Handle("POST /repair/contractor", logger(http.HandlerFunc(app.assignSubContractor)))
+	router.Handle("POST /repair/data", logger(http.HandlerFunc(app.updateRepairData)))
 
 	////
 
-	router.HandleFunc("POST /adduser", app.addUser)
+	router.Handle("POST /adduser", logger(http.HandlerFunc(app.addUser)))
 
-	router.HandleFunc("POST /subspec", app.getSubContractorSpec)
-	router.HandleFunc("POST /addsubspec", app.addSubContractorSpec)
-	router.HandleFunc("POST /addapartament", app.addApartament)
-	router.HandleFunc("POST /changerent", app.changeRent)
+	router.Handle("POST /subspec", logger(http.HandlerFunc(app.getSubContractorSpec)))
+	router.Handle("POST /addsubspec", logger(http.HandlerFunc(app.addSubContractorSpec)))
+	router.Handle("POST /addapartament", logger(http.HandlerFunc(app.addApartament)))
+	router.Handle("POST /changerent", logger(http.HandlerFunc(app.changeRent)))
 
 	return router
+}
+
+func logger(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.URL)
+		next.ServeHTTP(w, r)
+	})
 }

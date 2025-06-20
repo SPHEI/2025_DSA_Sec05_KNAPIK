@@ -68,3 +68,22 @@ func (j *JSONNullTime) MarshalJSON() ([]byte, error) {
 	json, err := json.Marshal(j.Time)
 	return json, err
 }
+
+type JSONNullFloat struct {
+	sql.NullFloat64
+}
+
+func (j *JSONNullFloat) UnmarshalJSON(data []byte) error {
+	var i float64
+	if err := json.Unmarshal(data, &i); err != nil {
+		return err
+	}
+	j.Float64 = i
+	j.Valid = true
+	return nil
+}
+
+func (j *JSONNullFloat) MarshalJSON() ([]byte, error) {
+	json, err := json.Marshal(j.Float64)
+	return json, err
+}

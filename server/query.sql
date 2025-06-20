@@ -1,48 +1,49 @@
 -- name: AddUser :exec
-INSERT INTO User (name, password, email, phone, role_id) VALUES(?, ?, ?, ?, ?);
+INSERT INTO user (name, password, email, phone, role_id) VALUES(?, ?, ?, ?, ?);
 
 -- name: GetUserInfo :one
-SELECT id, name, phone, role_id FROM User 
+SELECT id, name, phone, role_id FROM user 
 WHERE id = ?;
 
 -- name: GetUserId :one
-SELECT id FROM User 
+SELECT id FROM user 
 WHERE email = ?;
 
 -- name: GetUserPassword :one
-SELECT password FROM User 
+SELECT password FROM user 
 WHERE id = ?;
 
 -- name: GetUserPasswordEmail :one
-SELECT id, password FROM User 
+SELECT id, password FROM user 
 WHERE email = ?;
 
 -- name: GetUserRole :one
-SELECT role_id FROM User 
-WHERE id = ?;
+SELECT role.name FROM user 
+JOIN role ON role.id = user.role_id
+WHERE user.id = ?;
 
 -- name: GetApartmentID :one
 SELECT apartment_id FROM renting_history 
-WHERE end_date IS NULL AND user_id = ?;
+WHERE is_current IS 1 AND user_id = ?;
 
 -- name: GetSubconInfo :one
-SELECT address, NIP, speciality_id FROM Subcontractor 
+SELECT address, NIP, speciality_id FROM subcontractor 
 WHERE user_id = ?;
 
 -- name: AddSubcontractor :exec
-INSERT INTO Subcontractor (
+INSERT INTO subcontractor (
   user_id, address, NIP, speciality_id
 ) VALUES (
   ?, ?, ?, ?
 );
 
 -- name: GetSubcontractors :many
-SELECT Subcontractor.*, User.name FROM Subcontractor
-INNER JOIN User ON Subcontractor.user_id = User.id;
+SELECT subcontractor.*, user.name FROM subcontractor
+INNER JOIN user ON subcontractor.user_id = user.id;
 ;
 
 -- name: AddApartment :exec
-INSERT INTO Apartament (
+INSERT INTO apartment (
   name, street, building_number, building_name, flat_number, owner_id
 ) VALUES(
   ?, ?, ?, ?, ?, ?
@@ -50,30 +51,24 @@ INSERT INTO Apartament (
 
 -- name: GetApartments :many
 SELECT id, name, street, building_number, building_name, flat_number, owner_id
-FROM Apartament;
+FROM apartment;
 
--- name: AddOwner :exec
-INSERT INTO Owner (
-  name, email, phone
-) VALUES (
-  ?, ?, ?
-);
-
--- name: GetOwners :many
-SELECT id, name, email, phone
-FROM Owner;
+-- name: GetApartmentsAndRent :many
+SELECT apartment.*, pricing_history.price FROM apartment
+LEFT JOIN pricing_history ON pricing_history.apartment_id = apartment.id
+WHERE pricing_history.is_current = 1;
 
 -- name: GetRent :one
-SELECT price FROM pricinghistory 
+SELECT price FROM pricing_history 
 WHERE is_current = 0 AND apartment_id = ?;
 
 -- name: ChangeRent1 :exec
-UPDATE pricinghistory
+UPDATE pricing_history
 	SET is_current = 1
 	WHERE is_current = 0 AND apartment_id = ?;
 
 -- name: ChangeRent2 :exec
-INSERT INTO pricinghistory (apartment_id, price) VALUES(?, ?);
+INSERT INTO pricing_history (apartment_id, price) VALUES(?, ?);
 
 -- name: GetActiveRenting :many
 SELECT id, apartment_id, user_id, start_date FROM renting_history WHERE end_date IS NULL;
@@ -85,31 +80,31 @@ INSERT INTO renting_history (apartment_id, user_id, start_date) VALUES(?, ?, ?);
 UPDATE renting_history SET end_date = ? WHERE id = ?;
 
 -- name: GetFaultReports :many
-SELECT faultreport.*, Apartament.name FROM faultreport
-INNER JOIN Apartament ON Apartament.id = faultreport.apartment_id;
+SELECT fault_report.*, apartment.name FROM fault_report
+INNER JOIN apartment ON apartment.id = fault_report.apartment_id;
 
 -- name: GetFaultReportsUser :many
-SELECT faultreport.*, Apartament.name FROM faultreport
-INNER JOIN Apartament ON Apartament.id = faultreport.apartment_id
-WHERE faultreport.apartment_id = ?;
+SELECT fault_report.*, apartment.name FROM fault_report
+INNER JOIN apartment ON apartment.id = fault_report.apartment_id
+WHERE fault_report.apartment_id = ?;
 
 -- name: AddFault :exec
-INSERT INTO faultreport (title, description, status_id, apartment_id) VALUES(?, ?, ?, ?);
+INSERT INTO fault_report (title, description, status_id, apartment_id, user_id) VALUES(?, ?, ?, ?, ?);
 
 -- name: UpdateFaultStatus :one
-UPDATE faultreport
+UPDATE fault_report
 SET status_id = ?
 WHERE id = ?
 RETURNING *;
 
 -- name: GetTenets :many
-SELECT id, name, email, phone, role_id FROM User WHERE role_id = "2";
+SELECT id, name, email, phone, role_id FROM user WHERE role_id = "2";
 
 -- name: GetSubcontractorSpec :many
-SELECT id, name FROM Speciality;
+SELECT id, name FROM speciality;
 
 -- name: AddSpec :exec
-INSERT INTO Speciality (name) VALUES(?);
+INSERT INTO speciality (name) VALUES(?);
 
 -- name: AddRepair :exec
 INSERT INTO repair (
@@ -120,21 +115,21 @@ INSERT INTO repair (
 
 
 -- name: GetRepair :many
-SELECT repair.*, User.name FROM repair
-LEFT JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
-LEFT JOIN User ON Subcontractor.user_id = User.id;
+SELECT repair.*, user.name FROM repair
+LEFT JOIN subcontractor ON repair.subcontractor_id = subcontractor.id
+LEFT JOIN user ON subcontractor.user_id = user.id;
 
 -- name: GetRepairSub :many
-SELECT repair.*, User.name FROM repair
-LEFT JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
-LEFT JOIN User ON Subcontractor.user_id = User.id
-WHERE subcontractor_id = (SELECT id FROM Subcontractor WHERE Subcontractor.user_id = ?);
+SELECT repair.*, user.name FROM repair
+LEFT JOIN subcontractor ON repair.subcontractor_id = subcontractor.id
+LEFT JOIN user ON subcontractor.user_id = user.id
+WHERE subcontractor_id = (SELECT id FROM subcontractor WHERE subcontractor.user_id = ?);
 
 -- name: GetRepairApart :many
-SELECT repair.*, User.name FROM repair
-LEFT JOIN Subcontractor ON repair.subcontractor_id = Subcontractor.id
-LEFT JOIN User ON Subcontractor.user_id = User.id
-WHERE fault_report_id = (SELECT id FROM FaultReport WHERE apartment_id = ?);
+SELECT repair.*, user.name FROM repair
+LEFT JOIN subcontractor ON repair.subcontractor_id = subcontractor.id
+LEFT JOIN user ON subcontractor.user_id = user.id
+WHERE fault_report_id = (SELECT id FROM fault_report WHERE apartment_id = ?);
 
 -- name: UpdateSubToRepair :one
 UPDATE repair
@@ -144,6 +139,6 @@ RETURNING *;
 
 -- name: UpdateRepairData :one
 UPDATE repair
-SET status_id = (SELECT id FROM RepairStatus WHERE name = ?), date_completed = ?
+SET status_id = (SELECT id FROM repair_status WHERE name = ?), date_completed = ?
 WHERE repair.id = ?
 RETURNING *;
