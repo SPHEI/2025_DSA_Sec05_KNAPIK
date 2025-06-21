@@ -10,7 +10,7 @@ interface ApartmentProps {
   building_name: string;
   flat_number: string;
   owner_id: number;
-  rent: number;
+  price: number;
   changeRent: (id: number, newRent: number) => void;
 }
 
@@ -42,7 +42,7 @@ function ApartmentBox(props : ApartmentProps)
                     <h1>Building Number: {props.building_number}</h1>
                     <h1>Building Name: {props.building_name}</h1>
                     <h1>Flat Number: {props.flat_number}</h1>
-                    {props.rent != -1 ? <h1>Rent: {props.rent}</h1> : <h1>Rent: Not Set</h1>}
+                    {props.price != -1 ? <h1>Rent: {props.price}</h1> : <h1>Rent: Not Set</h1>}
                 </div>
                 <button className="black-button" onClick={()=>{setShowPopup(true)}}>Change Rent</button>
             </div>
