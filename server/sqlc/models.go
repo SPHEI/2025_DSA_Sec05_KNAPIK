@@ -5,7 +5,6 @@
 package sqlc
 
 import (
-	"database/sql"
 	"time"
 	"server/types"
 )
@@ -63,12 +62,11 @@ type FinancialRecord struct {
 
 type Payment struct {
 	ID                   int64          `json:"id"`
-	UserID               int64          `json:"user_id"`
-	ApartmentID          int64          `json:"apartment_id"`
 	Amount               float64        `json:"amount"`
 	PaymentDate          types.JSONNullTime   `json:"payment_date"`
 	DueDate              time.Time      `json:"due_date"`
 	StatusID             int64          `json:"status_id"`
+	RentingID            int64          `json:"renting_id"`
 	TransactionReference types.JSONNullString `json:"transaction_reference"`
 }
 
@@ -78,11 +76,11 @@ type PaymentStatus struct {
 }
 
 type PricingHistory struct {
-	ID          int64        `json:"id"`
-	ApartmentID int64        `json:"apartment_id"`
-	Date        time.Time    `json:"date"`
-	Price       float64      `json:"price"`
-	IsCurrent   sql.NullBool `json:"is_current"`
+	ID          int64         `json:"id"`
+	ApartmentID int64         `json:"apartment_id"`
+	Date        time.Time     `json:"date"`
+	Price       float64       `json:"price"`
+	IsCurrent   types.JSONNullInt64 `json:"is_current"`
 }
 
 type RentingHistory struct {

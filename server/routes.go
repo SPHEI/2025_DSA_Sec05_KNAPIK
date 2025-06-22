@@ -36,6 +36,7 @@ func (app *app) routes() http.Handler {
 
 	router.Handle("GET /payments/list", logger(http.HandlerFunc(app.getPayments)))
 	router.Handle("POST /payments/pay", logger(http.HandlerFunc(app.pay)))
+	router.HandleFunc("GET /test", app.updateAllPayments)
 
 	////
 

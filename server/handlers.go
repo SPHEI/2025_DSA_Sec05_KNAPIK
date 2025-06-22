@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -832,6 +831,8 @@ func (app *app) getPayments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.updateAllPayments(w, r)
+
 	if role == "admin" {
 		output, err := app.Query.GetAllPayment(app.Ctx)
 		if err != nil {
@@ -847,10 +848,7 @@ func (app *app) getPayments(w http.ResponseWriter, r *http.Request) {
 
 		id, _ := auth.ValidateSession(app.CACHE, token)
 
-		ctx := context.WithValue(r.Context(), "id", id)
-		app.updatePayment(w, r.WithContext(ctx))
-
-		output, err := app.Query.GetPayment(app.Ctx, id)
+		output, err := app.Query.GetPaymentsId(app.Ctx, id)
 		if err != nil {
 			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 			return
@@ -863,75 +861,75 @@ func (app *app) getPayments(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *app) updatePayment(w http.ResponseWriter, r *http.Request) {
-	id := r.Context().Value("id").(int64)
-	apartmentID, err := app.Query.GetApartmentID(app.Ctx, id)
-	if err != nil {
-		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-		return
-	}
-
-	output, err := app.Query.GetActiveRenting(app.Ctx)
-	if err != nil {
-		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-		return
-	}
-
-	for _, rent := range output {
-		if rent.ApartmentID == apartmentID && rent.UserID == id {
-			startDate := rent.StartDate
-			payments, err := app.Query.GetPayment(app.Ctx, id)
-			if err != nil {
-				sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-				return
-			}
-
-			price, err := app.Query.GetRent(app.Ctx, rent.ApartmentID)
-			if err != nil {
-				sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-				return
-			}
-
-			amount := 0
-			for x := range payments {
-				if startDate.Before(payments[x].DueDate) {
-					amount++
-				}
-			}
-
-			startDate = time.Date(
-				startDate.Year(),
-				startDate.Month(),
-				1, // Set the day to 1
-				0, // Set hour to 0
-				0, // Set minute to 0
-				0, // Set second to 0
-				0, // Set nanosecond to 0
-				startDate.Location(),
-			)
-
-			endDate := time.Date(
-				time.Now().Year(),
-				time.Now().Month(),
-				1, // Set the day to 1
-				0, // Set hour to 0
-				0, // Set minute to 0
-				0, // Set second to 0
-				0, // Set nanosecond to 0
-				time.Now().Location(),
-			)
-			endDate = endDate.AddDate(0, 1, 0)
-
-			for startDate.Before(endDate) {
-				if amount <= 0 {
-					app.Query.AddPayment(app.Ctx, sqlc.AddPaymentParams{UserID: id, UserID_2: id, Amount: price, DueDate: startDate.AddDate(0, 1, 0)})
-				}
-				startDate = startDate.AddDate(0, 1, 0)
-				amount--
-			}
-		}
-	}
-}
+//func (app *app) updatePayment(w http.ResponseWriter, r *http.Request) {
+//	id := r.Context().Value("id").(int64)
+//	apartmentID, err := app.Query.GetApartmentID(app.Ctx, id)
+//	if err != nil {
+//		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+//		return
+//	}
+//
+//	output, err := app.Query.GetActiveRenting(app.Ctx)
+//	if err != nil {
+//		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+//		return
+//	}
+//
+//	for _, rent := range output {
+//		if rent.ApartmentID == apartmentID && rent.UserID == id {
+//			startDate := rent.StartDate
+//			payments, err := app.Query.GetPayment(app.Ctx, id)
+//			if err != nil {
+//				sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+//				return
+//			}
+//
+//			price, err := app.Query.GetRent(app.Ctx, rent.ApartmentID)
+//			if err != nil {
+//				sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+//				return
+//			}
+//
+//			amount := 0
+//			for x := range payments {
+//				if startDate.Before(payments[x].DueDate) {
+//					amount++
+//				}
+//			}
+//
+//			startDate = time.Date(
+//				startDate.Year(),
+//				startDate.Month(),
+//				1, // Set the day to 1
+//				0, // Set hour to 0
+//				0, // Set minute to 0
+//				0, // Set second to 0
+//				0, // Set nanosecond to 0
+//				startDate.Location(),
+//			)
+//
+//			endDate := time.Date(
+//				time.Now().Year(),
+//				time.Now().Month(),
+//				1, // Set the day to 1
+//				0, // Set hour to 0
+//				0, // Set minute to 0
+//				0, // Set second to 0
+//				0, // Set nanosecond to 0
+//				time.Now().Location(),
+//			)
+//			endDate = endDate.AddDate(0, 1, 0)
+//
+//			for startDate.Before(endDate) {
+//				if amount <= 0 {
+//					app.Query.AddPayment(app.Ctx, sqlc.AddPaymentParams{UserID: id, UserID_2: id, Amount: price, DueDate: startDate.AddDate(0, 1, 0)})
+//				}
+//				startDate = startDate.AddDate(0, 1, 0)
+//				amount--
+//			}
+//		}
+//	}
+//}
 
 func (app *app) pay(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
@@ -960,4 +958,90 @@ func (app *app) pay(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(&output); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func (app *app) updateAllPayments(w http.ResponseWriter, r *http.Request) {
+	activeRentings, err := app.Query.GetActiveRenting(app.Ctx)
+	if err != nil {
+		log.Println("GetActiveRenting:")
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	for _, activeRenting := range activeRentings {
+		price, err := app.Query.GetRent(app.Ctx, activeRenting.ApartmentID)
+		if err != nil {
+			log.Println("GetRent:")
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
+
+		payments, err := app.Query.GetPayments(app.Ctx, activeRenting.ID)
+		if err != nil {
+			log.Println("GetPayments:")
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
+
+		amount := 0
+		startDate := time.Date(
+			activeRenting.StartDate.Year(),
+			activeRenting.StartDate.Month(),
+			2, // Set the day to 1
+			0, // Set hour to 0
+			0, // Set minute to 0
+			0, // Set second to 0
+			0, // Set nanosecond to 0
+			activeRenting.StartDate.Location(),
+		)
+		loopStartDate := startDate
+		startDate = startDate.AddDate(0, 0, -1)
+
+		if activeRenting.EndDate.Valid {
+			endDate := activeRenting.EndDate.Time
+			for loopStartDate.Before(endDate) {
+				amount++
+				loopStartDate = loopStartDate.AddDate(0, 1, 0)
+			}
+
+			if amount > len(payments) {
+				jump := amount - len(payments)
+				startDate = startDate.AddDate(0, len(payments)+1, 0)
+				for range jump + 1 {
+					app.Query.AddPayment(app.Ctx, sqlc.AddPaymentParams{Amount: price, DueDate: startDate, RentingID: activeRenting.ID})
+					startDate = startDate.AddDate(0, 1, 0)
+				}
+			}
+		} else {
+			endDate := time.Date(
+				time.Now().Year(),
+				time.Now().Month(),
+				1, // Set the day to 1
+				0, // Set hour to 0
+				0, // Set minute to 0
+				0, // Set second to 0
+				0, // Set nanosecond to 0
+				time.Now().Location(),
+			)
+
+			for loopStartDate.Before(endDate) {
+				amount++
+				loopStartDate = loopStartDate.AddDate(0, 1, 0)
+			}
+
+			if amount > len(payments) {
+				jump := amount - len(payments)
+				startDate = startDate.AddDate(0, len(payments)+1, 0)
+				for range jump + 1 {
+					if err := app.Query.AddPayment(app.Ctx, sqlc.AddPaymentParams{Amount: price, DueDate: startDate, RentingID: activeRenting.ID}); err != nil {
+						log.Println(err)
+						w.WriteHeader(http.StatusOK)
+						return
+					}
+					startDate = startDate.AddDate(0, 1, 0)
+				}
+			}
+		}
+	}
+	w.WriteHeader(http.StatusOK)
 }

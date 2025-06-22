@@ -60,7 +60,7 @@ WHERE pricing_history.is_current = 1;
 
 -- name: GetRent :one
 SELECT price FROM pricing_history 
-WHERE is_current = 0 AND apartment_id = ?;
+WHERE is_current = 1 AND apartment_id = ?;
 
 -- name: ChangeRent1 :exec
 UPDATE pricing_history
@@ -157,18 +157,11 @@ RETURNING *;
 -- name: GetAllPayment :many
 SELECT * FROM payments;
 
--- name: GetPayment :many
-SELECT * FROM payments
-WHERE user_id = ?;
-
 -- name: AddPayment :exec
 INSERT INTO payments (
-  user_id, apartment_id, amount, due_date
+  amount, due_date, renting_id
   ) VALUES (
-  ?, 
-  (SELECT renting_history.apartment_id 
-    FROM renting_history WHERE renting_history.user_id = ?),
-  ?, ?
+  ?, ?, ?
 );
 
 -- name: UpdatePayment :one
@@ -176,3 +169,13 @@ UPDATE payments
 SET status_id = 2, transaction_reference = ?, payment_date = ?
 WHERE id = ?
 RETURNING *;
+
+-- name: GetPayments :many
+SELECT *
+FROM payments
+WHERE renting_id = ?;
+
+-- name: GetPaymentsId :many
+SELECT *
+FROM payments
+WHERE renting_id = (SELECT id FROM renting_history WHERE user_id = ?);
