@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -141,6 +142,7 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 	output := struct {
 		ApartamentId int64   `json:"apartament_id"`
 		Rent         float64 `json:"rent"`
+		Status       string  `json:"status"`
 	}{}
 
 	r.ParseMultipartForm(32 << 20)
@@ -163,6 +165,32 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
+	}
+
+	_, err = app.Query.GetPendingPaymants(app.Ctx)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			output.Status = "Pending"
+		} else {
+			log.Println("GetOverduePayments")
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
+	}
+
+	_, err = app.Query.GetOverduePayments(app.Ctx)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			output.Status = "Overdue"
+		} else {
+			log.Println("GetOverduePayments")
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
+	}
+
+	if output.Status == "" {
+		output.Status = "Paid"
 	}
 
 	output.ApartamentId = apartmentId

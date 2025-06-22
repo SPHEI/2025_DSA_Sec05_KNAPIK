@@ -185,6 +185,11 @@ SELECT *
 FROM payments
 WHERE status_id = 1;
 
+-- name: GetOverduePayments :many
+SELECT *
+FROM payments
+WHERE status_id = 3;
+
 -- name: SetPaymanyOverdue :one
 UPDATE payments
 SET status_id = 3

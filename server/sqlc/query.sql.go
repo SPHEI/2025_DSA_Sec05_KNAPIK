@@ -470,6 +470,43 @@ func (q *Queries) GetFaultReportsUser(ctx context.Context, apartmentID int64) ([
 	return items, nil
 }
 
+const getOverduePayments = `-- name: GetOverduePayments :many
+SELECT id, amount, payment_date, due_date, status_id, renting_id, transaction_reference
+FROM payments
+WHERE status_id = 3
+`
+
+func (q *Queries) GetOverduePayments(ctx context.Context) ([]Payment, error) {
+	rows, err := q.db.QueryContext(ctx, getOverduePayments)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Payment
+	for rows.Next() {
+		var i Payment
+		if err := rows.Scan(
+			&i.ID,
+			&i.Amount,
+			&i.PaymentDate,
+			&i.DueDate,
+			&i.StatusID,
+			&i.RentingID,
+			&i.TransactionReference,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getPayments = `-- name: GetPayments :many
 SELECT id, amount, payment_date, due_date, status_id, renting_id, transaction_reference
 FROM payments
