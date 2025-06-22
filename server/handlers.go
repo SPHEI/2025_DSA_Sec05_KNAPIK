@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -148,12 +149,22 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(32 << 20)
 	token := r.FormValue("token")
 
-	if _, erro := app.checkRole(token, "tenant"); erro != nil {
+	role, erro := app.checkRole(token, "tenant", "admin")
+	if erro != nil {
 		sendError(w, *erro, nil)
 		return
 	}
 
 	userId, _ := auth.ValidateSession(app.CACHE, token)
+
+	if role == "admin" {
+		id, err := strconv.Atoi(r.FormValue("id"))
+		if err != nil {
+			sendError(w, Error{400, "Wrong id input", "Bad Request"}, err)
+			return
+		}
+		userId = int64(id)
+	}
 
 	apartmentId, err := app.Query.GetApartmentID(app.Ctx, userId)
 	if err != nil {
