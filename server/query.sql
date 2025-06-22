@@ -79,6 +79,9 @@ INSERT INTO renting_history (apartment_id, user_id, start_date) VALUES(?, ?, ?);
 -- name: SetEndDate :exec
 UPDATE renting_history SET end_date = ? WHERE id = ?;
 
+-- name: MakeAsEnd :exec
+UPDATE renting_history SET is_current = 0 WHERE id = ?;
+
 -- name: GetFaultReports :many
 SELECT fault_report.*, apartment.name FROM fault_report
 INNER JOIN apartment ON apartment.id = fault_report.apartment_id;

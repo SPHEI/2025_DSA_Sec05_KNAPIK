@@ -21,6 +21,7 @@ func (app *app) routes() http.Handler {
 	router.Handle("GET /renting/current", logger(http.HandlerFunc(app.getCurrentRenting)))
 	router.Handle("POST /renting/start", logger(http.HandlerFunc(app.addNewRenting)))
 	router.Handle("POST /renting/end", logger(http.HandlerFunc(app.setEndOfRenting)))
+	router.Handle("POST /renting/endStatus", logger(http.HandlerFunc(app.setStatusOfRenting)))
 
 	router.Handle("GET /faults/list", logger(http.HandlerFunc(app.getReports)))
 	router.Handle("POST /faults/add", logger(http.HandlerFunc(app.addFault)))

@@ -1040,6 +1040,15 @@ func (q *Queries) GetUserRole(ctx context.Context, id int64) (string, error) {
 	return name, err
 }
 
+const makeAsEnd = `-- name: MakeAsEnd :exec
+UPDATE renting_history SET is_current = 0 WHERE id = ?
+`
+
+func (q *Queries) MakeAsEnd(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, makeAsEnd, id)
+	return err
+}
+
 const setEndDate = `-- name: SetEndDate :exec
 UPDATE renting_history SET end_date = ? WHERE id = ?
 `

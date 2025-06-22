@@ -473,6 +473,34 @@ func (app *app) setEndOfRenting(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func (app *app) setStatusOfRenting(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
+
+	input := struct {
+		Token     string `json:"token"`
+		RentingID int64  `json:"renting_id"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		sendError(w, Error{400, "Could not acquire json data", "Bad Request"}, err)
+		return
+	}
+
+	if _, erro := app.checkRole(input.Token, "admin"); erro != nil {
+		sendError(w, *erro, nil)
+		return
+	}
+
+	err = app.Query.MakeAsEnd(app.Ctx, input.RentingID)
+	if err != nil {
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func (app *app) getReports(w http.ResponseWriter, r *http.Request) {
 	prepareResponse(w)
 
