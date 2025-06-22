@@ -5,56 +5,170 @@ import card from "./card.png";
 import PaymentBox from "../components/PaymentBox";
 import calendar from "./calendar.png";
 import { useRouter, usePathname } from 'next/navigation';
+import Cookies from "js-cookie";
 
 //Shared by admin and tenants
 function RentAndPayment() {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("none");
   const pathname = usePathname();
+
+  const [payments, setPayments] = useState([{id: -1, user_id: -1, apartment_id: -1, amount: -1, payment_date: '', due_date: '', status_id: -1, transaction_reference: ''}])
+  const [names,setNames] = useState([{id: -1, name: '', email: '', phone: '', role_id: -1}])
+
+  const [role, setRole] = useState('')
+
   useEffect(() => {
-    //Page setup goes here
-    setReady(true);
-  }, [pathname]);
+        refresh()
+    },[pathname])
+    
+    async function refresh()
+    {
+        var a = Cookies.get("role");
+        if(a != null)
+        {
+          setRole(a)
+          var t = Cookies.get("token");
+          try{
+              const res = await fetch('http://localhost:8080/payments/list?token=' + t)
+              const data = await res.json();
+              //alert(JSON.stringify(data))
+              if(data.message)
+              {
+                  setError(data.message)
+              }
+              else
+              {
+                  setPayments(data)
+              }
+              if(a === "1")
+              {
+                const res2 = await fetch('http://localhost:8080/tenant/list?token=' + t)
+                const data2 = await res2.json();
+                //alert(JSON.stringify(data));
+                if(data2.message)
+                {
+                  setError(data2.message)
+                }
+                else
+                {
+                  setNames(data2)
+                }
+              }
+          }catch(err: any){
+              setError(err.message);
+          }finally{
+              setReady(true);
+          }
+        }
+    }
+
+  async function pay(id: number)
+  {
+    var t = Cookies.get("token");
+    var t = Cookies.get("token");
+    var d = new Date()
+    var dd = String(d.getDate()).padStart(2,'0')
+    var m = String(d.getMonth() + 1).padStart(2,'0')
+    var y = String(d.getFullYear())
+
+    var date = y + "-" + m + "-" + dd
+    const res = await fetch('http://localhost:8080/payments/pay',{
+              method:'POST',
+              body: JSON.stringify({ 
+                  "token" : t,
+                  "payment" : {
+                    "payment_date" : date + "T15:04:05Z",
+                    "id" : id
+                  }
+        })
+    });
+    if(res.ok)
+    {
+        //alert("Paid succesfully.");
+    }
+    else
+    {
+        var data = await res.json()
+        alert(data.message)
+    }
+    refresh()
+  }
+
+  function isOverdue(d: string)
+  {
+    const date = new Date(d.split("T")[0]);
+    const now = new Date();
+    return date < now
+  }
 
   if (ready) {
     if (error == "none") {
       return (
         <main>
           <div className="page-head w-[50%]">
-            <b className="text-4xl">Rent & Payments</b>
+            <b className="text-4xl">{role === "2" ? "Rent & Payments" : "Payments"}</b>
           </div>
           <div className="flex flex-row gap-4 w-[50%]">
             <div className="white-box h-[150px] w-[100%]">
+              {role === "2" &&
               <div className="flex flex-col items-center justify-center">
                 <img src={card.src} width={40} />
-                <b>Current Rent</b>
-                <h1>150$</h1>
-              </div>
-            </div>
-            <div className="white-box h-[150px] w-[100%]">
-              <div className="flex flex-col items-center justify-center">
-                <img src={card.src} width={40} />
+                
                 <b>Rent Status</b>
-                <h1>paid</h1>
+                <h1>{
+                  payments.filter(a => a.status_id == 1).some(a => {const date = new Date(a.due_date.split("T")[0]);const now = new Date();return date < now}) ? "Overdue" :
+                  payments.some(a => a.status_id == 1) ? "Unpaid" : "Paid"
+                }</h1>
+              
               </div>
+              }
+              {role === "1" &&
+              <div className="flex flex-col items-center justify-center">
+                <img src={card.src} width={40} />
+                
+                <b>Overdue Payments</b>
+                <h1>{
+                  payments.filter(a => a.status_id == 1).filter(a => {const date = new Date(a.due_date.split("T")[0]);const now = new Date();return date < now}).length
+                }</h1>
+              
+              </div>
+              }
             </div>
+            {role === "2" &&
             <div className="white-box h-[150px] w-[100%]">
               <div className="flex flex-col items-center justify-center">
                 <img src={calendar.src} width={40} />
                 <b>Next Rent Due</b>
-                <h1>28.06.2025</h1>
+                <h1>{
+                  payments.filter(a => a.status_id == 1).map(p => p.due_date).reduce((earliest, current) => {return new Date(current) < new Date(earliest) ? current : earliest;}).split("T")[0]
+              }</h1>
               </div>
             </div>
+            }
           </div>
-          <button className="black-button">Pay rent</button>
           <div className="white-box w-[50%] py-4">
             <div className="flex flex-col items-left justify-start w-full h-full gap-2">
+              <b className="text-xl">Pending Payments</b>
+              <div className="flex flex-col gap-1">
+                {payments.map((a,index) => a.status_id == 1 && (
+                  <div key={index} className="flex flex-row">
+                    <PaymentBox 
+                    date={"Due: " + a.due_date.split("T")[0]} 
+                    name={role === "1" ? "Tenant: " + (names.find(b=>b.id == a.user_id)?.name) : ""} 
+                    type={isOverdue(a.due_date) ? "Overdue" : ""} 
+                    amount={a.amount} /> 
+                    {role === "2" && <button className="black-button" onClick={()=>{pay(a.id)}}>Pay</button>}
+                  </div>))}
+              </div>
               <b className="text-xl">Payment history</b>
               <div className="flex flex-col gap-1">
-                <PaymentBox date={"April 30 2025"} type={""} amount={2500} />
-                <PaymentBox date={"April 30 2025"} type={""} amount={2500} />
-                <PaymentBox date={"April 30 2025"} type={""} amount={2500} />
-                <PaymentBox date={"April 30 2025"} type={""} amount={2500} />
+                {payments.map((a,index) => a.status_id == 2 && 
+                <PaymentBox key={index}  
+                date={"Due: " + a.due_date.split("T")[0]}  
+                name={role === "1" ? "Tenant: " + (names.find(b=>b.id == a.user_id)?.name) : ""} 
+                type={"Paid on: " + a.payment_date.split("T")[0]} 
+                amount={a.amount} />)}
               </div>
             </div>
           </div>
