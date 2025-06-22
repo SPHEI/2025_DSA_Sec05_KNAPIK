@@ -241,6 +241,31 @@ func (q *Queries) GetActiveRenting(ctx context.Context) ([]GetActiveRentingRow, 
 	return items, nil
 }
 
+const getActiveRentingID = `-- name: GetActiveRentingID :one
+SELECT id, apartment_id, user_id, start_date, end_date FROM renting_history WHERE is_current = 1 AND apartment_id = ?
+`
+
+type GetActiveRentingIDRow struct {
+	ID          int64        `json:"id"`
+	ApartmentID int64        `json:"apartment_id"`
+	UserID      int64        `json:"user_id"`
+	StartDate   time.Time    `json:"start_date"`
+	EndDate     types.JSONNullTime `json:"end_date"`
+}
+
+func (q *Queries) GetActiveRentingID(ctx context.Context, apartmentID int64) (GetActiveRentingIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getActiveRentingID, apartmentID)
+	var i GetActiveRentingIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.ApartmentID,
+		&i.UserID,
+		&i.StartDate,
+		&i.EndDate,
+	)
+	return i, err
+}
+
 const getAllPayment = `-- name: GetAllPayment :many
 SELECT id, amount, payment_date, due_date, status_id, renting_id, transaction_reference FROM payments
 `

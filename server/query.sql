@@ -73,6 +73,9 @@ INSERT INTO pricing_history (apartment_id, price) VALUES(?, ?);
 -- name: GetActiveRenting :many
 SELECT id, apartment_id, user_id, start_date, end_date FROM renting_history WHERE is_current = 1;
 
+-- name: GetActiveRentingID :one
+SELECT id, apartment_id, user_id, start_date, end_date FROM renting_history WHERE is_current = 1 AND apartment_id = ?;
+
 -- name: AddNewRenting :exec
 INSERT INTO renting_history (apartment_id, user_id, start_date) VALUES(?, ?, ?);
 

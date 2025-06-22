@@ -436,6 +436,19 @@ func (app *app) addNewRenting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	rent, err := app.Query.GetActiveRentingID(app.Ctx, input.Renting.ApartmentID)
+	if err != nil {
+		log.Println("GetActiveRentingID:")
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	if err := app.Query.MakeAsEnd(app.Ctx, rent.ApartmentID); err != nil {
+		log.Println("MakeAsEnd:")
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
 	err = app.Query.AddNewRenting(app.Ctx, input.Renting)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
