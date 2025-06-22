@@ -29,7 +29,7 @@ CREATE TABLE pricing_history (
     apartment_id INTEGER NOT NULL,
     date DATE NOT NULL DEFAULT CURRENT_DATE,
     price REAL NOT NULL,
-    is_current BOOLEAN DEFAULT 1,
+    is_current INTEGER DEFAULT 1,
     FOREIGN KEY (apartment_id) REFERENCES apartment(id)
 );
 
@@ -97,15 +97,13 @@ CREATE TABLE renting_history (
 
 CREATE TABLE payments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    apartment_id INTEGER NOT NULL,
     amount REAL NOT NULL,
     payment_date DATE,
     due_date DATE NOT NULL,
     status_id INTEGER NOT NULL DEFAULT 1,  -- default'pending'
+    renting_id INTEGER NOT NULL,
     transaction_reference TEXT,
-    FOREIGN KEY (user_id) REFERENCES user(id),
-    FOREIGN KEY (apartment_id) REFERENCES apartment(id),
+    FOREIGN KEY (renting_id) REFERENCES renting_history(id),
     FOREIGN KEY (status_id) REFERENCES payment_status(id)
 );
 
@@ -115,8 +113,6 @@ CREATE TABLE payment_status (
 );
 
 ---
-
-
 
 CREATE TABLE expense_Category (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -191,9 +187,7 @@ INSERT INTO apartment (name, street, building_number, building_name, flat_number
 INSERT INTO pricing_history (apartment_id, date, price, is_current) VALUES
 (1, '2025-01-01', 1200.00, 1),
 (2, '2025-01-01', 850.00, 1),
-(3, '2025-01-01', 2500.00, 1),
-(1, '2022-06-01', 1100.00, 0),
-(2, '2022-06-01', 800.00, 0);
+(3, '2025-01-01', 2500.00, 1);
 
 -- subcontractors
 INSERT INTO speciality (name) VALUES
@@ -236,11 +230,10 @@ INSERT OR IGNORE INTO payment_status (name) VALUES
 ('completed');
 
 -- payments
-INSERT INTO payments (user_id, apartment_id, amount, due_date, status_id, transaction_reference) VALUES
-(3, 1, 1200.00, '2025-01-01', 2, 'PAY12345'),
-(2, 2, 850.00, '2025-02-01', 2,'PAY12346'),
-(3, 3, 2500.00, '2025-03-01', 2, 'PAY12347'),
-(3, 1, 1200.00, '2025-02-01', 2, 'PAY12348');
+-- INSERT INTO payments (amount, due_date, status_id, renting_id, transaction_reference) VALUES
+-- (1200.00, '2025-02-01', 2, 1, 'PAY12346'),
+-- (1200.00, '2025-03-01', 2, 1, 'PAY12347'),
+-- (850.00, '2025-02-01', 2, 2, 'PAY12348');
 
 -- categories
 INSERT INTO expense_category (name) VALUES
@@ -258,8 +251,5 @@ INSERT INTO expenses (amount, expense_date, description, category_id, repair_id)
 
 -- renting history
 INSERT INTO renting_history (apartment_id, user_id, start_date, end_date, is_current) VALUES
-(1, 3, '2025-01-15', '2025-06-30', 0),
-(2, 2, '2025-02-01', NULL, 1),
-(3, 1, '2025-02-01', NULL, 1),
-(1, 3, '2025-02-01', NULL, 1),
-(3, 3, '2025-03-01', '2025-04-30', 0);
+(1, 2, '2025-01-01', NULL, 1),
+(2, 3, '2025-01-01', NULL, 1);

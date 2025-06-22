@@ -544,6 +544,43 @@ func (q *Queries) GetPaymentsId(ctx context.Context, userID int64) ([]Payment, e
 	return items, nil
 }
 
+const getPendingPaymants = `-- name: GetPendingPaymants :many
+SELECT id, amount, payment_date, due_date, status_id, renting_id, transaction_reference
+FROM payments
+WHERE status_id = 1
+`
+
+func (q *Queries) GetPendingPaymants(ctx context.Context) ([]Payment, error) {
+	rows, err := q.db.QueryContext(ctx, getPendingPaymants)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Payment
+	for rows.Next() {
+		var i Payment
+		if err := rows.Scan(
+			&i.ID,
+			&i.Amount,
+			&i.PaymentDate,
+			&i.DueDate,
+			&i.StatusID,
+			&i.RentingID,
+			&i.TransactionReference,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getRent = `-- name: GetRent :one
 SELECT price FROM pricing_history 
 WHERE is_current = 1 AND apartment_id = ?
@@ -978,6 +1015,28 @@ type SetEndDateParams struct {
 func (q *Queries) SetEndDate(ctx context.Context, arg SetEndDateParams) error {
 	_, err := q.db.ExecContext(ctx, setEndDate, arg.EndDate, arg.ID)
 	return err
+}
+
+const setPaymanyOverdue = `-- name: SetPaymanyOverdue :one
+UPDATE payments
+SET status_id = 3
+WHERE id = ?
+RETURNING id, amount, payment_date, due_date, status_id, renting_id, transaction_reference
+`
+
+func (q *Queries) SetPaymanyOverdue(ctx context.Context, id int64) (Payment, error) {
+	row := q.db.QueryRowContext(ctx, setPaymanyOverdue, id)
+	var i Payment
+	err := row.Scan(
+		&i.ID,
+		&i.Amount,
+		&i.PaymentDate,
+		&i.DueDate,
+		&i.StatusID,
+		&i.RentingID,
+		&i.TransactionReference,
+	)
+	return i, err
 }
 
 const updateFaultStatus = `-- name: UpdateFaultStatus :one

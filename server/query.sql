@@ -179,3 +179,14 @@ WHERE renting_id = ?;
 SELECT *
 FROM payments
 WHERE renting_id = (SELECT id FROM renting_history WHERE user_id = ?);
+
+-- name: GetPendingPaymants :many
+SELECT *
+FROM payments
+WHERE status_id = 1;
+
+-- name: SetPaymanyOverdue :one
+UPDATE payments
+SET status_id = 3
+WHERE id = ?
+RETURNING *;

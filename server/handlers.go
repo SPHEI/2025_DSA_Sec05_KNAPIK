@@ -832,6 +832,7 @@ func (app *app) getPayments(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.updateAllPayments(w, r)
+	app.updateOverdueRent(w, r)
 
 	if role == "admin" {
 		output, err := app.Query.GetAllPayment(app.Ctx)
@@ -1008,7 +1009,13 @@ func (app *app) updateAllPayments(w http.ResponseWriter, r *http.Request) {
 				jump := amount - len(payments)
 				startDate = startDate.AddDate(0, len(payments)+1, 0)
 				for range jump + 1 {
-					app.Query.AddPayment(app.Ctx, sqlc.AddPaymentParams{Amount: price, DueDate: startDate, RentingID: activeRenting.ID})
+					err := app.Query.AddPayment(app.Ctx, sqlc.AddPaymentParams{Amount: price, DueDate: startDate, RentingID: activeRenting.ID})
+					if err != nil {
+						log.Println("AddPayment:")
+						sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+						return
+					}
+
 					startDate = startDate.AddDate(0, 1, 0)
 				}
 			}
@@ -1034,8 +1041,8 @@ func (app *app) updateAllPayments(w http.ResponseWriter, r *http.Request) {
 				startDate = startDate.AddDate(0, len(payments)+1, 0)
 				for range jump + 1 {
 					if err := app.Query.AddPayment(app.Ctx, sqlc.AddPaymentParams{Amount: price, DueDate: startDate, RentingID: activeRenting.ID}); err != nil {
-						log.Println(err)
-						w.WriteHeader(http.StatusOK)
+						log.Println("AddPayment:")
+						sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 						return
 					}
 					startDate = startDate.AddDate(0, 1, 0)
@@ -1043,5 +1050,24 @@ func (app *app) updateAllPayments(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	w.WriteHeader(http.StatusOK)
+}
+
+func (app *app) updateOverdueRent(w http.ResponseWriter, r *http.Request) {
+	pendingPaymants, err := app.Query.GetPendingPaymants(app.Ctx)
+	if err != nil {
+		log.Println("GetPendingPaymants:")
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	}
+
+	currentDate := time.Now()
+	for _, payment := range pendingPaymants {
+		if !payment.DueDate.After(currentDate) {
+			if _, err := app.Query.SetPaymanyOverdue(app.Ctx, payment.ID); err != nil {
+				log.Println("SetPaymentOverdue:")
+				sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+				return
+			}
+		}
+	}
 }
