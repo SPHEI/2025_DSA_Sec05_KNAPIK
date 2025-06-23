@@ -182,7 +182,7 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	wah, err := app.Query.GetPendingPaymantsID(app.Ctx, userId)
+	wah, err := app.Query.GetPendingPaymantsID(app.Ctx, output.RentingID)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			log.Println("GetOverduePayments")
@@ -194,7 +194,7 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 		output.Status = "Pending"
 	}
 
-	pain, err := app.Query.GetOverduePaymentsID(app.Ctx, userId)
+	pain, err := app.Query.GetOverduePaymentsID(app.Ctx, output.RentingID)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			log.Println("GetOverduePayments")
