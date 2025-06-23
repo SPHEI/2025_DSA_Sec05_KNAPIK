@@ -577,12 +577,11 @@ func (q *Queries) GetOverduePayments(ctx context.Context) ([]Payment, error) {
 const getOverduePaymentsID = `-- name: GetOverduePaymentsID :many
 SELECT payments.id, payments.amount, payments.payment_date, payments.due_date, payments.status_id, payments.renting_id, payments.transaction_reference
 FROM payments
-LEFT JOIN renting_history ON renting_history.id = payments.renting_id AND renting_history.user_id = ?
-WHERE payments.status_id = 3
+WHERE payments.status_id = 3 AND payments.renting_id = ?
 `
 
-func (q *Queries) GetOverduePaymentsID(ctx context.Context, userID int64) ([]Payment, error) {
-	rows, err := q.db.QueryContext(ctx, getOverduePaymentsID, userID)
+func (q *Queries) GetOverduePaymentsID(ctx context.Context, rentingID int64) ([]Payment, error) {
+	rows, err := q.db.QueryContext(ctx, getOverduePaymentsID, rentingID)
 	if err != nil {
 		return nil, err
 	}
@@ -726,12 +725,11 @@ func (q *Queries) GetPendingPaymants(ctx context.Context) ([]Payment, error) {
 const getPendingPaymantsID = `-- name: GetPendingPaymantsID :many
 SELECT payments.id, payments.amount, payments.payment_date, payments.due_date, payments.status_id, payments.renting_id, payments.transaction_reference
 FROM payments
-LEFT JOIN renting_history ON renting_history.id = payments.renting_id AND renting_history.user_id = ?
-WHERE payments.status_id = 1
+WHERE payments.status_id = 1 AND payments.renting_id = ?
 `
 
-func (q *Queries) GetPendingPaymantsID(ctx context.Context, userID int64) ([]Payment, error) {
-	rows, err := q.db.QueryContext(ctx, getPendingPaymantsID, userID)
+func (q *Queries) GetPendingPaymantsID(ctx context.Context, rentingID int64) ([]Payment, error) {
+	rows, err := q.db.QueryContext(ctx, getPendingPaymantsID, rentingID)
 	if err != nil {
 		return nil, err
 	}
