@@ -46,12 +46,11 @@ function Tenants() {
                 const res2 = await fetch('http://localhost:8080/tenant/info?token=' + t +"&id=" + Number(a.id))
                 const data2 = await res2.json()
                 console.log(JSON.stringify(data2))
-                if(data2.renting_id != null)
+                if(data2!= null)
                 {
+                    a.name_2 = data2.apartment.name
+                    a.price = data2.rent
                     a.renting_id = data2.renting_id
-                }
-                if(data2.status != null)
-                {
                     a.status = data2.status
                 }
             }
