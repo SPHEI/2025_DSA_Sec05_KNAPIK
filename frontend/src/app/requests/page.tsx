@@ -66,7 +66,8 @@ function Requests() {
                 {
                   if(data.message)
                   {
-                    setError(data.message)
+                    console.log(data.message)
+                    setRequests([])
                   }
                   else
                   {
