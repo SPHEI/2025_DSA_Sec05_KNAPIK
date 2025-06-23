@@ -33,7 +33,7 @@ function RentAndPayment() {
               await fetch('http://localhost:8080/test')
               const res = await fetch('http://localhost:8080/payments/list?token=' + t)
               const data = await res.json();
-              //alert(JSON.stringify(data))
+              alert(JSON.stringify(data))
               if(data != null)
               {
                 if(data.message)
