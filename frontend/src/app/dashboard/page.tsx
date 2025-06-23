@@ -91,7 +91,7 @@ function Dashboard() {
                     }
                     else
                     {
-                        alert(JSON.stringify(data2))
+                        //alert(JSON.stringify(data2))
                         setTenantInfo(data2)
                     }
                 }

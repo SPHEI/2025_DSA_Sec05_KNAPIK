@@ -30,6 +30,7 @@ function RentAndPayment() {
           setRole(a)
           var t = Cookies.get("token");
           try{
+              await fetch('http://localhost:8080/test')
               const res = await fetch('http://localhost:8080/payments/list?token=' + t)
               const data = await res.json();
               //alert(JSON.stringify(data))
@@ -124,7 +125,7 @@ function RentAndPayment() {
                 
                 <b>Rent Status</b>
                 <h1>{
-                  payments.filter(a => a.status_id == 1).some(a => {const date = new Date(a.due_date.split("T")[0]);const now = new Date();return date < now}) ? "Overdue" :
+                  payments.some(a => a.status_id == 3) ? "Overdue" :
                   payments.some(a => a.status_id == 1) ? "Unpaid" : "Paid"
                 }</h1>
               
@@ -136,19 +137,22 @@ function RentAndPayment() {
                 
                 <b>Overdue Payments</b>
                 <h1>{
-                  payments.filter(a => a.status_id == 1).filter(a => {const date = new Date(a.due_date.split("T")[0]);const now = new Date();return date < now}).length
+                  payments.filter(a => a.status_id == 3).length
                 }</h1>
               
               </div>
               }
             </div>
-            {role === "2" &&
+            {role === "2" && payments.filter(a => a.status_id != 2).length > 0 &&
             <div className="white-box h-[150px] w-[100%]">
               <div className="flex flex-col items-center justify-center">
                 <img src={calendar.src} width={40} />
                 <b>Next Rent Due</b>
                 <h1>{
-                  payments.filter(a => a.status_id == 1).map(p => p.due_date).reduce((earliest, current) => {return new Date(current) < new Date(earliest) ? current : earliest;},'').split("T")[0]
+                  payments.filter(a => a.status_id != 2)
+                  .map(p => p.due_date)
+                  .reduce((earliest, current) => {return new Date(current.split("T")[0]) < new Date(earliest.split("T")[0]) ? current : earliest;},"3000-01-01")
+                  .split("T")[0]
               }</h1>
               </div>
             </div>
@@ -158,7 +162,7 @@ function RentAndPayment() {
             <div className="flex flex-col items-left justify-start w-full h-full gap-2">
               <b className="text-xl">Pending Payments</b>
               <div className="flex flex-col gap-1">
-                {payments.map((a,index) => a.status_id == 1 && (
+                {payments.map((a,index) => a.status_id != 2 && (
                   <div key={index} className="flex flex-row">
                     <PaymentBox 
                     date={"Due: " + a.due_date.split("T")[0]} 

@@ -7,6 +7,11 @@ interface TenantProps {
     email: String
     phone: String
     role_id: number
+    apartment_id: number
+    apartment: string
+    rent: string
+    status: string
+    evict: Function
   }
 
 function TenantBox(props : TenantProps)
@@ -20,16 +25,16 @@ function TenantBox(props : TenantProps)
                 <h1>Name: {props.name}</h1>
                 <h1>Email: {props.email}</h1>
                 <h1>Phone: {props.phone}</h1>
-                <h1>Apartment: 1 demo street</h1>
-                <h1>Monthly Rent: 0$</h1>
-                <h1>Rent Status: Paid</h1>
+                <h1>Apartment: {props.apartment != '' ? props.apartment : "None"}</h1>
+                {props.apartment != '' && <h1>Monthly Rent: {Number(props.rent) > 0 ? props.rent : "Not Set"}</h1>}
+                {props.apartment != '' && <h1>Rent Status: {props.status}</h1>}
             </div>
             <div className="flex flex-row justify-end items-center gap-10">
                 <p className="status-box-green"></p>
                 <div className="flex flex-col w-[160px] gap-2">
                     <button className="black-button" onClick={()=>{setShowChange(true)}}>Change Apartment</button>
                     <button className="black-button" onClick={()=>{setShowChange2(true)}}>Change Rent</button>
-                    <button className="black-button">Evict</button>
+                    <button className="black-button" onClick={()=>{props.evict(props.apartment_id)}}>Evict</button>
                     <button className="black-button" onClick={()=>{setShowPayments(true)}}>View Payments</button>
                 </div>
             </div>

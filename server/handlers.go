@@ -1042,6 +1042,7 @@ func (app *app) pay(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *app) updateAllPayments(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
 	activeRentings, err := app.Query.GetActiveRenting(app.Ctx)
 	if err != nil {
 		log.Println("GetActiveRenting:")
