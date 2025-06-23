@@ -179,19 +179,23 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = app.Query.GetPendingPaymants(app.Ctx)
-	if err != nil && err != sql.ErrNoRows {
-		log.Println("GetOverduePayments")
-		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-		return
+	if err != nil {
+		if err != sql.ErrNoRows {
+			log.Println("GetOverduePayments")
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
 	} else {
 		output.Status = "Pending"
 	}
 
 	_, err = app.Query.GetOverduePayments(app.Ctx)
-	if err != nil && err != sql.ErrNoRows {
-		log.Println("GetOverduePayments")
-		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-		return
+	if err != nil {
+		if err != sql.ErrNoRows {
+			log.Println("GetOverduePayments")
+			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+			return
+		}
 	} else {
 		output.Status = "Overdue"
 	}
@@ -434,7 +438,7 @@ func (app *app) addNewRenting(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rent, err := app.Query.GetActiveRentingID(app.Ctx, input.Renting.ApartmentID)
-	if err != nil && err != sql.ErrNoRows{
+	if err != nil && err != sql.ErrNoRows {
 		log.Println("GetActiveRentingID:")
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
