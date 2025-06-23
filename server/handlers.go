@@ -167,14 +167,14 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 		userId = int64(id)
 	}
 
-	renting, err := app.Query.GetActiveRentingID(app.Ctx, userId)
-	output.RentingID = renting.ID
-
 	output.Apartment, err = app.Query.GetApartmentAll(app.Ctx, userId)
 	if err != nil && err != sql.ErrNoRows {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
+
+	renting, err := app.Query.GetActiveRentingID(app.Ctx, output.Apartment.ID.Int64)
+	output.RentingID = renting.ID
 
 	output.Rent, err = app.Query.GetRent(app.Ctx, output.Apartment.ID.Int64)
 	if err != nil && err != sql.ErrNoRows {
