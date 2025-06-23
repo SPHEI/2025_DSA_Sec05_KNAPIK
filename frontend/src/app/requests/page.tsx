@@ -62,14 +62,21 @@ function Requests() {
             try{
                 const res = await fetch('http://localhost:8080/faults/list?token=' + t)
                 const data = await res.json();
-                if(data.message)
+                if(data != null)
                 {
-                  setError(data.message)
+                  if(data.message)
+                  {
+                    setError(data.message)
+                  }
+                  else
+                  {
+                    //alert(JSON.stringify(data))
+                    setRequests(data);
+                  }
                 }
                 else
                 {
-                  //alert(JSON.stringify(data))
-                  setRequests(data);
+                  setRequests([])
                 }
             }
             catch(err: any)
@@ -79,14 +86,21 @@ function Requests() {
             try{
                 const res = await fetch('http://localhost:8080/repair/list?token=' + t)
                 const data = await res.json();
-                if(data.message)
+                if(data != null)
                 {
-                  setError(data.message)
+                  if(data.message)
+                  {
+                    setError(data.message)
+                  }
+                  else
+                  {
+                    //alert(JSON.stringify(data))
+                    setRepairs(data);
+                  }
                 }
                 else
                 {
-                  //alert(JSON.stringify(data))
-                  setRepairs(data);
+                  setRepairs([])
                 }
             }
             catch(err: any)
@@ -246,7 +260,7 @@ function Requests() {
               <b className="text-4xl">Assigned Repairs</b>
             </div>
             <div className="flex flex-col w-[50%] gap-5">
-              {repairs != null ? repairs.map((a, index) => <RepairBox
+              {repairs.length > 0 ? repairs.map((a, index) => <RepairBox
               key={index} id={a.id} title={a.title} assigned_date={a.date_assigned} completed_date={a.date_completed} status={a.status_id} 
               subcontractor={a.name} subcontractors={subcontractors}
               changeRepairSubcon={changeRepairSubcon} changeRepairStatus={changeRepairStatus}/>)
@@ -263,7 +277,7 @@ function Requests() {
             <div className="page-head w-[50%] min-w-[500px]">
               <b className="text-4xl">My requests</b>
             </div>
-            {requests != null ? requests.map((a, index) => <RequestBox 
+            {requests.length > 0  ? requests.map((a, index) => <RequestBox 
             key={index} id={a.id} title={a.title}description={a.description} date={a.date_reported} status={a.status_id}
             apartment_id={a.apartment_id} name={a.name} repairs={mapRepairsToRequest(a.id)} 
             changeRepairSubcon={changeRepairSubcon} changeRepairStatus={changeRepairStatus}

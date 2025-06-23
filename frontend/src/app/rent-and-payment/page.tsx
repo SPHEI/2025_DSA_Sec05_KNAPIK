@@ -13,7 +13,7 @@ function RentAndPayment() {
   const [error, setError] = useState("none");
   const pathname = usePathname();
 
-  const [payments, setPayments] = useState([{id: -1, user_id: -1, apartment_id: -1, amount: -1, payment_date: '', due_date: '', status_id: -1, transaction_reference: ''}])
+  const [payments, setPayments] = useState([{id: -1, amount: -1, payment_date: '', due_date: '', status_id: -1, renting_id: -1, transaction_reference: ''}])
   const [names,setNames] = useState([{id: -1, name: '', email: '', phone: '', role_id: -1}])
 
   const [role, setRole] = useState('')
@@ -33,19 +33,26 @@ function RentAndPayment() {
               const res = await fetch('http://localhost:8080/payments/list?token=' + t)
               const data = await res.json();
               //alert(JSON.stringify(data))
-              if(data.message)
+              if(data != null)
               {
-                  setError(data.message)
+                if(data.message)
+                {
+                    setError(data.message)
+                }
+                else
+                {
+                    setPayments(data)
+                }
               }
               else
               {
-                  setPayments(data)
+                setPayments([])
               }
               if(a === "1")
               {
                 const res2 = await fetch('http://localhost:8080/tenant/list?token=' + t)
                 const data2 = await res2.json();
-                //alert(JSON.stringify(data));
+                //alert(JSON.stringify(data2));
                 if(data2.message)
                 {
                   setError(data2.message)
@@ -141,7 +148,7 @@ function RentAndPayment() {
                 <img src={calendar.src} width={40} />
                 <b>Next Rent Due</b>
                 <h1>{
-                  payments.filter(a => a.status_id == 1).map(p => p.due_date).reduce((earliest, current) => {return new Date(current) < new Date(earliest) ? current : earliest;}).split("T")[0]
+                  payments.filter(a => a.status_id == 1).map(p => p.due_date).reduce((earliest, current) => {return new Date(current) < new Date(earliest) ? current : earliest;},'').split("T")[0]
               }</h1>
               </div>
             </div>
@@ -155,7 +162,7 @@ function RentAndPayment() {
                   <div key={index} className="flex flex-row">
                     <PaymentBox 
                     date={"Due: " + a.due_date.split("T")[0]} 
-                    name={role === "1" ? "Tenant: " + (names.find(b=>b.id == a.user_id)?.name) : ""} 
+                    name={role === "1" ? "Renting Id: " + (a.renting_id)  : ""} 
                     type={isOverdue(a.due_date) ? "Overdue" : ""} 
                     amount={a.amount} /> 
                     {role === "2" && <button className="black-button" onClick={()=>{pay(a.id)}}>Pay</button>}
@@ -166,7 +173,7 @@ function RentAndPayment() {
                 {payments.map((a,index) => a.status_id == 2 && 
                 <PaymentBox key={index}  
                 date={"Due: " + a.due_date.split("T")[0]}  
-                name={role === "1" ? "Tenant: " + (names.find(b=>b.id == a.user_id)?.name) : ""} 
+                name={role === "1" ? "Renting Id: " + (a.renting_id) : ""} 
                 type={"Paid on: " + a.payment_date.split("T")[0]} 
                 amount={a.amount} />)}
               </div>

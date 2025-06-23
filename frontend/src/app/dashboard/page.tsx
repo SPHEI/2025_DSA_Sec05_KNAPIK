@@ -14,7 +14,7 @@ function Dashboard() {
     const [error, setError] = useState('none')
 
     const [userInfo, setUserInfo] = useState({id: -1, name: '', phone: '', role_id: -1})
-    const [tenantInfo, setTenantInfo] = useState({apartment_id: -1, rent: -1})
+    const [tenantInfo, setTenantInfo] = useState({apartament_id: -1, rent: -1, status: ''})
     const [subconInfo, setSubconInfo] = useState({address: '', nip: '', speciality_id: -1})
 
     const [requests, setRequests] = useState([{id: -1, title : '',description: '', date_reported: '', status_id: -1, apartment_id: -1, name: ''}])
@@ -43,28 +43,42 @@ function Dashboard() {
                 {
                     const res3 = await fetch('http://localhost:8080/faults/list?token=' + t)
                     const data3 = await res3.json();
-                    if(data3.message)
+                    if(data3 != null)
                     {
-                        setError(data3.message)
+                        if(data3.message)
+                        {
+                            setError(data3.message)
+                        }
+                        else
+                        {
+                            //alert(JSON.stringify(data))
+                            setRequests(data3);
+                        }
                     }
                     else
                     {
-                        //alert(JSON.stringify(data))
-                        setRequests(data3);
+                        setRequests([])
                     }
                 }
                 else
                 {
                     const res4 = await fetch('http://localhost:8080/repair/list?token=' + t)
                     const data4 = await res4.json();
-                    if(data4.message)
+                    if(data4 != null)
                     {
-                        setError(data4.message)
+                        if(data4.message)
+                        {
+                            setError(data4.message)
+                        }
+                        else
+                        {
+                            //alert(JSON.stringify(data))
+                            setRepairs(data4);
+                        }  
                     }
                     else
                     {
-                        //alert(JSON.stringify(data))
-                        setRepairs(data4);
+                        setRepairs([])
                     }
                 }
                 if(data.role_id == 2)
@@ -77,6 +91,7 @@ function Dashboard() {
                     }
                     else
                     {
+                        alert(JSON.stringify(data2))
                         setTenantInfo(data2)
                     }
                 }
@@ -123,7 +138,7 @@ function Dashboard() {
                                 <div className="flex flex-col">
                                     <b className="text-2xl">Tenant Info</b>
                                     <h1 className="text-xl">Name: {userInfo.name}</h1>
-                                    <h1 className="text-xl">Apartment: {tenantInfo.apartment_id}</h1>
+                                    <h1 className="text-xl">Apartment: {tenantInfo.apartament_id}</h1>
                                 </div>
                             }
                             {userInfo.role_id === 3 &&
