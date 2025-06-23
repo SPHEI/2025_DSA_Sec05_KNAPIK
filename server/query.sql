@@ -202,6 +202,18 @@ SELECT *
 FROM payments
 WHERE status_id = 3;
 
+-- name: GetPendingPaymantsID :many
+SELECT payments.*
+FROM payments
+LEFT JOIN renting_history ON renting_history.id = payments.renting_id AND renting_history.user_id = ?
+WHERE payments.status_id = 1;
+
+-- name: GetOverduePaymentsID :many
+SELECT payments.*
+FROM payments
+LEFT JOIN renting_history ON renting_history.id = payments.renting_id AND renting_history.user_id = ?
+WHERE payments.status_id = 3;
+
 -- name: SetPaymanyOverdue :one
 UPDATE payments
 SET status_id = 3

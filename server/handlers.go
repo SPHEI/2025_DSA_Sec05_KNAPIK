@@ -142,6 +142,7 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 
 	output := struct {
 		Apartment sqlc.GetApartmentAllRow `json:"apartment"`
+		RentingID int64                   `json:"renting_id"`
 		Rent      float64                 `json:"rent"`
 		Status    string                  `json:"status"`
 	}{}
@@ -166,6 +167,9 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 		userId = int64(id)
 	}
 
+	renting, err := app.Query.GetActiveRentingID(app.Ctx, userId)
+	output.RentingID = renting.ID
+
 	output.Apartment, err = app.Query.GetApartmentAll(app.Ctx, userId)
 	if err != nil && err != sql.ErrNoRows {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
@@ -178,29 +182,32 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = app.Query.GetPendingPaymants(app.Ctx)
+	wah, err := app.Query.GetPendingPaymantsID(app.Ctx, userId)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			log.Println("GetOverduePayments")
 			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 			return
 		}
-	} else {
+	}
+	if len(wah) > 0 {
 		output.Status = "Pending"
 	}
 
-	_, err = app.Query.GetOverduePayments(app.Ctx)
+	pain, err := app.Query.GetOverduePaymentsID(app.Ctx, userId)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			log.Println("GetOverduePayments")
 			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 			return
 		}
-	} else {
+	}
+	if len(pain) > 0 {
 		output.Status = "Overdue"
 	}
 
 	if output.Status != "Overdue" && output.Status != "Pending" {
+		log.Println("what")
 		output.Status = "Paid"
 	}
 
@@ -1054,6 +1061,9 @@ func (app *app) updateAllPayments(w http.ResponseWriter, r *http.Request) {
 	for _, activeRenting := range activeRentings {
 		price, err := app.Query.GetRent(app.Ctx, activeRenting.ApartmentID)
 		if err != nil {
+			if err == sql.ErrNoRows {
+				continue
+			}
 			log.Println("GetRent:")
 			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 			return
