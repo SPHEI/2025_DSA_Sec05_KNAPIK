@@ -305,7 +305,7 @@ func (app *app) getTenants(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output, err := app.Query.GetTenetsWithRent(app.Ctx)
+	output, err := app.Query.GetTenets(app.Ctx)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
