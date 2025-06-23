@@ -42,7 +42,13 @@ function RentAndPayment() {
                 }
                 else
                 {
-                    setPayments(data)
+                    const sorted = [...data].sort((a, b) => {
+                      const dateA = new Date(a.due_date).getTime();
+                      const dateB = new Date(b.due_date).getTime();
+                      return dateB - dateA;
+                    });
+
+                    setPayments(sorted);
                 }
               }
               else
