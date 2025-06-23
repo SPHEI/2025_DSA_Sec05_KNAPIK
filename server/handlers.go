@@ -451,7 +451,7 @@ func (app *app) addNewRenting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := app.Query.MakeAsEnd(app.Ctx, rent.ApartmentID); err != nil {
+	if err := app.Query.MakeAsEnd(app.Ctx, rent.ID); err != nil {
 		log.Println("MakeAsEnd:")
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return

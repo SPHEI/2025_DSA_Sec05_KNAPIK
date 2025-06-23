@@ -7,8 +7,8 @@ package sqlc
 
 import (
 	"context"
-	"time"
 	"server/types"
+	"time"
 )
 
 const addApartment = `-- name: AddApartment :one
