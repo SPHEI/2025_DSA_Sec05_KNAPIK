@@ -70,8 +70,8 @@ WHERE is_current = 1 AND apartment_id = ?;
 
 -- name: ChangeRent1 :exec
 UPDATE pricing_history
-	SET is_current = 1
-	WHERE is_current = 0 AND apartment_id = ?;
+	SET is_current = 0
+	WHERE is_current = 1 AND apartment_id = ?;
 
 -- name: ChangeRent2 :exec
 INSERT INTO pricing_history (apartment_id, price) VALUES(?, ?);

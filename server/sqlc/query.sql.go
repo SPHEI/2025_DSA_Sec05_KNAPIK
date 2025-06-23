@@ -188,8 +188,8 @@ func (q *Queries) AddUser(ctx context.Context, arg AddUserParams) error {
 
 const changeRent1 = `-- name: ChangeRent1 :exec
 UPDATE pricing_history
-	SET is_current = 1
-	WHERE is_current = 0 AND apartment_id = ?
+	SET is_current = 0
+	WHERE is_current = 1 AND apartment_id = ?
 `
 
 func (q *Queries) ChangeRent1(ctx context.Context, apartmentID int64) error {
