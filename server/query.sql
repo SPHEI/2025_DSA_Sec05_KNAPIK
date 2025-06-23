@@ -167,7 +167,9 @@ WHERE repair.id = ?
 RETURNING *;
 
 -- name: GetAllPayment :many
-SELECT * FROM payments;
+SELECT payments.*, user.name FROM payments
+LEFT JOIN renting_history ON renting_history.id = payments.renting_id
+LEFT JOIN user ON user.id = renting_history.user_id;
 
 -- name: AddPayment :exec
 INSERT INTO payments (

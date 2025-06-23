@@ -278,18 +278,31 @@ func (q *Queries) GetActiveRentingID(ctx context.Context, apartmentID int64) (Ge
 }
 
 const getAllPayment = `-- name: GetAllPayment :many
-SELECT id, amount, payment_date, due_date, status_id, renting_id, transaction_reference FROM payments
+SELECT payments.id, payments.amount, payments.payment_date, payments.due_date, payments.status_id, payments.renting_id, payments.transaction_reference, user.name FROM payments
+LEFT JOIN renting_history ON renting_history.id = payments.renting_id
+LEFT JOIN user ON user.id = renting_history.user_id
 `
 
-func (q *Queries) GetAllPayment(ctx context.Context) ([]Payment, error) {
+type GetAllPaymentRow struct {
+	ID                   int64          `json:"id"`
+	Amount               float64        `json:"amount"`
+	PaymentDate          types.JSONNullTime   `json:"payment_date"`
+	DueDate              time.Time      `json:"due_date"`
+	StatusID             int64          `json:"status_id"`
+	RentingID            int64          `json:"renting_id"`
+	TransactionReference types.JSONNullString `json:"transaction_reference"`
+	Name                 types.JSONNullString `json:"name"`
+}
+
+func (q *Queries) GetAllPayment(ctx context.Context) ([]GetAllPaymentRow, error) {
 	rows, err := q.db.QueryContext(ctx, getAllPayment)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Payment
+	var items []GetAllPaymentRow
 	for rows.Next() {
-		var i Payment
+		var i GetAllPaymentRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Amount,
@@ -298,6 +311,7 @@ func (q *Queries) GetAllPayment(ctx context.Context) ([]Payment, error) {
 			&i.StatusID,
 			&i.RentingID,
 			&i.TransactionReference,
+			&i.Name,
 		); err != nil {
 			return nil, err
 		}
