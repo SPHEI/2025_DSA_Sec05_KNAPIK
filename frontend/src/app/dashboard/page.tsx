@@ -120,7 +120,7 @@ function Dashboard() {
                     else
                     {
                         //alert(JSON.stringify(data2))
-                        setTenantInfo(data2)
+                        setTenantInfo(data2.apartment)
                     }
                 }
                 else if(data.role_id == 3)
