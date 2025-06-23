@@ -12,6 +12,7 @@ interface TenantProps {
     rent: string
     status: string
     evict: Function
+    renting_id: number
 
     changeRent: (id: number, newRent: number) => void;
     changeApartment: (a_id: number, u_id: number, date: string) => void;
@@ -44,6 +45,12 @@ function TenantBox(props : TenantProps)
         setShowChange2(false)
     }
 
+    function callChangeApartment()
+    {
+        props.changeApartment(apartment, props.id, date)
+        setShowChange(false)
+    }
+
     const line = "flex flex-row gap-1";
     return(
         <div className="w-[50%]">
@@ -57,12 +64,12 @@ function TenantBox(props : TenantProps)
                     {props.apartment != '' && <h1>Rent Status: {props.status}</h1>}
                 </div>
                 <div className="flex flex-row justify-end items-center gap-10">
-                    <p className="status-box-green"></p>
+                    <p className={props.status == "Overdue" ? "status-box-red" : props.status == "Pending" ? "status-box-yellow" : "status-box-green"}></p>
                     <div className="flex flex-col w-[160px] gap-2">
                         <div></div>
                         <button className="black-button" onClick={()=>{setShowChange(true)}}>{props.apartment != '' ? "Change Apartment" : "Assign Apartment"}</button>
                         {props.apartment != '' && <button className="black-button" onClick={()=>{setShowChange2(true)}}>Change Rent</button>}
-                        {props.apartment != '' && <button className="black-button" onClick={()=>{props.evict(props.apartment_id)}}>Evict</button>}
+                        {props.apartment != '' && <button className="black-button" onClick={()=>{props.evict(props.renting_id)}}>Evict</button>}
                     </div>
                 </div>
             </div>
@@ -85,7 +92,7 @@ function TenantBox(props : TenantProps)
                                     value={date}
                                     onChange={(e) => setDate(e.target.value)}
                                     />
-                                    <button className="black-button" onClick={() => {props.changeApartment(apartment, props.id, date)}}> Change </button>
+                                    <button className="black-button" onClick={callChangeApartment}> Change </button>
                                 </div>
                             </div>
                         </div>
