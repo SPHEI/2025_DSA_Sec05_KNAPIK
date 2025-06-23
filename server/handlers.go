@@ -141,9 +141,9 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	output := struct {
-		ApartamentId int64   `json:"apartament_id"`
-		Rent         float64 `json:"rent"`
-		Status       string  `json:"status"`
+		Apartment sqlc.GetApartmentAllRow `json:"apartment"`
+		Rent      float64                 `json:"rent"`
+		Status    string                  `json:"status"`
 	}{}
 
 	r.ParseMultipartForm(32 << 20)
@@ -166,45 +166,39 @@ func (app *app) tenantInfo(w http.ResponseWriter, r *http.Request) {
 		userId = int64(id)
 	}
 
-	apartmentId, err := app.Query.GetApartmentID(app.Ctx, userId)
-	if err != nil {
+	output.Apartment, err = app.Query.GetApartmentAll(app.Ctx, userId)
+	if err != nil && err != sql.ErrNoRows {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
 
-	output.Rent, err = app.Query.GetRent(app.Ctx, apartmentId)
-	if err != nil {
+	output.Rent, err = app.Query.GetRent(app.Ctx, output.Apartment.ID.Int64)
+	if err != nil && err != sql.ErrNoRows {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
 
 	_, err = app.Query.GetPendingPaymants(app.Ctx)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			output.Status = "Pending"
-		} else {
-			log.Println("GetOverduePayments")
-			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-			return
-		}
+	if err != nil && err != sql.ErrNoRows {
+		log.Println("GetOverduePayments")
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	} else {
+		output.Status = "Pending"
 	}
 
 	_, err = app.Query.GetOverduePayments(app.Ctx)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			output.Status = "Overdue"
-		} else {
-			log.Println("GetOverduePayments")
-			sendError(w, Error{400, "Database", "Internal Server Error"}, err)
-			return
-		}
+	if err != nil && err != sql.ErrNoRows {
+		log.Println("GetOverduePayments")
+		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
+		return
+	} else {
+		output.Status = "Overdue"
 	}
 
-	if output.Status == "" {
+	if output.Status != "Overdue" && output.Status != "Pending" {
 		output.Status = "Paid"
 	}
-
-	output.ApartamentId = apartmentId
 
 	err = json.NewEncoder(w).Encode(&output)
 	if err != nil {
@@ -354,13 +348,16 @@ func (app *app) addApartament(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.Query.AddApartment(app.Ctx, input.Apartment)
+	output, err := app.Query.AddApartment(app.Ctx, input.Apartment)
 	if err != nil {
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	if err = json.NewEncoder(w).Encode(&output); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }
 
 func (app *app) changeRent(w http.ResponseWriter, r *http.Request) {

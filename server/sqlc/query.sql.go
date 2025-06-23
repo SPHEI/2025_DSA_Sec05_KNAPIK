@@ -11,7 +11,7 @@ import (
 	"server/types"
 )
 
-const addApartment = `-- name: AddApartment :exec
+const addApartment = `-- name: AddApartment :one
 ;
 
 INSERT INTO apartment (
@@ -19,6 +19,7 @@ INSERT INTO apartment (
 ) VALUES(
   ?, ?, ?, ?, ?, ?
 )
+RETURNING id, name, street, building_number, building_name, flat_number, owner_id
 `
 
 type AddApartmentParams struct {
@@ -30,8 +31,8 @@ type AddApartmentParams struct {
 	OwnerID        int64  `json:"owner_id"`
 }
 
-func (q *Queries) AddApartment(ctx context.Context, arg AddApartmentParams) error {
-	_, err := q.db.ExecContext(ctx, addApartment,
+func (q *Queries) AddApartment(ctx context.Context, arg AddApartmentParams) (Apartment, error) {
+	row := q.db.QueryRowContext(ctx, addApartment,
 		arg.Name,
 		arg.Street,
 		arg.BuildingNumber,
@@ -39,7 +40,17 @@ func (q *Queries) AddApartment(ctx context.Context, arg AddApartmentParams) erro
 		arg.FlatNumber,
 		arg.OwnerID,
 	)
-	return err
+	var i Apartment
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Street,
+		&i.BuildingNumber,
+		&i.BuildingName,
+		&i.FlatNumber,
+		&i.OwnerID,
+	)
+	return i, err
 }
 
 const addFault = `-- name: AddFault :exec
@@ -301,6 +312,38 @@ func (q *Queries) GetAllPayment(ctx context.Context) ([]Payment, error) {
 	return items, nil
 }
 
+const getApartmentAll = `-- name: GetApartmentAll :one
+SELECT apartment.id, apartment.name, apartment.street, apartment.building_number, apartment.building_name, apartment.flat_number, apartment.owner_id FROM renting_history 
+LEFT JOIN apartment 
+ON renting_history.apartment_id = apartment.id
+WHERE renting_history.is_current IS 1 AND renting_history.user_id = ?
+`
+
+type GetApartmentAllRow struct {
+	ID             types.JSONNullInt64  `json:"id"`
+	Name           types.JSONNullString `json:"name"`
+	Street         types.JSONNullString `json:"street"`
+	BuildingNumber types.JSONNullString `json:"building_number"`
+	BuildingName   types.JSONNullString `json:"building_name"`
+	FlatNumber     types.JSONNullString `json:"flat_number"`
+	OwnerID        types.JSONNullInt64  `json:"owner_id"`
+}
+
+func (q *Queries) GetApartmentAll(ctx context.Context, userID int64) (GetApartmentAllRow, error) {
+	row := q.db.QueryRowContext(ctx, getApartmentAll, userID)
+	var i GetApartmentAllRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Street,
+		&i.BuildingNumber,
+		&i.BuildingName,
+		&i.FlatNumber,
+		&i.OwnerID,
+	)
+	return i, err
+}
+
 const getApartmentID = `-- name: GetApartmentID :one
 SELECT apartment_id FROM renting_history 
 WHERE is_current IS 1 AND user_id = ?
@@ -351,8 +394,7 @@ func (q *Queries) GetApartments(ctx context.Context) ([]Apartment, error) {
 
 const getApartmentsAndRent = `-- name: GetApartmentsAndRent :many
 SELECT apartment.id, apartment.name, apartment.street, apartment.building_number, apartment.building_name, apartment.flat_number, apartment.owner_id, pricing_history.price FROM apartment
-LEFT JOIN pricing_history ON pricing_history.apartment_id = apartment.id
-WHERE pricing_history.is_current = 1
+LEFT JOIN pricing_history ON pricing_history.apartment_id = apartment.id AND pricing_history.is_current = 1
 `
 
 type GetApartmentsAndRentRow struct {

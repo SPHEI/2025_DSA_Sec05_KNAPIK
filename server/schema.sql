@@ -186,7 +186,6 @@ INSERT INTO apartment (name, street, building_number, building_name, flat_number
 -- pricing history
 INSERT INTO pricing_history (apartment_id, date, price, is_current) VALUES
 (1, '2025-01-01', 1200.00, 1),
-(2, '2025-01-01', 850.00, 1),
 (3, '2025-01-01', 2500.00, 1);
 
 -- subcontractors

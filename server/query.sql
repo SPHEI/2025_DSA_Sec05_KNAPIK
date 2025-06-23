@@ -26,6 +26,12 @@ WHERE user.id = ?;
 SELECT apartment_id FROM renting_history 
 WHERE is_current IS 1 AND user_id = ?;
 
+-- name: GetApartmentAll :one
+SELECT apartment.* FROM renting_history 
+LEFT JOIN apartment 
+ON renting_history.apartment_id = apartment.id
+WHERE renting_history.is_current IS 1 AND renting_history.user_id = ?;
+
 -- name: GetSubconInfo :one
 SELECT address, NIP, speciality_id FROM subcontractor 
 WHERE user_id = ?;
@@ -42,12 +48,13 @@ SELECT subcontractor.*, user.name FROM subcontractor
 INNER JOIN user ON subcontractor.user_id = user.id;
 ;
 
--- name: AddApartment :exec
+-- name: AddApartment :one
 INSERT INTO apartment (
   name, street, building_number, building_name, flat_number, owner_id
 ) VALUES(
   ?, ?, ?, ?, ?, ?
-);
+)
+RETURNING *;
 
 -- name: GetApartments :many
 SELECT id, name, street, building_number, building_name, flat_number, owner_id
@@ -55,8 +62,7 @@ FROM apartment;
 
 -- name: GetApartmentsAndRent :many
 SELECT apartment.*, pricing_history.price FROM apartment
-LEFT JOIN pricing_history ON pricing_history.apartment_id = apartment.id
-WHERE pricing_history.is_current = 1;
+LEFT JOIN pricing_history ON pricing_history.apartment_id = apartment.id AND pricing_history.is_current = 1;
 
 -- name: GetRent :one
 SELECT price FROM pricing_history 
