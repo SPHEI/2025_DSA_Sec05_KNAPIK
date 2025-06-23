@@ -9,7 +9,7 @@ import { useRouter, usePathname } from 'next/navigation';
 function Tenants() {
     const [ready,setReady] = useState(false)
     const [error, setError] = useState('none')
-    const [names,setNames] = useState([{id: -1, name: '', email: '', phone: '', role_id: -1, id_2: -1, name_2: '', price: '', renting_id: -1}])
+    const [names,setNames] = useState([{id: -1, name: '', email: '', phone: '', role_id: -1, id_2: -1, name_2: '', price: '', renting_id: -1, status: ''}])
     const [apartaments,setApartaments] = useState([{id: -1,name: '', street: '', building_number: '', building_name: '',flat_number:'',owner_id:-1 }])
     const pathname = usePathname();
     const router = useRouter();
@@ -33,7 +33,7 @@ function Tenants() {
             }
             const res = await fetch('http://localhost:8080/tenant/list?token=' + t)
             const data = await res.json();
-            //alert(JSON.stringify(data));
+            console.log(JSON.stringify(data));
             if(data.message)
             {
             setError(data.message)
@@ -42,13 +42,17 @@ function Tenants() {
             {
             for(const a of data)
             {
-                alert(a.id)
+                //alert(a.id)
                 const res2 = await fetch('http://localhost:8080/tenant/info?token=' + t +"&id=" + Number(a.id))
                 const data2 = await res2.json()
-                alert(JSON.stringify(data2))
+                console.log(JSON.stringify(data2))
                 if(data2.renting_id != null)
                 {
                     a.renting_id = data2.renting_id
+                }
+                if(data2.status != null)
+                {
+                    a.status = data2.status
                 }
             }
             //alert(JSON.stringify(data))
@@ -92,9 +96,10 @@ function Tenants() {
         }
     }
 
-    const changeApartment = async(a_id: number, u_id: number, date: string) =>
+    const changeApartment = async(a_id: number, u_id: number, date: string, r_id: number) =>
     {
         console.log(a_id + " " + u_id + " " + date)
+        evict(r_id, date)
         var t = Cookies.get("token");
         const res2 = await fetch('http://localhost:8080/renting/start',{
             method:'POST',
@@ -119,9 +124,47 @@ function Tenants() {
         }
     }
 
-    async function evict(id: number)
+    async function evict(id: number, date: string)
     {
-        alert(id)
+        console.log(id + " " + date)
+        var t = Cookies.get("token");
+        const res = await fetch('http://localhost:8080/renting/end',{
+            method:'POST',
+            body: JSON.stringify({ 
+                "token": t,
+                "end" : {
+                    "end_date" : date + "T00:00:00Z",
+                    "id" : id,
+                }
+            })
+        });
+        if(res.ok)
+        {
+            console.log("evict date succesful")
+        }
+        else
+        {
+            var data = await res.json()
+            alert(data.message)
+        }
+
+        const res2 = await fetch('http://localhost:8080/renting/endStatus',{
+            method:'POST',
+            body: JSON.stringify({ 
+                "token": t,
+                "renting_id" :id 
+            })
+        });
+        if(res2.ok)
+        {
+            console.log("evict status succesful")
+        }
+        else
+        {
+            var data2 = await res2.json()
+            alert(data2.message)
+        }
+        refresh()
     }
 
     if(ready)
@@ -135,7 +178,7 @@ function Tenants() {
                         <button className="black-button" onClick={() =>{router.push("/accounts")}}>+ Add Tenants</button>
                     </div>
                     {names.map((text, index) => <TenantBox key={index} id={text.id} name={text.name} email={text.email} phone={text.phone} role_id={text.role_id} 
-                    apartment_id = {text.id_2} apartment={text.name_2} rent={text.price} status="Paid" renting_id={text.renting_id}
+                    apartment_id = {text.id_2} apartment={text.name_2} rent={text.price} status={text.status} renting_id={text.renting_id}
                     evict={evict} changeRent={changeRent} changeApartment={changeApartment}
                     apartments={apartaments}/>)}
                 </main>

@@ -15,7 +15,7 @@ interface TenantProps {
     renting_id: number
 
     changeRent: (id: number, newRent: number) => void;
-    changeApartment: (a_id: number, u_id: number, date: string) => void;
+    changeApartment: (a_id: number, u_id: number, date: string, r_id: number) => void;
 
     apartments: {id: number,name: string, street: string, building_number: string, building_name: string,flat_number:string,owner_id:number }[]
   }
@@ -24,11 +24,13 @@ function TenantBox(props : TenantProps)
 {
     const [showChange, setShowChange] = useState(false)
     const [showChange2, setShowChange2] = useState(false)
+    const [showEvict, setShowEvict] = useState(false)
 
     const [newRent, setNewRent] = useState('')
 
     const [apartment, setApartment] = useState(1);
     const [date, setDate] = useState('');
+    const [edate, setEdate] = useState('');
 
     const formatNumber = (value: string) => {
         const digits = value.replace(/[^\d.]/g, '');
@@ -47,8 +49,14 @@ function TenantBox(props : TenantProps)
 
     function callChangeApartment()
     {
-        props.changeApartment(apartment, props.id, date)
+        props.changeApartment(apartment, props.id, date, props.renting_id)
         setShowChange(false)
+    }
+
+    function callEvict()
+    {
+        props.evict(props.renting_id, edate)
+        setShowEvict(false)
     }
 
     const line = "flex flex-row gap-1";
@@ -69,7 +77,7 @@ function TenantBox(props : TenantProps)
                         <div></div>
                         <button className="black-button" onClick={()=>{setShowChange(true)}}>{props.apartment != '' ? "Change Apartment" : "Assign Apartment"}</button>
                         {props.apartment != '' && <button className="black-button" onClick={()=>{setShowChange2(true)}}>Change Rent</button>}
-                        {props.apartment != '' && <button className="black-button" onClick={()=>{props.evict(props.renting_id)}}>Evict</button>}
+                        {props.apartment != '' && <button className="black-button" onClick={()=>{setShowEvict(true)}}>Evict</button>}
                     </div>
                 </div>
             </div>
@@ -111,6 +119,29 @@ function TenantBox(props : TenantProps)
                             </div>
                         </div>
                         <button onClick={() => setShowChange2(false)}className="absolute top-4 right-4 text-xl font-bold cursor-pointer">x</button>
+                    </div>
+                </div>
+            )}
+            {showEvict && (
+                <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50">
+                    <div className="white-box w-[40%] py-4 rounded-lg relative min-w-[400px]">
+                        <div className="flex flex-col gap-2 w-[100%] ">
+                            <div>
+                                <div className={line}>
+                                    <b className="w-[26%]">End Date</b>
+                                </div>
+                                <div className={line}>
+                                    <input
+                                    type="date"
+                                    className="input-box w-[26%]"
+                                    value={edate}
+                                    onChange={(e) => setEdate(e.target.value)}
+                                    />
+                                    <button className="black-button" onClick={callEvict}> Evict </button>
+                                </div>
+                            </div>
+                        </div>
+                        <button onClick={() => setShowEvict(false)}className="absolute top-4 right-4 text-xl font-bold cursor-pointer">x</button>
                     </div>
                 </div>
             )}

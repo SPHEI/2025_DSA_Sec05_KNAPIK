@@ -119,7 +119,7 @@ function Dashboard() {
                     }
                     else
                     {
-                        //alert(JSON.stringify(data2))
+                        console.log(JSON.stringify(data2))
                         setTenantInfo(data2.apartment)
                     }
                 }
