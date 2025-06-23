@@ -14,7 +14,7 @@ function Dashboard() {
     const [error, setError] = useState('none')
 
     const [userInfo, setUserInfo] = useState({id: -1, name: '', phone: '', role_id: -1})
-    const [tenantInfo, setTenantInfo] = useState({apartament_id: -1, rent: -1, status: ''})
+    const [tenantInfo, setTenantInfo] = useState({id:-1,name:'',street:'',building_number:'',building_name:'',flat_number:'',owner_id:-1})
     const [subconInfo, setSubconInfo] = useState({address: '', nip: '', speciality_id: -1})
 
     const [requests, setRequests] = useState([{id: -1, title : '',description: '', date_reported: '', status_id: -1, apartment_id: -1, name: ''}])
@@ -75,7 +75,8 @@ function Dashboard() {
                     {
                         if(data3.message)
                         {
-                            setError(data3.message)
+                            console.log(data3.message)
+                            setRequests([])
                         }
                         else
                         {
@@ -166,7 +167,7 @@ function Dashboard() {
                                 <div className="flex flex-col">
                                     <b className="text-2xl">Tenant Info</b>
                                     <h1 className="text-xl">Name: {userInfo.name}</h1>
-                                    <h1 className="text-xl">Apartment: {tenantInfo.apartament_id}</h1>
+                                    <h1 className="text-xl">Apartment: {tenantInfo.name != '' ? tenantInfo.name : "None"}</h1>
                                 </div>
                             }
                             {userInfo.role_id === 3 &&

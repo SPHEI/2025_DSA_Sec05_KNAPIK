@@ -48,6 +48,7 @@ function Tenants() {
                 console.log(JSON.stringify(data2))
                 if(data2!= null)
                 {
+                    a.id_2 = data2.apartment.id
                     a.name_2 = data2.apartment.name
                     a.price = data2.rent
                     a.renting_id = data2.renting_id

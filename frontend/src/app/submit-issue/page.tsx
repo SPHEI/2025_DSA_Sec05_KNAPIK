@@ -85,8 +85,8 @@ function SubmitIssue() {
             }
             else
             {
-              //alert(data.apartament_id)
-                setApartment(data.apartament_id);
+              console.log(data.apartment.id)
+                setApartment(data.apartment.id);
             }
         }
         catch(err: any)
