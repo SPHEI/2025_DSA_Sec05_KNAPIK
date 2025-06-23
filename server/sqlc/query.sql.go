@@ -651,7 +651,7 @@ func (q *Queries) GetPayments(ctx context.Context, rentingID int64) ([]Payment, 
 const getPaymentsId = `-- name: GetPaymentsId :many
 SELECT id, amount, payment_date, due_date, status_id, renting_id, transaction_reference
 FROM payments
-WHERE renting_id = (SELECT id FROM renting_history WHERE user_id = ?)
+WHERE renting_id = (SELECT id FROM renting_history WHERE user_id = ? AND is_current = 1)
 `
 
 func (q *Queries) GetPaymentsId(ctx context.Context, userID int64) ([]Payment, error) {
