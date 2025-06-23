@@ -434,7 +434,7 @@ func (app *app) addNewRenting(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rent, err := app.Query.GetActiveRentingID(app.Ctx, input.Renting.ApartmentID)
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows{
 		log.Println("GetActiveRentingID:")
 		sendError(w, Error{400, "Database", "Internal Server Error"}, err)
 		return
@@ -1039,6 +1039,7 @@ func (app *app) pay(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *app) updateAllPayments(w http.ResponseWriter, r *http.Request) {
+	prepareResponse(w)
 	activeRentings, err := app.Query.GetActiveRenting(app.Ctx)
 	if err != nil {
 		log.Println("GetActiveRenting:")

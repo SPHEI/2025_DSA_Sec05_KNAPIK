@@ -13,7 +13,7 @@ function RentAndPayment() {
   const [error, setError] = useState("none");
   const pathname = usePathname();
 
-  const [payments, setPayments] = useState([{id: -1, user_id: -1, apartment_id: -1, amount: -1, payment_date: '', due_date: '', status_id: -1, transaction_reference: ''}])
+  const [payments, setPayments] = useState([{id: -1, amount: -1, payment_date: '', due_date: '', status_id: -1, renting_id: -1, transaction_reference: ''}])
   const [names,setNames] = useState([{id: -1, name: '', email: '', phone: '', role_id: -1}])
 
   const [role, setRole] = useState('')
@@ -30,22 +30,36 @@ function RentAndPayment() {
           setRole(a)
           var t = Cookies.get("token");
           try{
+              await fetch('http://localhost:8080/test')
               const res = await fetch('http://localhost:8080/payments/list?token=' + t)
               const data = await res.json();
               //alert(JSON.stringify(data))
-              if(data.message)
+              if(data != null)
               {
-                  setError(data.message)
+                if(data.message)
+                {
+                    setError(data.message)
+                }
+                else
+                {
+                    const sorted = [...data].sort((a, b) => {
+                      const dateA = new Date(a.due_date).getTime();
+                      const dateB = new Date(b.due_date).getTime();
+                      return dateB - dateA;
+                    });
+
+                    setPayments(sorted);
+                }
               }
               else
               {
-                  setPayments(data)
+                setPayments([])
               }
               if(a === "1")
               {
                 const res2 = await fetch('http://localhost:8080/tenant/list?token=' + t)
                 const data2 = await res2.json();
-                //alert(JSON.stringify(data));
+                //alert(JSON.stringify(data2));
                 if(data2.message)
                 {
                   setError(data2.message)
@@ -117,7 +131,7 @@ function RentAndPayment() {
                 
                 <b>Rent Status</b>
                 <h1>{
-                  payments.filter(a => a.status_id == 1).some(a => {const date = new Date(a.due_date.split("T")[0]);const now = new Date();return date < now}) ? "Overdue" :
+                  payments.some(a => a.status_id == 3) ? "Overdue" :
                   payments.some(a => a.status_id == 1) ? "Unpaid" : "Paid"
                 }</h1>
               
@@ -129,19 +143,22 @@ function RentAndPayment() {
                 
                 <b>Overdue Payments</b>
                 <h1>{
-                  payments.filter(a => a.status_id == 1).filter(a => {const date = new Date(a.due_date.split("T")[0]);const now = new Date();return date < now}).length
+                  payments.filter(a => a.status_id == 3).length
                 }</h1>
               
               </div>
               }
             </div>
-            {role === "2" &&
+            {role === "2" && payments.filter(a => a.status_id != 2).length > 0 &&
             <div className="white-box h-[150px] w-[100%]">
               <div className="flex flex-col items-center justify-center">
                 <img src={calendar.src} width={40} />
                 <b>Next Rent Due</b>
                 <h1>{
-                  payments.filter(a => a.status_id == 1).map(p => p.due_date).reduce((earliest, current) => {return new Date(current) < new Date(earliest) ? current : earliest;}).split("T")[0]
+                  payments.filter(a => a.status_id != 2)
+                  .map(p => p.due_date)
+                  .reduce((earliest, current) => {return new Date(current.split("T")[0]) < new Date(earliest.split("T")[0]) ? current : earliest;},"3000-01-01")
+                  .split("T")[0]
               }</h1>
               </div>
             </div>
@@ -151,11 +168,11 @@ function RentAndPayment() {
             <div className="flex flex-col items-left justify-start w-full h-full gap-2">
               <b className="text-xl">Pending Payments</b>
               <div className="flex flex-col gap-1">
-                {payments.map((a,index) => a.status_id == 1 && (
+                {payments.map((a,index) => a.status_id != 2 && (
                   <div key={index} className="flex flex-row">
                     <PaymentBox 
                     date={"Due: " + a.due_date.split("T")[0]} 
-                    name={role === "1" ? "Tenant: " + (names.find(b=>b.id == a.user_id)?.name) : ""} 
+                    name={role === "1" ? "Renting Id: " + (a.renting_id)  : ""} 
                     type={isOverdue(a.due_date) ? "Overdue" : ""} 
                     amount={a.amount} /> 
                     {role === "2" && <button className="black-button" onClick={()=>{pay(a.id)}}>Pay</button>}
@@ -166,7 +183,7 @@ function RentAndPayment() {
                 {payments.map((a,index) => a.status_id == 2 && 
                 <PaymentBox key={index}  
                 date={"Due: " + a.due_date.split("T")[0]}  
-                name={role === "1" ? "Tenant: " + (names.find(b=>b.id == a.user_id)?.name) : ""} 
+                name={role === "1" ? "Renting Id: " + (a.renting_id) : ""} 
                 type={"Paid on: " + a.payment_date.split("T")[0]} 
                 amount={a.amount} />)}
               </div>

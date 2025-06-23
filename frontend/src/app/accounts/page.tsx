@@ -215,6 +215,7 @@ function Dashboard() {
                 })
             });
             const data = await res.json();
+            alert(JSON.stringify(data))
             if(data.message)
             {
                 alert(data.message)

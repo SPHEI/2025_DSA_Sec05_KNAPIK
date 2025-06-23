@@ -14,11 +14,13 @@ function Dashboard() {
     const [error, setError] = useState('none')
 
     const [userInfo, setUserInfo] = useState({id: -1, name: '', phone: '', role_id: -1})
-    const [tenantInfo, setTenantInfo] = useState({apartment_id: -1, rent: -1})
+    const [tenantInfo, setTenantInfo] = useState({apartament_id: -1, rent: -1, status: ''})
     const [subconInfo, setSubconInfo] = useState({address: '', nip: '', speciality_id: -1})
 
     const [requests, setRequests] = useState([{id: -1, title : '',description: '', date_reported: '', status_id: -1, apartment_id: -1, name: ''}])
     const [repairs, setRepairs] = useState([{id: -1, title: '', fault_report_id: -1, date_assigned: '', date_completed: '', status_id: -1, subcontractor_id: -1, name: ''}])
+
+    const [payments, setPayments] = useState([{id: -1, amount: -1, payment_date: '', due_date: '', status_id: -1, renting_id: -1, transaction_reference: ''}])
 
     const router = useRouter();
     const pathname = usePathname();
@@ -41,30 +43,70 @@ function Dashboard() {
                 setUserInfo(data)
                 if(data.role_id != 3)
                 {
-                    const res3 = await fetch('http://localhost:8080/faults/list?token=' + t)
-                    const data3 = await res3.json();
-                    if(data3.message)
+                    await fetch('http://localhost:8080/test')
+                    const res5 = await fetch('http://localhost:8080/payments/list?token=' + t)
+                    const data5 = await res5.json();
+                    //alert(JSON.stringify(data))
+                    if(data5 != null)
                     {
-                        setError(data3.message)
+                        if(data5.message)
+                        {
+                            setError(data5.message)
+                        }
+                        else
+                        {
+                            const sorted = [...data5].sort((a, b) => {
+                                const dateA = new Date(a.due_date).getTime();
+                                const dateB = new Date(b.due_date).getTime();
+                                return dateB - dateA;
+                            });
+
+                            setPayments(sorted);
+                            //alert(JSON.stringify(sorted))
+                        }
                     }
                     else
                     {
-                        //alert(JSON.stringify(data))
-                        setRequests(data3);
+                        setPayments([])
+                    }
+                    const res3 = await fetch('http://localhost:8080/faults/list?token=' + t)
+                    const data3 = await res3.json();
+                    if(data3 != null)
+                    {
+                        if(data3.message)
+                        {
+                            setError(data3.message)
+                        }
+                        else
+                        {
+                            //alert(JSON.stringify(data))
+                            setRequests(data3);
+                        }
+                    }
+                    else
+                    {
+                        setRequests([])
                     }
                 }
                 else
                 {
                     const res4 = await fetch('http://localhost:8080/repair/list?token=' + t)
                     const data4 = await res4.json();
-                    if(data4.message)
+                    if(data4 != null)
                     {
-                        setError(data4.message)
+                        if(data4.message)
+                        {
+                            setError(data4.message)
+                        }
+                        else
+                        {
+                            //alert(JSON.stringify(data))
+                            setRepairs(data4);
+                        }  
                     }
                     else
                     {
-                        //alert(JSON.stringify(data))
-                        setRepairs(data4);
+                        setRepairs([])
                     }
                 }
                 if(data.role_id == 2)
@@ -77,6 +119,7 @@ function Dashboard() {
                     }
                     else
                     {
+                        //alert(JSON.stringify(data2))
                         setTenantInfo(data2)
                     }
                 }
@@ -123,7 +166,7 @@ function Dashboard() {
                                 <div className="flex flex-col">
                                     <b className="text-2xl">Tenant Info</b>
                                     <h1 className="text-xl">Name: {userInfo.name}</h1>
-                                    <h1 className="text-xl">Apartment: {tenantInfo.apartment_id}</h1>
+                                    <h1 className="text-xl">Apartment: {tenantInfo.apartament_id}</h1>
                                 </div>
                             }
                             {userInfo.role_id === 3 &&
@@ -141,8 +184,12 @@ function Dashboard() {
                         <div className="white-box h-[150px] w-[100%]">
                             <div className="flex flex-col items-center justify-center">
                                 <img src={card.src} width={40} />
-                                <b>Total Rent Paid</b>
-                                <h1>2400$</h1>
+                                <b>{userInfo.role_id == 2 ? "Total Rent Paid" : "Profits"}</b>
+                                <h1>
+                                    {
+                                        "$" + payments.filter(a => a.status_id == 2).reduce((sum, payment) => sum + payment.amount, 0)
+                                    }
+                                </h1>
                             </div>
                         </div>
                         }
@@ -155,25 +202,35 @@ function Dashboard() {
                                 </div>
                             </div>
                         </button>
-                        {userInfo.role_id != 3 &&
-                            <div className="white-box h-[150px] w-[100%]">
-                                <div className="flex flex-col items-center justify-center">
-                                    <img src={calendar.src} width={40} />
-                                    <b>Next Rent Due</b>
-                                    <h1>28.06.2025</h1>
+                        {userInfo.role_id == 2 &&
+                            <button className="cursor-pointer h-[100%] w-[150%]" onClick={() => router.push("/rent-and-payment")}>
+                                <div className="white-box h-[150px] w-[100%]">
+                                    <div className="flex flex-col items-center justify-center">
+                                        <img src={calendar.src} width={40} />
+                                        <b>Next Rent Due</b>
+                                        <h1>{
+                                            payments.filter(a => a.status_id != 2)
+                                            .map(p => p.due_date)
+                                            .reduce((earliest, current) => {return new Date(current.split("T")[0]) < new Date(earliest.split("T")[0]) ? current : earliest;},"3000-01-01")
+                                            .split("T")[0]
+                                        }</h1>
+                                    </div>
                                 </div>
-                            </div>
+                            </button>
                         }
                     </div>
                     {userInfo.role_id != 3 &&
                         <div className="white-box w-[50%] min-w-[600px] py-4">
                             <div className="flex flex-col items-left justify-start w-full h-full gap-2">
-                                <b className="text-xl">Recent Operations</b>
+                                <b className="text-xl">Recent Payments</b>
                                 <div className="flex flex-col gap-1">
-                                    <PaymentBox date={"April 30 2025"} type={"Loss"} amount={2500}/>
-                                    <PaymentBox date={"April 30 2025"} type={"Income"} amount={2500}/>
-                                    <PaymentBox date={"April 30 2025"} type={""} amount={2500}/>
-                                    <PaymentBox date={"April 30 2025"} type={""} amount={2500}/>
+                                    {payments.filter(a=>a.status_id == 2).slice(0,4).map((a, index) => 
+                                    <PaymentBox 
+                                    key={index}
+                                    date={"Due: " + a.due_date.split("T")[0]}  
+                                    name={userInfo.role_id === 1 ? "Renting Id: " + (a.renting_id) : ""} 
+                                    type={"Paid on: " + a.payment_date.split("T")[0]} 
+                                    amount={a.amount} />)}
                                 </div>
                             </div>
                         </div>
