@@ -649,20 +649,32 @@ func (q *Queries) GetPayments(ctx context.Context, rentingID int64) ([]Payment, 
 }
 
 const getPaymentsId = `-- name: GetPaymentsId :many
-SELECT id, amount, payment_date, due_date, status_id, renting_id, transaction_reference
-FROM payments
-WHERE renting_id = (SELECT id FROM renting_history WHERE user_id = ? AND is_current = 1)
+SELECT payments.id, payments.amount, payments.payment_date, payments.due_date, payments.status_id, payments.renting_id, payments.transaction_reference, user.name FROM payments
+LEFT JOIN renting_history ON renting_history.id = payments.renting_id
+lEFT JOIN user ON renting_history.user_id = user.id
+WHERE renting_history.user_id = ?
 `
 
-func (q *Queries) GetPaymentsId(ctx context.Context, userID int64) ([]Payment, error) {
+type GetPaymentsIdRow struct {
+	ID                   int64          `json:"id"`
+	Amount               float64        `json:"amount"`
+	PaymentDate          types.JSONNullTime   `json:"payment_date"`
+	DueDate              time.Time      `json:"due_date"`
+	StatusID             int64          `json:"status_id"`
+	RentingID            int64          `json:"renting_id"`
+	TransactionReference types.JSONNullString `json:"transaction_reference"`
+	Name                 types.JSONNullString `json:"name"`
+}
+
+func (q *Queries) GetPaymentsId(ctx context.Context, userID int64) ([]GetPaymentsIdRow, error) {
 	rows, err := q.db.QueryContext(ctx, getPaymentsId, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Payment
+	var items []GetPaymentsIdRow
 	for rows.Next() {
-		var i Payment
+		var i GetPaymentsIdRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Amount,
@@ -671,6 +683,7 @@ func (q *Queries) GetPaymentsId(ctx context.Context, userID int64) ([]Payment, e
 			&i.StatusID,
 			&i.RentingID,
 			&i.TransactionReference,
+			&i.Name,
 		); err != nil {
 			return nil, err
 		}
