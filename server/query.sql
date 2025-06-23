@@ -190,7 +190,7 @@ WHERE renting_id = ?;
 -- name: GetPaymentsId :many
 SELECT *
 FROM payments
-WHERE renting_id = (SELECT id FROM renting_history WHERE user_id = ?);
+WHERE renting_id = (SELECT id FROM renting_history WHERE user_id = ? AND is_current = 1);
 
 -- name: GetPendingPaymants :many
 SELECT *
