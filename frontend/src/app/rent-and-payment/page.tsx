@@ -176,6 +176,7 @@ function RentAndPayment() {
             </div>
             }
           </div>
+          {role === "1" && 
           <div className="white-box w-[50%] py-4">
             <div className="flex flex-row gap-1">
               <h1 className="text-xl">Tenant Filter:</h1>
@@ -184,6 +185,8 @@ function RentAndPayment() {
               </select>
             </div>
           </div>
+          }
+
           <div className="white-box w-[50%] py-4">
             <div className="flex flex-col items-left justify-start w-full h-full gap-2">
               <b className="text-xl">Pending Payments</b>

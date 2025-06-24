@@ -93,7 +93,8 @@ function Requests() {
                 {
                   if(data.message)
                   {
-                    setError(data.message)
+                    console.log(data.message)
+                    setRepairs([])
                   }
                   else
                   {

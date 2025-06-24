@@ -73,7 +73,7 @@ function TenantBox(props : TenantProps)
                     {props.apartment != '' && <h1>Rent Status: {props.status}</h1>}
                 </div>
                 <div className="flex flex-row justify-end items-center gap-10">
-                    <p className={props.status == "Overdue" ? "status-box-red" : props.status == "Pending" ? "status-box-yellow" : "status-box-green"}></p>
+                    <p className={ props.apartment == '' ? '' : props.status == "Overdue" ? "status-box-red" : props.status == "Pending" ? "status-box-yellow" : "status-box-green"}></p>
                     <div className="flex flex-col w-[160px] gap-2">
                         <div></div>
                         <button className="black-button" onClick={()=>{setShowChange(true)}}>{props.apartment != '' ? "Change Apartment" : "Assign Apartment"}</button>
