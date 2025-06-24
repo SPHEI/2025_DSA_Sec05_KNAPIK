@@ -17,10 +17,19 @@ function Tenants() {
         refresh()
     },[pathname])
 
+    const [sort, setSort] = useState('None')
     async function refresh()
     {
         try {
+            var s = Cookies.get("tSort");
+            if(s != null)
+            {
+                setSort(s)
+                Cookies.remove("tSort")
+            }
             var t = Cookies.get("token");
+            await fetch('http://localhost:8080/test')
+            await fetch('http://localhost:8080/payments/list?token=' + t)
             const res2 = await fetch('http://localhost:8080/apartament/list?token=' + t)
             const data2 = await res2.json();
             if(data2.message)
@@ -167,6 +176,30 @@ function Tenants() {
         refresh()
     }
 
+    async function viewPayments(name: string)
+    {
+        Cookies.set("tFilter", name)
+        router.push("/rent-and-payment")
+    }
+    
+    const priorityPaid: Record<string, number> = {
+        "Paid" : 3,
+        "Pending" : 2,
+        "Overdue" : 1
+    };
+
+    const priorityPending: Record<string, number> = {
+        "Paid" : 2,
+        "Pending" : 3,
+        "Overdue" : 1
+    };
+    
+    const priorityOverdue: Record<string, number> = {
+        "Paid" : 1,
+        "Pending" : 2,
+        "Overdue" : 3
+    };
+
     if(ready)
     {
         if(error == 'none')
@@ -175,12 +208,26 @@ function Tenants() {
                 <main>
                     <div className="page-head w-[50%] min-w-[600px]">
                         <b className="text-4xl">Tenants</b> 
+                        <div className="flex flex-row gap-1 min-w-[300px]">
+                            <h1 className="text-2xl">Sort:</h1>
+                            <select className="input-box w-[50%]" value={sort} onChange={(a) => {setSort(a.target.value)}}>
+                                <option value="None">None</option>
+                                <option value="Paid">Paid</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Overdue">Overdue</option>
+                            </select>
                         <button className="black-button" onClick={() =>{router.push("/accounts")}}>+ Add Tenants</button>
+                        </div>
                     </div>
-                    {names.map((text, index) => <TenantBox key={index} id={text.id} name={text.name} email={text.email} phone={text.phone} role_id={text.role_id} 
+                    {names.length > 0  ? (sort == 'None' ? names : [...names].sort((a, b) => {
+                        const priorityA = sort == "Paid" ? priorityPaid[a.status] : sort == "Pending" ? priorityPending[a.status] : priorityOverdue[a.status];
+                        const priorityB = sort == "Paid" ? priorityPaid[b.status] : sort == "Pending" ? priorityPending[b.status] : priorityOverdue[b.status];
+                        return priorityB - priorityA;
+                    })).map((text, index) => <TenantBox key={index} id={text.id} name={text.name} email={text.email} phone={text.phone} role_id={text.role_id} 
                     apartment_id = {text.id_2} apartment={text.name_2} rent={text.price} status={text.status} renting_id={text.renting_id}
-                    evict={evict} changeRent={changeRent} changeApartment={changeApartment}
-                    apartments={apartaments}/>)}
+                    evict={evict} changeRent={changeRent} changeApartment={changeApartment} viewPayments={viewPayments}
+                    apartments={apartaments}/>)
+                    :<h1>No tenants</h1>}
                 </main>
             );
         }

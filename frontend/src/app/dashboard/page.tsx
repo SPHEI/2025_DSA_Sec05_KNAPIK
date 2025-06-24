@@ -20,7 +20,7 @@ function Dashboard() {
     const [requests, setRequests] = useState([{id: -1, title : '',description: '', date_reported: '', status_id: -1, apartment_id: -1, name: ''}])
     const [repairs, setRepairs] = useState([{id: -1, title: '', fault_report_id: -1, date_assigned: '', date_completed: '', status_id: -1, subcontractor_id: -1, name: ''}])
 
-    const [payments, setPayments] = useState([{id: -1, amount: -1, payment_date: '', due_date: '', status_id: -1, renting_id: -1, transaction_reference: ''}])
+    const [payments, setPayments] = useState([{id: -1, amount: -1, payment_date: '', due_date: '', status_id: -1, renting_id: -1, transaction_reference: '', name: ''}])
 
     const router = useRouter();
     const pathname = usePathname();
@@ -56,8 +56,8 @@ function Dashboard() {
                         else
                         {
                             const sorted = [...data5].sort((a, b) => {
-                                const dateA = new Date(a.due_date).getTime();
-                                const dateB = new Date(b.due_date).getTime();
+                                const dateA = new Date(a.date_completed).getTime();
+                                const dateB = new Date(b.date_completed).getTime();
                                 return dateB - dateA;
                             });
 
@@ -145,6 +145,7 @@ function Dashboard() {
         }
         setReady(true);
     }
+
     if(ready)
     {
         if(error == 'none')
@@ -198,8 +199,8 @@ function Dashboard() {
                             <div className="white-box h-[150px] w-[100%]">
                                 <div className="flex flex-col items-center justify-center">
                                         <img src={wrench.src} width={40} />
-                                        <b>{userInfo.role_id === 1 ? "Requests" : userInfo.role_id === 2 ? "My Requests" : "Assigned Repairs"}</b>
-                                        <h1>{userInfo.role_id != 3 ? requests.length : repairs.length}</h1>
+                                        <b>{userInfo.role_id === 1 ? "Open Requests" : userInfo.role_id === 2 ? "My Requests" : "Assigned Repairs"}</b>
+                                        <h1>{userInfo.role_id != 3 ? requests.filter(a => a.status_id != 2).length : repairs.filter(a => a.status_id != 3).length}</h1>
                                 </div>
                             </div>
                         </button>
@@ -210,10 +211,11 @@ function Dashboard() {
                                         <img src={calendar.src} width={40} />
                                         <b>Next Rent Due</b>
                                         <h1>{
+                                            payments.filter(a => a.status_id != 2).length > 0 ?
                                             payments.filter(a => a.status_id != 2)
                                             .map(p => p.due_date)
                                             .reduce((earliest, current) => {return new Date(current.split("T")[0]) < new Date(earliest.split("T")[0]) ? current : earliest;},"3000-01-01")
-                                            .split("T")[0]
+                                            .split("T")[0] : "-"
                                         }</h1>
                                     </div>
                                 </div>
@@ -225,11 +227,11 @@ function Dashboard() {
                             <div className="flex flex-col items-left justify-start w-full h-full gap-2">
                                 <b className="text-xl">Recent Payments</b>
                                 <div className="flex flex-col gap-1">
-                                    {payments.filter(a=>a.status_id == 2).slice(0,4).map((a, index) => 
+                                    {payments.filter((a) => a.status_id == 2).slice(0,4).map((a, index) => 
                                     <PaymentBox 
                                     key={index}
                                     date={"Due: " + a.due_date.split("T")[0]}  
-                                    name={userInfo.role_id === 1 ? "Renting Id: " + (a.renting_id) : ""} 
+                                    name={userInfo.role_id === 1 ? "Tenant: " + a.name : ""} 
                                     type={"Paid on: " + a.payment_date.split("T")[0]} 
                                     amount={a.amount} />)}
                                 </div>

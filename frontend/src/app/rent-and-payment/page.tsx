@@ -13,10 +13,18 @@ function RentAndPayment() {
   const [error, setError] = useState("none");
   const pathname = usePathname();
 
-  const [payments, setPayments] = useState([{id: -1, amount: -1, payment_date: '', due_date: '', status_id: -1, renting_id: -1, transaction_reference: ''}])
-  const [names,setNames] = useState([{id: -1, name: '', email: '', phone: '', role_id: -1}])
+  const [payments, setPayments] = useState([{id: -1, amount: -1, payment_date: '', due_date: '', status_id: -1, renting_id: -1, transaction_reference: '', name: ''}])
+
+  const [names, setNames] = useState(['None'])
 
   const [role, setRole] = useState('')
+
+  const router = useRouter();
+
+  const [sort, setSort] = useState('Newest')
+  const [sort2, setSort2] = useState('Newest')
+
+  const [filter, setFilter] = useState('None')
 
   useEffect(() => {
         refresh()
@@ -33,7 +41,7 @@ function RentAndPayment() {
               await fetch('http://localhost:8080/test')
               const res = await fetch('http://localhost:8080/payments/list?token=' + t)
               const data = await res.json();
-              alert(JSON.stringify(data))
+              //alert(JSON.stringify(data))
               if(data != null)
               {
                 if(data.message)
@@ -49,25 +57,22 @@ function RentAndPayment() {
                     });
 
                     setPayments(sorted);
+
+                    const set = new Set(sorted.map(a => a.name))
+                    set.add("None")
+
+                    setNames(Array.from(set).reverse())
+                    var s = Cookies.get("tFilter");
+                    if(s != null)
+                    {
+                        setFilter(s)
+                        Cookies.remove("tFilter")
+                    }
                 }
               }
               else
               {
                 setPayments([])
-              }
-              if(a === "1")
-              {
-                const res2 = await fetch('http://localhost:8080/tenant/list?token=' + t)
-                const data2 = await res2.json();
-                //alert(JSON.stringify(data2));
-                if(data2.message)
-                {
-                  setError(data2.message)
-                }
-                else
-                {
-                  setNames(data2)
-                }
               }
           }catch(err: any){
               setError(err.message);
@@ -116,6 +121,11 @@ function RentAndPayment() {
     return date < now
   }
 
+  function countUnique(array: string[])
+  {
+    return new Set(array).size
+  }
+
   if (ready) {
     if (error == "none") {
       return (
@@ -138,15 +148,17 @@ function RentAndPayment() {
               </div>
               }
               {role === "1" &&
-              <div className="flex flex-col items-center justify-center">
-                <img src={card.src} width={40} />
+              <button className="cursor-pointer h-[100%] w-[100%]" onClick={() => {Cookies.set("tSort", "Overdue");router.push("/tenants")}}>
+                <div className="flex flex-col items-center justify-center">
+                  <img src={card.src} width={40} />
+                  
+                  <b>Overdue Tenants</b>
+                  <h1>{
+                    countUnique(payments.filter(a => a.status_id == 3).map(a => a.name))
+                  }</h1>
                 
-                <b>Overdue Payments</b>
-                <h1>{
-                  payments.filter(a => a.status_id == 3).length
-                }</h1>
-              
-              </div>
+                </div>
+              </button>
               }
             </div>
             {role === "2" && payments.filter(a => a.status_id != 2).length > 0 &&
@@ -165,25 +177,69 @@ function RentAndPayment() {
             }
           </div>
           <div className="white-box w-[50%] py-4">
+            <div className="flex flex-row gap-1">
+              <h1 className="text-xl">Tenant Filter:</h1>
+              <select className="input-box w-[50%]" value={filter} onChange={(a) => {setFilter(a.target.value)}}>
+                  {names.map((a, index) => (<option key={index} value={a}>{a}</option>))}
+              </select>
+            </div>
+          </div>
+          <div className="white-box w-[50%] py-4">
             <div className="flex flex-col items-left justify-start w-full h-full gap-2">
               <b className="text-xl">Pending Payments</b>
+              <div className="flex flex-row gap-1 min-w-[300px]">
+                <h1 className="text-xl">Sort:</h1>
+                <select className="input-box w-[25%]" value={sort} onChange={(a) => {setSort(a.target.value)}}>
+                    <option value="Newest">Newest</option>
+                    <option value="Oldest">Oldest</option>
+                    <option value="High">Highest Amount</option>
+                    <option value="Low">Lowest Amount</option>
+                    <option value="Overdue">Overdue</option>
+                </select>
+              </div>
               <div className="flex flex-col gap-1">
-                {payments.map((a,index) => a.status_id != 2 && (
+                {(sort == 'Newest' ? payments : sort == "Oldest" ? [...payments].reverse() : [...payments].sort((a, b) => {
+                        if(sort == "Overdue")
+                        {
+                          const priorityA = a.status_id == 3 ? 1 : 0
+                          const priorityB = b.status_id == 3 ? 1 : 0
+                          return priorityB - priorityA;
+                        }
+                        else
+                        {
+                          const priorityA = a.amount 
+                          const priorityB = b.amount
+                          return sort == "High" ? priorityB - priorityA : priorityA - priorityB;
+                        }
+                  })).filter((a) => filter == "None" || a.name == filter).map((a,index) => a.status_id != 2 && (
                   <div key={index} className="flex flex-row">
                     <PaymentBox 
                     date={"Due: " + a.due_date.split("T")[0]} 
-                    name={role === "1" ? "Renting Id: " + (a.renting_id)  : ""} 
+                    name={role === "1" ? "Tenant: " + a.name  : ""} 
                     type={isOverdue(a.due_date) ? "Overdue" : ""} 
                     amount={a.amount} /> 
                     {role === "2" && <button className="black-button" onClick={()=>{pay(a.id)}}>Pay</button>}
                   </div>))}
               </div>
               <b className="text-xl">Payment history</b>
+              <div className="flex flex-row gap-1 min-w-[300px]">
+                <h1 className="text-xl">Sort:</h1>
+                <select className="input-box w-[25%]" value={sort2} onChange={(a) => {setSort2(a.target.value)}}>
+                    <option value="Newest">Newest</option>
+                    <option value="Oldest">Oldest</option>
+                    <option value="High">Highest Amount</option>
+                    <option value="Low">Lowest Amount</option>
+                </select>
+              </div>
               <div className="flex flex-col gap-1">
-                {payments.map((a,index) => a.status_id == 2 && 
+                {(sort2 == 'Newest' ? payments : sort2 == "Oldest" ? [...payments].reverse() : [...payments].sort((a, b) => {
+                      const priorityA = a.amount 
+                      const priorityB = b.amount
+                      return sort2 == "High" ? priorityB - priorityA : priorityA - priorityB;
+                  })).filter((a) => filter == "None" || a.name == filter).map((a,index) => a.status_id == 2 && 
                 <PaymentBox key={index}  
                 date={"Due: " + a.due_date.split("T")[0]}  
-                name={role === "1" ? "Renting Id: " + (a.renting_id) : ""} 
+                name={role === "1" ? "Tenant: " + a.name : ""} 
                 type={"Paid on: " + a.payment_date.split("T")[0]} 
                 amount={a.amount} />)}
               </div>

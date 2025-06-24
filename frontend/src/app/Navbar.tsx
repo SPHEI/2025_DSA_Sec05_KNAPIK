@@ -60,13 +60,13 @@ function Navbar() {
         router.push("/login")
     }
 
-    function DebugNextUser()
-    {
-        if      (userType == "tenant") {setUserType("admin")}
-        else if (userType == "admin") {setUserType("subcontractor")}
-        else if (userType == "subcontractor") {setUserType("not logged in")}
-        else {setUserType("tenant")}
-    }
+    // function DebugNextUser()
+    // {
+    //     if      (userType == "tenant") {setUserType("admin")}
+    //     else if (userType == "admin") {setUserType("subcontractor")}
+    //     else if (userType == "subcontractor") {setUserType("not logged in")}
+    //     else {setUserType("tenant")}
+    // }
 
     const button =          "h-[35px] px-2 cursor-pointer text-[var(--text)] tracking-wide transition-colors duration-200 rounded-lg hover:bg-[#c0c0c0] active:bg-[#a0a0a0] bg-transparent text-shadow-md "
     const buttonSelected = " h-[35px] px-2 cursor-pointer text-[var(--text)] tracking-wide transition-colors duration-200 rounded-lg bg-[var(--navbutton)] shadow-md"
@@ -77,7 +77,7 @@ function Navbar() {
             <nav className="h-[80px] px-4 py-5 bg-[var(--borders)] top-0 w-full shadow-md flex justify-between z-50">
                 <div className="flex gap-1">
                     <img className="cursor-pointer" src={logo.src} width={150} onClick={() => router.push("/")}/>
-                    <button onClick={DebugNextUser}><b>{userType}</b></button>
+                    {/* <button onClick={DebugNextUser}><b>{userType}</b></button> */}
                 </div>
                 {
                     currentPage != "login" ?

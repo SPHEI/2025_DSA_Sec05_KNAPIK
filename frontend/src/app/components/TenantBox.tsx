@@ -12,6 +12,7 @@ interface TenantProps {
     rent: string
     status: string
     evict: Function
+    viewPayments: Function
     renting_id: number
 
     changeRent: (id: number, newRent: number) => void;
@@ -76,6 +77,7 @@ function TenantBox(props : TenantProps)
                     <div className="flex flex-col w-[160px] gap-2">
                         <div></div>
                         <button className="black-button" onClick={()=>{setShowChange(true)}}>{props.apartment != '' ? "Change Apartment" : "Assign Apartment"}</button>
+                        <button className="black-button" onClick={()=>{props.viewPayments(props.name)}}>View Payments</button>
                         {props.apartment != '' && <button className="black-button" onClick={()=>{setShowChange2(true)}}>Change Rent</button>}
                         {props.apartment != '' && <button className="black-button" onClick={()=>{setShowEvict(true)}}>Evict</button>}
                     </div>

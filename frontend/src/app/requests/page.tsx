@@ -17,6 +17,8 @@ function Requests() {
   const [role, setRole] = useState('')
   const pathname = usePathname();
   const [subcontractors, setSubcontractors] = useState([{id: -1, user_id: -1, address: '', nip: '', speciality_id: -1, name: ''}])
+
+  const [sort, setSort] = useState('None')
   
 
   function mapRepairsToRequest(faultID: number)
@@ -251,6 +253,12 @@ function Requests() {
           refresh()
   }
 
+  const priorityInProgress: Record<number, number> = {
+        3 : 2,
+        2:  3,
+        1 : 1,
+    };
+
   if (ready) {
     if (error == "none") {
       if(role == "3")
@@ -259,9 +267,22 @@ function Requests() {
           <main>
             <div className="page-head w-[50%] min-w-[500px]">
               <b className="text-4xl">Assigned Repairs</b>
+              <div className="flex flex-row gap-1">
+                <h1 className="text-2xl">Sort:</h1>
+                <select className="input-box w-[70%]" value={sort} onChange={(a) => {setSort(a.target.value)}}>
+                    <option value="None">None</option>
+                    <option value="Completed">Completed</option>
+                    <option value="In-Progress">In-Progress</option>
+                    <option value="Pending">Pending</option>
+                </select>
+              </div>
             </div>
             <div className="flex flex-col w-[50%] gap-5">
-              {repairs.length > 0 ? repairs.map((a, index) => <RepairBox
+              {repairs.length > 0 ? (sort == 'None' ? repairs : [...repairs].sort((a, b) => {
+                  const priorityA = sort == "Completed" ? a.status_id : sort == "Pending" ? 4 - a.status_id : priorityInProgress[a.status_id];
+                  const priorityB = sort == "Completed" ? b.status_id : sort == "Pending" ? 4 - b.status_id : priorityInProgress[b.status_id];
+                  return priorityB - priorityA;
+              })).map((a, index) => <RepairBox
               key={index} id={a.id} title={a.title} assigned_date={a.date_assigned} completed_date={a.date_completed} status={a.status_id} 
               subcontractor={a.name} subcontractors={subcontractors}
               changeRepairSubcon={changeRepairSubcon} changeRepairStatus={changeRepairStatus}/>)
@@ -277,8 +298,20 @@ function Requests() {
           <main>
             <div className="page-head w-[50%] min-w-[500px]">
               <b className="text-4xl">My requests</b>
+              <div className="flex flex-row gap-1">
+                <h1 className="text-2xl">Sort:</h1>
+                <select className="input-box w-[100%]" value={sort} onChange={(a) => {setSort(a.target.value)}}>
+                    <option value="None">None</option>
+                    <option value="Open">Open</option>
+                    <option value="Closed">Closed</option>
+                </select>
+              </div>
             </div>
-            {requests.length > 0  ? requests.map((a, index) => <RequestBox 
+            {requests.length > 0  ? (sort == 'None' ? requests : [...requests].sort((a, b) => {
+              const priorityA = a.status_id;
+              const priorityB = b.status_id;
+              return sort == 'Open' ? priorityA - priorityB : priorityB - priorityA;
+            })).map((a, index) => <RequestBox 
             key={index} id={a.id} title={a.title}description={a.description} date={a.date_reported} status={a.status_id}
             apartment_id={a.apartment_id} name={a.name} repairs={mapRepairsToRequest(a.id)} 
             changeRepairSubcon={changeRepairSubcon} changeRepairStatus={changeRepairStatus}

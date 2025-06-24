@@ -48,6 +48,15 @@ useEffect(() => {
         }
     },[pathname])
 
+    const [sort, setSort] = useState('None')
+
+
+    const priorityInProgress: Record<number, number> = {
+        3 : 2,
+        2:  3,
+        1 : 1,
+    };
+    
 
   const line = "flex flex-row gap-1";
   return (
@@ -77,21 +86,31 @@ useEffect(() => {
                           <button className="black-button"onClick={() => props.changeFaultStatus(props.status, props.id)}>
                             {props.status == 1 ? "Close Request" : "Reopen Request"}
                           </button>
-                          <div className="page-head w-full flex items-center justify-between mt-6">
+                          <div className="page-head w-full flex items-center gap-2 justify-between mt-6">
                             <b className="text-4xl">Associated Repairs:</b>
+                            <h1 className="text-2xl">Sort:</h1>
+                            <select className="input-box w-[25%]" value={sort} onChange={(a) => {setSort(a.target.value)}}>
+                                <option value="None">None</option>
+                                <option value="Completed">Completed</option>
+                                <option value="In-Progress">In-Progress</option>
+                                <option value="Pending">Pending</option>
+                            </select>
                             {role === "1" && (
-                              <button className="black-button w-[50%]"onClick={() => setShowPopup2(true)}>+ Add Repair</button>
+                              <button className="black-button w-[30%]"onClick={() => setShowPopup2(true)}>+ Add Repair</button>
                             )}
                           </div>
-                          {props.repairs?.length ? (
-                            props.repairs.map((a, index) => (
+                          {props.repairs.length > 0 ? (sort == 'None' ? props.repairs : [...props.repairs].sort((a, b) => {
+                                const priorityA = sort == "Completed" ? a.StatusID : sort == "Pending" ? 4 - a.StatusID : priorityInProgress[a.StatusID];
+                                const priorityB = sort == "Completed" ? b.StatusID : sort == "Pending" ? 4 - b.StatusID : priorityInProgress[b.StatusID];
+                                return priorityB - priorityA;
+                            })).map((a, index) => (
                               <RepairBox key={index} id={a.ID} title={a.Title}
                                 assigned_date={a.DateAssigned} completed_date={a.DateCompleted}
                                 status={a.StatusID}
                                 subcontractor={a.Subcontractor} subcontractors={props.subcontractors}
                                 changeRepairSubcon={props.changeRepairSubcon} changeRepairStatus={props.changeRepairStatus}
                               />
-                            ))) : (<h1>No Repairs</h1>)}
+                            )) : (<h1>No Repairs</h1>)}
                         </div>
                       </div>
                     </div>

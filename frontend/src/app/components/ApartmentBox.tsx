@@ -42,7 +42,7 @@ function ApartmentBox(props : ApartmentProps)
                     <h1>Building Number: {props.building_number}</h1>
                     <h1>Building Name: {props.building_name}</h1>
                     <h1>Flat Number: {props.flat_number}</h1>
-                    {props.price != -1 ? <h1>Rent: {props.price}</h1> : <h1>Rent: Not Set</h1>}
+                    {props.price > 0  ? <h1>Rent: {props.price}</h1> : <h1>Rent: Not Set</h1>}
                 </div>
                 <button className="black-button" onClick={()=>{setShowPopup(true)}}>Change Rent</button>
             </div>
